@@ -29,7 +29,7 @@
         <?php endif; ?>
     </header><!-- .entry-header -->
 
-    <?php //milliondollartheme_post_thumbnail(); // We'll enable this later ?>
+    <?php milliondollartheme_post_thumbnail(); // We'll enable this later ?>
 
     <div class="entry-content">
         <?php
@@ -54,7 +54,7 @@
     </div><!-- .entry-content -->
 
     <footer class="entry-footer">
-        <?php // milliondollartheme_entry_footer(); // We'll enable this later ?>
+        <?php milliondollartheme_entry_footer(); // We'll enable this later ?>
     </footer><!-- .entry-footer -->
 </article><!-- #post-<?php the_ID(); ?> -->
 EOF
