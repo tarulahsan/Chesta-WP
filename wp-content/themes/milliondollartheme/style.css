@@ -717,6 +717,259 @@ a.skip-link:focus {
     color: var(--text-color-light);
 }
 
+/* --- Responsive Layout for Main Content & Sidebar (Phase 2, Step 5.3) --- */
+.main-content-area-wrapper {
+    display: flex;
+    flex-wrap: wrap; /* Allow sidebar to wrap below on smaller screens if not handled by media query */
+    gap: var(--spacing-lg); /* Gap between main content and sidebar */
+    /* Assuming .site-content is the parent setting max-width and centering */
+}
+
+/* Assuming #primary is the main content area */
+/* In our templates, #primary is the <main> tag */
+#primary.site-main {
+    flex: 1; /* Allow main content to grow */
+    min-width: 0; /* Prevent flexbox overflow issues with long content */
+    /* Example: calculate width if sidebar has fixed width:
+       flex-basis: calc(100% - 300px - var(--spacing-lg)); approx 70-75% */
+}
+
+/* Assuming #secondary is the sidebar <aside> tag */
+#secondary.widget-area {
+    flex-basis: 280px; /* Fixed width for sidebar, adjust as needed */
+    flex-shrink: 0; /* Prevent sidebar from shrinking */
+    /* Ensure its own padding is respected, from previous step */
+}
+
+/* Responsive adjustments for main content and sidebar */
+/* Tablet & Smaller */
+@media (max-width: 1023px) {
+    /* Keep the two-column layout for tablets for now, adjust if needed */
+    /* If stacking on tablets:
+    .main-content-area-wrapper {
+        flex-direction: column;
+    }
+    #secondary.widget-area {
+        flex-basis: auto; /* Allow sidebar to take full width when stacked */
+        width: 100%;
+        margin-top: var(--spacing-lg);
+    }
+    */
+}
+
+/* Mobile Only */
+@media (max-width: 767px) {
+    .main-content-area-wrapper {
+        flex-direction: column;
+    }
+
+    #primary.site-main {
+        flex-basis: auto; /* Full width */
+    }
+
+    #secondary.widget-area {
+        flex-basis: auto; /* Full width */
+        width: 100%;
+        margin-top: var(--spacing-lg);
+        padding: var(--spacing-md); /* Potentially reduce padding on mobile for sidebar */
+    }
+
+    /* Adjust padding for widgets on mobile if .widget-area padding is reduced */
+    #secondary.widget-area .widget {
+        padding: var(--spacing-md);
+    }
+}
+
+/* --- Responsive Design (Phase 2, Step 5) --- */
+
+/* x-cloak utility for Alpine.js to prevent flash of unstyled content */
+[x-cloak] { display: none !important; }
+
+/* Basic Mobile First Reset for Navigation if needed */
+.main-navigation ul {
+    /* Desktop styles are flex. On mobile, we might want them block. */
+}
+
+/* Tablet & Mobile */
+@media (max-width: 1023px) {
+    .site-header {
+        /* Potentially adjust padding for tablets */
+        padding: var(--spacing-sm) var(--spacing-md);
+    }
+
+    .main-navigation ul {
+        /* Desktop: display: flex; */
+        /* On tablet, maybe still flex but allow wrapping more aggressively or start stacking */
+    }
+    .widget-area {
+        /* Example: if sidebar is floated or in grid, make it full width */
+        /* width: 100%; */
+        /* margin-left: 0; */
+        /* This will depend heavily on the chosen desktop layout (e.g. flex, grid for main content + sidebar) */
+    }
+}
+
+
+/* Mobile Only (styles for screens <= 767px) */
+@media (max-width: 767px) {
+    .site-header {
+        flex-direction: column; /* Stack branding and nav toggle */
+        align-items: flex-start; /* Align items to the start */
+        position: relative; /* If menu is absolute, header can be relative */
+    }
+
+    .site-branding {
+        margin-bottom: var(--spacing-sm); /* Space between branding and toggle */
+        width: 100%; /* Allow branding to take full width if needed */
+        justify-content: space-between; /* Puts logo left, (optional) site title center/left, and toggle effectively right if toggle is moved into branding */
+                                      /* For now, toggle is separate */
+    }
+
+    .site-header .main-navigation {
+      width: 100%; /* Navigation container takes full width */
+    }
+
+
+    .menu-toggle {
+        display: inline-flex; /* Show the toggle button */
+        align-items:center;
+        justify-content:center;
+        padding: var(--spacing-sm);
+        min-height: 44px; /* Accessibility for touch targets */
+        min-width: 44px;
+    }
+
+    .menu-toggle .sr-only { /* Screen reader only text for button meaning */
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0,0,0,0);
+        white-space: nowrap;
+        border-width: 0;
+    }
+
+    .burger-icon {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        width: 24px; /* Size of the burger icon */
+        height: 18px; /* Size of the burger icon */
+    }
+    .burger-icon .line {
+        display: block;
+        height: 2px; /* Thickness of burger lines */
+        width: 100%;
+        background-color: var(--text-color-light); /* Color of burger lines */
+        border-radius: 1px;
+    }
+    .close-icon {
+        font-size: 24px; /* Size of X */
+        line-height: 1;
+        color: var(--text-color-light);
+    }
+
+
+    .main-navigation ul { /* This is the ul inside .primary-menu-container */
+        display: none; /* Hide desktop menu by default on mobile if not controlled by x-show on ul itself */
+        flex-direction: column; /* Stack menu items vertically */
+        width: 100%;
+        background: var(--primary-color); /* Or a glass effect for mobile menu */
+        padding: var(--spacing-sm) 0;
+        position: absolute; /* Position it relative to .main-navigation or .site-header */
+        top: 100%; /* Position below the button/header area */
+        left: 0;
+        right: 0;
+        z-index: 999; /* Ensure it's above other content */
+        box-shadow: var(--glass-box-shadow);
+
+        /* If using x-show on the .primary-menu-container, these ul styles are for when it's shown */
+        /* background: var(--glass-bg-color); For consistency */
+        /* backdrop-filter: blur(var(--glass-blur-radius)); */
+        /* -webkit-backdrop-filter: blur(var(--glass-blur-radius)); */
+        /* border-top: 1px solid var(--glass-border-color); */
+    }
+
+    .main-navigation.mobile-menu-open ul {
+        /* This class is toggled by Alpine on the nav element.
+           If x-show is on the .primary-menu-container, this might not be needed.
+           If x-show is on the ul itself, then display:flex/block would be managed by Alpine.
+           The .primary-menu-container with x-show is preferred.
+        */
+    }
+
+    .primary-menu-container { /* This is the div we wrapped around wp_nav_menu */
+      /* Styles for when it's shown by x-show */
+      /* These are applied when 'open' is true */
+      background: var(--primary-color); /* Darker, more solid for mobile dropdown */
+      border-top: 1px solid var(--accent-color);
+      width: 100%;
+      position: absolute;
+      top: 100%; /* Position below the menu toggle button, assuming button is at bottom of header content */
+      left:0;
+      right:0;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+
+    .primary-menu-container ul { /* The actual ul from wp_nav_menu */
+        display: flex; /* Overriding any default from WordPress if needed */
+        flex-direction: column;
+        width: 100%;
+    }
+
+
+    .main-navigation li {
+        margin: 0; /* Reset horizontal margins */
+        width: 100%; /* Full width list items */
+    }
+
+    .main-navigation a {
+        padding: var(--spacing-md); /* Larger tap targets */
+        border-bottom: 1px solid rgba(255,255,255,0.1); /* Separator for mobile links */
+        color: var(--text-color-light); /* Ensure text is light on primary color bg */
+        border-radius: 0; /* No individual radius for mobile menu items */
+    }
+    .main-navigation a:hover {
+        background-color: var(--accent-color); /* Accent hover for mobile */
+    }
+
+    .main-navigation ul ul.sub-menu {
+        position: static; /* Reset absolute positioning for sub-menus */
+        width: 100%;
+        padding-left: var(--spacing-md); /* Indent sub-menu items */
+        box-shadow: none;
+        border-radius: 0;
+        background-color: rgba(0,0,0,0.1); /* Slightly darker bg for sub-menus */
+        border: none;
+    }
+    .main-navigation ul ul.sub-menu a {
+        color: var(--text-color-light); /* Ensure sub-menu links are also light */
+    }
+
+    /* General layout adjustments */
+    .site-content {
+        padding: 0 var(--spacing-sm); /* Less padding on mobile */
+    }
+
+    article.post, article.page {
+        padding: var(--spacing-md); /* Less padding inside articles on mobile */
+    }
+
+    h1 { font-size: 2em; }
+    h2 { font-size: 1.7em; }
+    h3 { font-size: 1.4em; }
+
+    /* Hide sidebar or stack it */
+    /* This requires that main content area and sidebar are in a flex/grid container */
+    /* For example:
+    .content-area { width: 100%; }
+    .widget-area { display: none; } // or width: 100%; margin-left: 0; margin-top: var(--spacing-lg);
+    */
+
+} /* End @media (max-width: 767px) */
+
 /* --- Comments Section Styling (Phase 2, Step 4.6) --- */
 .comments-area {
     margin-top: var(--spacing-xl);
