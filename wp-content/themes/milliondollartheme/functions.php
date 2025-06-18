@@ -140,6 +140,12 @@ add_action( 'widgets_init', 'milliondollartheme_widgets_init' );
  * Enqueue scripts and styles.
  */
 function milliondollartheme_scripts() {
+    // Enqueue Google Fonts
+    wp_enqueue_style( 'milliondollartheme-google-fonts', 'https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&family=Inter:wght@400;700&display=swap', array(), null );
+
+    // Enqueue Alpine.js from CDN, defer loading
+    wp_enqueue_script( 'alpinejs', 'https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js', array(), MILLIONDOLLARTHEME_VERSION, true ); // true for in_footer
+
     wp_enqueue_style( 'milliondollartheme-style', get_stylesheet_uri(), array(), MILLIONDOLLARTHEME_VERSION );
     wp_style_add_data( 'milliondollartheme-style', 'rtl', 'replace' );
 
@@ -175,5 +181,16 @@ require get_template_directory() . '/inc/customizer.php';
 if ( defined( 'JETPACK__VERSION' ) ) {
     require get_template_directory() . '/inc/jetpack.php';
 }
+
+/**
+ * Add defer attribute to the Alpine.js script tag.
+ */
+function milliondollartheme_add_defer_to_alpinejs( $tag, $handle, $src ) {
+    if ( 'alpinejs' === $handle ) {
+        $tag = str_replace( ' src=', ' defer src=', $tag );
+    }
+    return $tag;
+}
+add_filter( 'script_loader_tag', 'milliondollartheme_add_defer_to_alpinejs', 10, 3 );
 
 EOF
