@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps, RichText, InspectorControls, InnerBlocks } from '@wordpress/block-editor';
 import { PanelBody, TextControl, ToggleControl, SelectControl, Button, Icon } from '@wordpress/components';
-import { useState } from '@wordpress/element'; // For editor interactivity
+import { useState, useEffect } from '@wordpress/element'; // For editor interactivity
 import { v4 as uuidv4 } from 'uuid'; // For unique IDs for items
 
 /**
@@ -17,7 +17,7 @@ import './index.css';
 
 const { name, title, attributes } = metadata;
 
-const AccordionItem = ({ title, content, id, isOpen, onClick, onUpdateTitle, onUpdateContent, onRemove, titleTag }) => {
+const AccordionItem = ({ title, content, id, isOpen, onClick, onUpdateTitle, onUpdateContent, onRemove, titleTag, iconSet }) => {
     const TitleTag = titleTag || 'h4';
     return (
         <div className="accordion-item-editor">
@@ -29,7 +29,11 @@ const AccordionItem = ({ title, content, id, isOpen, onClick, onUpdateTitle, onU
                     onChange={onUpdateTitle}
                     placeholder={__('Accordion Title', 'milliondollartheme')}
                 />
-                <span className="accordion-icon-editor">{isOpen ? '[-]' : '[+]'}</span>
+                <span className={`accordion-icon-editor icon-set-${iconSet}`}>
+                    {iconSet === 'plus-minus' && (isOpen ? '[-]' : '[+]') }
+                    {iconSet === 'chevron' && (isOpen ? '▲' : '▼') }
+                    {/* iconSet === 'none' will render nothing here or be hidden by CSS */}
+                </span>
             </div>
             {isOpen && (
                 <div className="accordion-content-editor">
@@ -56,23 +60,24 @@ registerBlockType(name, {
     attributes: attributes,
 
     edit: ({ attributes, setAttributes }) => {
-        const { items, openMultiple, defaultOpenIndex, accordionStyle, iconSet, titleTag } = attributes;
+        const {
+            items, openMultiple, defaultOpenIndex, accordionStyle, iconSet, titleTag,
+            titleColor, titleBgColor, contentBgColor, borderColor, borderRadius
+        } = attributes;
+
         const blockProps = useBlockProps({
             className: `is-style-${accordionStyle} icon-set-${iconSet}`
         });
 
-        // Editor-only state for which items are open
         const [openItems, setOpenItems] = useState(() => {
             if (openMultiple) {
-                // If multiple can be open, defaultOpenIndex might be an array or string of indices
-                // For simplicity now, only one defaultOpenIndex is handled
                 const initialOpen = {};
-                if (defaultOpenIndex >= 0 && items[defaultOpenIndex]) {
+                if (defaultOpenIndex >= 0 && items[defaultOpenIndex] && items[defaultOpenIndex].id) {
                     initialOpen[items[defaultOpenIndex].id] = true;
                 }
                 return initialOpen;
             }
-            return defaultOpenIndex >= 0 && items[defaultOpenIndex] ? items[defaultOpenIndex].id : null;
+            return defaultOpenIndex >= 0 && items[defaultOpenIndex] && items[defaultOpenIndex].id ? items[defaultOpenIndex].id : null;
         });
 
         const toggleItem = (itemId) => {
@@ -110,7 +115,6 @@ registerBlockType(name, {
                             checked={!!openMultiple}
                             onChange={() => setAttributes({ openMultiple: !openMultiple })}
                         />
-                        {/* Default Open Index might be complex if items are reordered, using ID might be better */}
                         <TextControl
                             label={__('Default Open Item Index (0-based, -1 for none)', 'milliondollartheme')}
                             type="number"
@@ -137,14 +141,37 @@ registerBlockType(name, {
                             options={[ {label: 'Default', value: 'default'}, {label: 'Glassy', value: 'glassy'}, {label: 'Separated Items', value: 'separated'} ]}
                             onChange={(val) => setAttributes({ accordionStyle: val })}
                         />
-                        {/* TODO: ColorPickers for titleColor, titleBgColor, contentBgColor, borderColor */}
-                        {/* TODO: TextControl for borderRadius */}
+                        <TextControl /* TODO: ColorPalette for titleColor */
+                            label={__('Title Text Color', 'milliondollartheme')}
+                            value={titleColor || ''}
+                            onChange={(val) => setAttributes({ titleColor: val })}
+                        />
+                        <TextControl /* TODO: ColorPalette for titleBgColor */
+                            label={__('Title Background Color', 'milliondollartheme')}
+                            value={titleBgColor || ''}
+                            onChange={(val) => setAttributes({ titleBgColor: val })}
+                        />
+                        <TextControl /* TODO: ColorPalette for contentBgColor */
+                            label={__('Content Background Color', 'milliondollartheme')}
+                            value={contentBgColor || ''}
+                            onChange={(val) => setAttributes({ contentBgColor: val })}
+                        />
+                        <TextControl /* TODO: ColorPalette for borderColor */
+                            label={__('Border Color (for default/separated styles)', 'milliondollartheme')}
+                            value={borderColor || ''}
+                            onChange={(val) => setAttributes({ borderColor: val })}
+                        />
+                        <TextControl
+                            label={__('Border Radius (e.g., 4px, var(--border-radius-sm))', 'milliondollartheme')}
+                            value={borderRadius || ''}
+                            onChange={(val) => setAttributes({ borderRadius: val })}
+                        />
                     </PanelBody>
                 </InspectorControls>
                 <div {...blockProps}>
                     {items.map((item, index) => (
                         <AccordionItem
-                            key={item.id || index} // Use item.id if available and unique
+                            key={item.id || index}
                             id={item.id}
                             title={item.title}
                             content={item.content}
@@ -154,6 +181,7 @@ registerBlockType(name, {
                             onUpdateContent={(newContent) => updateItem(index, 'content', newContent)}
                             onRemove={() => removeItem(index)}
                             titleTag={titleTag}
+                            iconSet={iconSet}
                         />
                     ))}
                     <Button isPrimary onClick={addItem} style={{marginTop: '10px'}}>
@@ -168,7 +196,6 @@ registerBlockType(name, {
         const { items, openMultiple, defaultOpenIndex, accordionStyle, iconSet, titleTag, borderRadius, borderColor, titleBgColor, titleColor, contentBgColor } = attributes;
         const blockProps = useBlockProps.save({
             className: `is-style-${accordionStyle} icon-set-${iconSet}`,
-            // Alpine.js main data store
             'x-data': JSON.stringify({
                 openItems: openMultiple ? {} : (defaultOpenIndex >= 0 && items[defaultOpenIndex] ? items[defaultOpenIndex].id : null),
                 openMultiple: openMultiple,
@@ -201,17 +228,19 @@ registerBlockType(name, {
                         <button
                             type="button"
                             className="accordion-title"
-                            aria-expanded={openMultiple ? `!!openItems['${item.id}']` : `openItems === '${item.id}'`} // x-bind:aria-expanded
+                            // Alpine bindings for aria-expanded and class
+                            x-bind:aria-expanded={openMultiple ? `!!openItems['${item.id}']` : `openItems === '${item.id}'`}
+                            x-bind:class="{'is-active': ${openMultiple ? `!!openItems['${item.id}']` : `openItems === '${item.id}'`}}"
                             aria-controls={`accordion-content-${item.id}`}
                             id={`accordion-title-${item.id}`}
-                            dangerouslySetInnerHTML={{__html: `<${TitleTag} class='accordion-title-text' style='color: ${titleColor || "inherit"};'>${item.title}</${TitleTag}>`}}
                             style={{
                                 backgroundColor: titleBgColor,
-                                // borderRadius applied via CSS for dynamic open/close state
+                                // Dynamic border radius for title button managed by CSS based on .is-active and item position
                             }}
-                            {'@click'}(`toggleItem('${item.id}')`) // Alpine click handler
+                            dangerouslySetInnerHTML={{__html: `<${TitleTag} class='accordion-title-text' style='color: ${titleColor || "inherit"};'>${item.title}</${TitleTag}>`}}
+                            x-on:click={`toggleItem('${item.id}')`}
                         >
-                            {/* Icon will be CSS pseudo-element or inline SVG based on iconSet */}
+                            {/* Icon is handled by CSS pseudo-elements based on .icon-set-* and .is-active */}
                         </button>
                         <div
                             className="accordion-content"
@@ -219,12 +248,13 @@ registerBlockType(name, {
                             role="region"
                             aria-labelledby={`accordion-title-${item.id}`}
                             x-show={openMultiple ? `openItems['${item.id}']` : `openItems === '${item.id}'`}
-                            x-collapse.duration.300ms="" // Alpine collapse plugin
+                            x-collapse.duration.300ms=""
                             style={{
                                 backgroundColor: contentBgColor,
-                                // borderRadius applied via CSS for dynamic open/close state
-                                borderColor: borderColor, // if style needs border on content too
-                                borderTopColor: (borderColor && (accordionStyle === 'default' || accordionStyle === 'glassy')) ? borderColor : 'transparent',
+                                // Dynamic border radius for content managed by CSS
+                                borderColor: (accordionStyle === 'default' || accordionStyle === 'glassy') ? borderColor : undefined, // Only apply top border if needed
+                                borderTopStyle: (accordionStyle === 'default' || accordionStyle === 'glassy') && borderColor ? 'solid' : undefined,
+                                borderTopWidth: (accordionStyle === 'default' || accordionStyle === 'glassy') && borderColor ? '1px' : undefined,
                             }}
                         >
                             <RichText.Content tagName="div" className="accordion-content-inner" value={item.content} />

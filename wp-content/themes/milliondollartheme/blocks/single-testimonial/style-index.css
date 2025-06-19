@@ -1,47 +1,55 @@
 /* --- Single Testimonial Block Styles (style-index.css) --- */
 .wp-block-milliondollartheme-single-testimonial {
     position: relative;
-    transition: transform var(--transition-speed, 0.3s) ease, box-shadow var(--transition-speed, 0.3s) ease;
+    transition: transform var(--transition-speed, 0.3s) ease,
+                box-shadow var(--transition-speed, 0.3s) ease,
+                background-color var(--transition-speed, 0.3s) ease,
+                border-color var(--transition-speed, 0.3s) ease;
+    /* Default padding, borderRadius, backgroundColor, borderColor applied via inline styles from attributes by save() */
+    /* Default text alignment from has-text-align-* class added by WP to wrapper */
 }
-/* WP adds .has-text-align-left, .has-text-align-center, .has-text-align-right to the wrapper */
+
+/* Text Alignment classes from WP */
 .wp-block-milliondollartheme-single-testimonial.has-text-align-left { text-align: left; }
 .wp-block-milliondollartheme-single-testimonial.has-text-align-center { text-align: center; }
 .wp-block-milliondollartheme-single-testimonial.has-text-align-right { text-align: right; }
 
-
 .wp-block-milliondollartheme-single-testimonial:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    transform: translateY(-5px); /* Slightly more lift */
+    box-shadow: 0 12px 30px rgba(var(--primary-color-rgb, 0,82,212), 0.15); /* Theme-colored shadow */
 }
 
 .testimonial-image-wrapper {
     margin-bottom: var(--spacing-md, 16px);
+    line-height: 0; /* Remove any extra space if img is inline-block */
 }
-/* Alignment of image wrapper itself if parent is text-align: center/right */
+/* Alignment of image wrapper itself */
 .wp-block-milliondollartheme-single-testimonial.has-text-align-center .testimonial-image-wrapper {
     display: inline-block; /* Allows text-align to center it */
 }
-.wp-block-milliondollartheme-single-testimonial.has-text-align-right .testimonial-image-wrapper {
-    /* Default block behavior or float: right; if needed, but text-align on parent should handle it for inline-block */
-}
-
-
-.testimonial-image-wrapper img {
-    display: block;
-    max-width: 100px;
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    margin-left: auto; /* For center/right align if wrapper is block */
-    margin-right: auto; /* For center align if wrapper is block */
-}
 .wp-block-milliondollartheme-single-testimonial.has-text-align-left .testimonial-image-wrapper img {
-    margin-left: 0; margin-right: auto;
+    margin-left: 0; margin-right: auto; /* Default for block */
+}
+.wp-block-milliondollartheme-single-testimonial.has-text-align-center .testimonial-image-wrapper img {
+    margin-left: auto; margin-right: auto;
 }
 .wp-block-milliondollartheme-single-testimonial.has-text-align-right .testimonial-image-wrapper img {
     margin-left: auto; margin-right: 0;
 }
 
+
+.testimonial-image-wrapper img {
+    display: block; /* Or inline-block if preferred for centering via text-align on parent */
+    max-width: 100px; /* Default, can be overridden by specific style variations if needed */
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border: 3px solid var(--background-color-light, #fff); /* Default border to lift it from bg */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Subtle shadow for image */
+}
+.wp-block-milliondollartheme-single-testimonial.is-style-glassy .testimonial-image-wrapper img {
+    border-color: var(--glass-border-color, rgba(255,255,255,0.18)); /* Border matches glassy style */
+}
 
 .testimonial-image-wrapper img.is-shape-circle { border-radius: 50%; }
 .testimonial-image-wrapper img.is-shape-rounded-square { border-radius: var(--border-radius-sm, 8px); }
@@ -51,10 +59,38 @@
     margin: 0 0 var(--spacing-md, 16px) 0;
     padding: 0;
     font-style: italic;
-    line-height: 1.6;
+    line-height: 1.7; /* Increased for readability */
     position: relative;
     /* font-size and color applied inline from attributes */
 }
+
+/* Optional: More prominent quote icons */
+.wp-block-milliondollartheme-single-testimonial:not(.is-style-quote-bg) .testimonial-quote::before {
+    content: "\201C"; /* Left double quotation mark */
+    font-family: Georgia, serif; /* More traditional quote font */
+    font-size: 3em; /* Larger quote mark */
+    position: absolute;
+    left: -0.2em;
+    top: -0.3em;
+    opacity: 0.15;
+    color: var(--quote-icon-color, var(--primary-color)); /* Use a CSS var */
+    line-height: 1;
+    z-index: 0;
+}
+.wp-block-milliondollartheme-single-testimonial.has-text-align-center .testimonial-quote::before {
+    left: 50%;
+    transform: translateX(-50%) translateX(-1em); /* Adjust to center better */
+}
+.wp-block-milliondollartheme-single-testimonial.has-text-align-right .testimonial-quote::before {
+    left: auto;
+    right: -0.2em;
+}
+
+
+.testimonial-quote > p:last-of-type { /* If quote is RichText with <p> tags */
+    margin-bottom: 0;
+}
+
 
 .testimonial-author-details {
     margin-bottom: var(--spacing-sm, 8px);
@@ -62,31 +98,46 @@
 
 .testimonial-author-name {
     font-weight: 700;
+    font-family: var(--font-family-heading);
+    font-size: 1.1em; /* Slightly larger */
     margin: 0;
     /* color applied inline */
 }
 
 .testimonial-author-title {
-    font-size: 0.9em;
-    opacity: 0.8;
+    font-size: 0.85em; /* Slightly smaller */
+    opacity: 0.75;
     margin: 0;
     /* color applied inline */
 }
 
 .testimonial-rating {
     line-height: 1;
+    margin-top: var(--spacing-xs);
 }
 .testimonial-rating .dashicons {
     margin-right: 2px;
-    /* font-size and color applied inline by StarRating component */
+    /* font-size and color applied inline by StarRating component's style prop */
 }
 
 /* Block Styles */
 .wp-block-milliondollartheme-single-testimonial.is-style-default {
-    background-color: var(--milliondollartheme-testimonial-default-bg, #f9f9f9); /* Use CSS var for theme customization */
-    border: 1px solid var(--milliondollartheme-testimonial-default-border, #eee);
-    /* padding and borderRadius applied inline */
+    /* background-color and border-color applied inline or default to theme vars */
+    background-color: var(--milliondollartheme-testimonial-default-bg, #f8f9fa); /* Lighter default */
+    border: 1px solid var(--milliondollartheme-testimonial-default-border, #e9ecef);
 }
+
+.wp-block-milliondollartheme-single-testimonial.is-style-outline {
+    background-color: transparent;
+    /* border-color applied inline from attribute */
+    border-width: 2px !important; /* Ensure outline is visible */
+    border-style: solid !important;
+}
+.wp-block-milliondollartheme-single-testimonial.is-style-outline:hover {
+    border-color: var(--accent-color);
+    background-color: rgba(var(--accent-color-rgb, 0,198,173), 0.05); /* Faint bg on hover */
+}
+
 
 .wp-block-milliondollartheme-single-testimonial.is-style-glassy {
     background: var(--glass-bg-color, rgba(255, 255, 255, 0.1));
@@ -94,31 +145,65 @@
     -webkit-backdrop-filter: blur(var(--glass-blur-radius, 10px));
     border: 1px solid var(--glass-border-color, rgba(255, 255, 255, 0.18));
     box-shadow: var(--glass-box-shadow, 0 8px 32px 0 rgba(31, 38, 135, 0.37));
-    /* Text colors should be set via attributes for contrast, or define defaults here if needed */
+    /* Default text colors for glassy style if not overridden by attributes */
 }
 .wp-block-milliondollartheme-single-testimonial.is-style-glassy .testimonial-quote,
 .wp-block-milliondollartheme-single-testimonial.is-style-glassy .testimonial-author-name,
 .wp-block-milliondollartheme-single-testimonial.is-style-glassy .testimonial-author-title {
-    /* color: var(--text-color-light); /* Example default for glassy if not set by attr */
+    /* color: var(--text-color-light); /* Handled by attributes or global theme styles for on-glass text */
+}
+.wp-block-milliondollartheme-single-testimonial.is-style-glassy .testimonial-quote::before {
+    color: var(--quote-icon-color-glassy, var(--text-color-light));
+    opacity: 0.2;
 }
 
 
 .wp-block-milliondollartheme-single-testimonial.is-style-quote-bg .testimonial-quote {
-    background-color: rgba(var(--primary-color-rgb, 0,82,212), 0.05); /* Use CSS var for theme customization */
+    background-color: rgba(var(--primary-color-rgb, 0,82,212), 0.08); /* Slightly more prominent */
     padding: var(--spacing-md, 16px);
     border-radius: var(--border-radius-sm, 8px);
-    border-left: 4px solid var(--primary-color, #0052D4);
+    border-left: 5px solid var(--primary-color, #0052D4); /* Thicker border */
     font-style: normal;
 }
+.wp-block-milliondollartheme-single-testimonial.is-style-quote-bg .testimonial-quote::before {
+    content: none;
+}
+.wp-block-milliondollartheme-single-testimonial.is-style-quote-bg:hover {
+    border-color: var(--primary-color); /* If it has an outer border */
+}
+
+/* Custom style relies on inline styles, but can have a base */
+.wp-block-milliondollartheme-single-testimonial.is-style-custom {
+    /* Base for custom, most styles are inline */
+}
+
 
 /* Responsive */
-@media (max-width: 767px) {
+@media (max-width: 767px) { /* Mobile */
     .wp-block-milliondollartheme-single-testimonial .testimonial-image-wrapper img {
         max-width: 80px;
         width: 80px;
         height: 80px;
     }
+    /* Quote font size should be controlled by attribute, but can have mobile override if necessary */
     .wp-block-milliondollartheme-single-testimonial .testimonial-quote {
-        /* font-size: 1.1em; /* Example, if not responsive attr */
+        /* font-size: 1.1em; /* Example, if not using responsive attributes */
+    }
+    .wp-block-milliondollartheme-single-testimonial .testimonial-quote::before {
+        font-size: 2.5em; /* Adjust if needed */
+    }
+}
+
+@media (max-width: 480px) { /* Smaller Mobile */
+    .wp-block-milliondollartheme-single-testimonial .testimonial-quote {
+        /* font-size: 1em; */
+    }
+     .wp-block-milliondollartheme-single-testimonial .testimonial-quote::before {
+        font-size: 2em;
+        left: -0.1em;
+    }
+    .wp-block-milliondollartheme-single-testimonial.has-text-align-center .testimonial-quote::before {
+        left: 50%;
+        transform: translateX(-50%) translateX(-0.8em); /* Adjust for smaller quote mark */
     }
 }

@@ -37,10 +37,10 @@ registerBlockType(name, {
 
     edit: ({ attributes, setAttributes }) => {
         const {
-            quote, authorName, authorTitle, authorImageUrl, imageShape,
+            quote, authorName, authorTitle, authorImageUrl, authorImageId, imageShape,
             showRating, rating, testimonialStyle, alignment,
             quoteFontSize, quoteColor, authorNameColor, authorTitleColor, starColor,
-            padding, borderRadius, backgroundColor, borderColor
+            backgroundColor, borderColor, borderRadius, padding
         } = attributes;
 
         const blockProps = useBlockProps({
@@ -49,16 +49,15 @@ registerBlockType(name, {
                 padding: padding,
                 borderRadius: borderRadius,
                 backgroundColor: (testimonialStyle === 'default' || testimonialStyle === 'custom') ? backgroundColor : undefined,
-                borderColor: (testimonialStyle === 'custom' /* || testimonialStyle === 'outline' */) ? borderColor : undefined,
-                borderStyle: (testimonialStyle === 'custom' && borderColor) ? 'solid' : undefined,
-                borderWidth: (testimonialStyle === 'custom' && borderColor) ? '1px' : undefined,
+                borderColor: (testimonialStyle === 'custom' || testimonialStyle === 'outline') ? borderColor : undefined,
+                borderStyle: (testimonialStyle === 'custom' && borderColor || testimonialStyle === 'outline') ? 'solid' : undefined,
+                borderWidth: (testimonialStyle === 'custom' && borderColor || testimonialStyle === 'outline') ? '1px' : undefined,
             }
         });
 
         const quoteStyles = { fontSize: quoteFontSize, color: quoteColor };
         const authorNameStyles = { color: authorNameColor };
         const authorTitleStyles = { color: authorTitleColor };
-
 
         return (
             <>
@@ -108,33 +107,33 @@ registerBlockType(name, {
                         {showRating && (
                             <RangeControl label={__('Rating (1-5)', 'milliondollartheme')} value={rating} onChange={(val) => setAttributes({ rating: val })} min={1} max={5} />
                         )}
-                        {showRating && <TextControl /* TODO: ColorPalette */ label={__('Star Color', 'milliondollartheme')} value={starColor} onChange={val => setAttributes({starColor: val})} />}
+                        {showRating && <TextControl /* TODO: Replace with ColorPalette for starColor */ label={__('Star Color', 'milliondollartheme')} value={starColor} onChange={val => setAttributes({starColor: val})} />}
                     </PanelBody>
                     <PanelBody title={__('Styling & Appearance', 'milliondollartheme')}>
                         <SelectControl
                             label={__('Testimonial Style', 'milliondollartheme')}
                             value={testimonialStyle}
-                            options={[{label: 'Glassy', value: 'glassy'}, {label: 'Default', value: 'default'}, {label: 'Quote Background', value: 'quote-bg'}]}
+                            options={[{label: 'Glassy', value: 'glassy'}, {label: 'Default', value: 'default'}, {label: 'Quote Background', value: 'quote-bg'}, {label: 'Outline', value: 'outline'}, {label: 'Custom', value: 'custom'}]}
                             onChange={(val) => setAttributes({ testimonialStyle: val })}
                         />
-                        <FontSizePicker
-                            fontSizes={[ {name: __('Small', 'milliondollartheme'), slug: 'small', size: '1em'}, {name: __('Medium', 'milliondollartheme'), slug: 'medium', size: '1.3em'}, {name: __('Large', 'milliondollartheme'), slug: 'large', size: '1.6em'} ]}
+                        <TextControl /* TODO: Advanced FontSizePicker with units */
+                            label={__('Quote Font Size (e.g., 1.2em, 16px)', 'milliondollartheme')}
                             value={quoteFontSize}
-                            units={['em', 'px', 'rem']}
-                            fallbackFontSize={'1.3em'}
                             onChange={ ( val ) => setAttributes( { quoteFontSize: val } ) }
                         />
-                        <TextControl /* TODO: ColorPalette */ label={__('Quote Color', 'milliondollartheme')} value={quoteColor || ''} onChange={val => setAttributes({quoteColor: val})} />
-                        <TextControl /* TODO: ColorPalette */ label={__('Author Name Color', 'milliondollartheme')} value={authorNameColor || ''} onChange={val => setAttributes({authorNameColor: val})} />
-                        <TextControl /* TODO: ColorPalette */ label={__('Author Title Color', 'milliondollartheme')} value={authorTitleColor || ''} onChange={val => setAttributes({authorTitleColor: val})} />
+                        <TextControl /* TODO: ColorPalette for quoteColor */ label={__('Quote Color', 'milliondollartheme')} value={quoteColor || ''} onChange={val => setAttributes({quoteColor: val})} />
+                        <TextControl /* TODO: ColorPalette for authorNameColor */ label={__('Author Name Color', 'milliondollartheme')} value={authorNameColor || ''} onChange={val => setAttributes({authorNameColor: val})} />
+                        <TextControl /* TODO: ColorPalette for authorTitleColor */ label={__('Author Title Color', 'milliondollartheme')} value={authorTitleColor || ''} onChange={val => setAttributes({authorTitleColor: val})} />
 
-                        {(testimonialStyle === 'default' || testimonialStyle === 'custom') && ( /* Added 'custom' for completeness */
-                            <TextControl /* TODO: ColorPalette */ label={__('Background Color', 'milliondollartheme')} value={backgroundColor || ''} onChange={val => setAttributes({backgroundColor: val})} />
+                        {(testimonialStyle === 'default' || testimonialStyle === 'custom') && (
+                            <TextControl /* TODO: ColorPalette for backgroundColor */ label={__('Background Color', 'milliondollartheme')} value={backgroundColor || ''} onChange={val => setAttributes({backgroundColor: val})} />
                         )}
-                        {/* TODO: Border Color for custom/outline styles */ }
+                        {(testimonialStyle === 'outline' || testimonialStyle === 'custom') && (
+                            <TextControl /* TODO: ColorPalette for borderColor */ label={__('Border Color', 'milliondollartheme')} value={borderColor || ''} onChange={val => setAttributes({borderColor: val})} />
+                        )}
 
-                        <TextControl label={__('Padding (e.g., 20px)', 'milliondollartheme')} value={padding} onChange={val => setAttributes({padding: val})} />
-                        <TextControl label={__('Border Radius (e.g., 8px)', 'milliondollartheme')} value={borderRadius} onChange={val => setAttributes({borderRadius: val})} />
+                        <TextControl label={__('Padding (e.g., 20px, var(--spacing-md))', 'milliondollartheme')} value={padding} onChange={val => setAttributes({padding: val})} />
+                        <TextControl label={__('Border Radius (e.g., 8px, var(--border-radius-md))', 'milliondollartheme')} value={borderRadius} onChange={val => setAttributes({borderRadius: val})} />
                     </PanelBody>
                 </InspectorControls>
 
@@ -190,9 +189,9 @@ registerBlockType(name, {
                 padding: padding,
                 borderRadius: borderRadius,
                 backgroundColor: (testimonialStyle === 'default' || testimonialStyle === 'custom') ? backgroundColor : undefined,
-                borderColor: (testimonialStyle === 'custom' /* || testimonialStyle === 'outline' */) ? borderColor : undefined,
-                borderStyle: (testimonialStyle === 'custom' && borderColor) ? 'solid' : undefined,
-                borderWidth: (testimonialStyle === 'custom' && borderColor) ? '1px' : undefined,
+                borderColor: (testimonialStyle === 'custom' || testimonialStyle === 'outline') ? borderColor : undefined,
+                borderStyle: (testimonialStyle === 'custom' && borderColor || testimonialStyle === 'outline') ? 'solid' : undefined,
+                borderWidth: (testimonialStyle === 'custom' && borderColor || testimonialStyle === 'outline') ? '1px' : undefined,
             }
         });
 

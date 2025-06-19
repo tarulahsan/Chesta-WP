@@ -1,23 +1,56 @@
 /* --- Single Testimonial Block Editor Styles (index.css) --- */
 .wp-block-milliondollartheme-single-testimonial {
     /* border: 1px dashed #ccc; */ /* Optional visual guide */
+    /* Inline styles from JS (padding, borderRadius, bg, border) will apply */
 }
 
 /* Ensure text alignment from block props is reflected for child containers in editor */
 .wp-block-milliondollartheme-single-testimonial.has-text-align-center .testimonial-image-wrapper {
-    /* display: flex; justify-content: center; */ /* Handled by text-align on parent and inline-block on child */
+    /* display: inline-block; /* JS sets this on img now */
 }
 .wp-block-milliondollartheme-single-testimonial.has-text-align-center .testimonial-image-wrapper img {
-    margin-left: auto; margin-right: auto; /* Center img if it is block */
+    margin-left: auto; margin-right: auto;
+}
+.wp-block-milliondollartheme-single-testimonial.has-text-align-left .testimonial-image-wrapper img {
+    margin-left: 0; margin-right: auto;
+}
+.wp-block-milliondollartheme-single-testimonial.has-text-align-right .testimonial-image-wrapper img {
+    margin-left: auto; margin-right: 0;
 }
 
 
 .wp-block-milliondollartheme-single-testimonial .testimonial-image-wrapper img {
     display: block; /* Consistent display */
+    /* width, height, object-fit, border-radius from front-end styles or inline */
+    /* Max-width, border, shadow from front-end styles */
 }
+.wp-block-milliondollartheme-single-testimonial .testimonial-image-wrapper img.is-shape-circle { border-radius: 50%; }
+.wp-block-milliondollartheme-single-testimonial .testimonial-image-wrapper img.is-shape-rounded-square { border-radius: var(--border-radius-sm, 8px); }
+.wp-block-milliondollartheme-single-testimonial .testimonial-image-wrapper img.is-shape-square { border-radius: 0; }
+
 
 /* Style for glassy preview in editor if inline styles are not enough */
 .wp-block-milliondollartheme-single-testimonial.is-style-glassy {
-    /* background: rgba(50, 50, 150, 0.1); */ /* JS applies this via inline style */
+    /* background: rgba(50, 50, 150, 0.1); /* JS applies this via inline style */
     /* border: 1px solid rgba(255,255,255,0.1); */
+    /* For editor, ensure text is readable if background is darkish */
+    /* color: #fff; /* This might be too broad, JS applies specific text colors */
+}
+.wp-block-milliondollartheme-single-testimonial.is-style-glassy .testimonial-quote .rich-text,
+.wp-block-milliondollartheme-single-testimonial.is-style-glassy .testimonial-author-name .rich-text,
+.wp-block-milliondollartheme-single-testimonial.is-style-glassy .testimonial-author-title .rich-text {
+    /* color: #f0f0f0; /* Example if JS inline styles for color are not set */
+}
+
+
+.wp-block-milliondollartheme-single-testimonial.is-style-quote-bg .testimonial-quote .rich-text {
+    background-color: rgba(var(--primary-color-rgb, 0,82,212), 0.08);
+    padding: 16px; /* Use var if available */
+    border-radius: var(--border-radius-sm, 8px);
+    border-left: 5px solid var(--primary-color, #0052D4);
+    font-style: normal;
+}
+
+.wp-block-milliondollartheme-single-testimonial .testimonial-rating .dashicons {
+    /* color and font-size applied by StarRating component directly */
 }

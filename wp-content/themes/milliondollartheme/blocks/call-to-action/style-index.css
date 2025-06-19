@@ -2,23 +2,37 @@
 .wp-block-milliondollartheme-call-to-action {
     position: relative;
     overflow: hidden;
-    color: var(--text-color-dark);
-    /* padding, borderRadius, backgroundColor, backgroundImage applied inline by save() */
+    /* Default text color, overridden by styles that have dark backgrounds */
+    color: var(--text-color-dark, #1A1A1A);
+    /* padding, borderRadius, backgroundColor, backgroundImage applied inline by save() from attributes */
+    transition: box-shadow var(--transition-speed) ease; /* For potential hover on wrapper */
 }
+.wp-block-milliondollartheme-call-to-action:hover {
+    /* box-shadow: 0 10px 30px rgba(var(--primary-color-rgb, 0,82,212), 0.1); /* Subtle hover shadow */
+}
+
 
 .wp-block-milliondollartheme-call-to-action .cta-overlay {
-    /* position, bg color, opacity applied inline by save() */
-    pointer-events: none; /* Allow interaction with content below overlay */
-}
-.wp-block-milliondollartheme-call-to-action .cta-content-wrapper {
-    /* position, z-index applied inline by save() */
-    display: flex;
-    flex-direction: column; /* Default, overridden by layout classes */
-    align-items: center; /* Default */
-    text-align: center; /* Default */
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    border-radius: inherit; /* Ensure overlay inherits wrapper's border-radius */
+    /* background-color and opacity applied inline by save() */
 }
 
-/* Layout: text-left-button-right */
+.wp-block-milliondollartheme-call-to-action .cta-content-wrapper {
+    position: relative; /* Above overlay */
+    z-index: 2;
+    display: flex;
+    width: 100%; /* Ensure it takes up space for alignment */
+    /* Default layout: text-center-button-center */
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Layout Variations */
 .wp-block-milliondollartheme-call-to-action.layout-text-left-button-right .cta-content-wrapper {
     flex-direction: row;
     justify-content: space-between;
@@ -31,135 +45,194 @@
 }
 .wp-block-milliondollartheme-call-to-action.layout-text-left-button-right .cta-buttons {
     flex-basis: 35%;
-    justify-content: flex-end; /* Align button(s) to their right */
+    justify-content: flex-end;
     align-self: center;
 }
 
-
-/* Layout: text-center-button-center (default behavior of content-wrapper) */
-/* No specific class needed if this is the default flex setup */
-
-/* Layout: text-above-button-center */
 .wp-block-milliondollartheme-call-to-action.layout-text-above-button-center .cta-text-content {
-    margin-bottom: var(--spacing-lg, 32px); /* Space between text and buttons */
+    margin-bottom: var(--spacing-lg, 32px);
 }
 
 
+/* Content Elements */
 .cta-heading {
     font-family: var(--font-family-heading);
-    font-weight: 700;
+    font-weight: 700; /* Or from theme's H tag styles */
     margin-top: 0;
-    margin-bottom: var(--spacing-sm);
-    /* color applied inline */
+    margin-bottom: var(--spacing-sm, 8px);
+    line-height: 1.3;
+    /* color applied inline from attribute */
 }
 .cta-text {
     font-family: var(--font-family-body);
     line-height: 1.7;
-    margin-bottom: var(--spacing-md); /* Default spacing before buttons if stacked */
-    max-width: 650px;
+    margin-bottom: var(--spacing-md, 16px);
+    max-width: 680px; /* Prevent text from being too wide in centered layouts */
+    /* color applied inline from attribute */
 }
-.layout-text-left-button-right .cta-text { max-width: none; margin-bottom: 0; }
+.layout-text-left-button-right .cta-text {
+    max-width: none; /* Allow full width in this layout */
+    margin-bottom: 0; /* Buttons are beside it */
+}
 
 
 .cta-buttons {
     display: flex;
-    gap: var(--spacing-md, 16px); /* Increased gap */
+    gap: var(--spacing-md, 16px);
     flex-wrap: wrap;
-    justify-content: inherit; /* Inherit from .cta-content-wrapper or specific layout */
-    align-items: center; /* Align items if they wrap to multiple lines */
+    /* Default alignment for buttons within this container */
+    justify-content: center; /* For text-center-button-center and text-above-button-center */
 }
-/* Button styling (.cta-button) should mimic Advanced Button Block styles */
+.layout-text-left-button-right .cta-buttons {
+    justify-content: flex-end; /* Already set by parent .cta-content-wrapper */
+}
+
+
+/* CTA Button Styling (mimics Advanced Button Block for consistency) */
 .cta-button {
-    display: inline-block; /* Was inline-flex, but for simple <a> this is fine */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     text-decoration: none;
     font-family: var(--font-family-heading, sans-serif);
     font-weight: 700;
     transition: all var(--transition-speed, 0.3s) ease;
     cursor: pointer;
-    border: 2px solid transparent;
-    padding: var(--spacing-sm, 8px) var(--spacing-lg, 32px); /* Adjusted padding */
-    font-size: 1em;
-    border-radius: var(--border-radius-sm);
+    border: 2px solid transparent; /* Base for consistent sizing */
+    padding: var(--button-padding-vertical, var(--spacing-sm, 8px)) var(--button-padding-horizontal, var(--spacing-lg, 32px));
+    font-size: var(--button-font-size, 1em);
+    border-radius: var(--button-border-radius, var(--border-radius-sm)); /* Use button-specific or global */
     text-align: center;
+    line-height: 1.5; /* Ensure text vertical center */
 }
-.cta-button:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15); /* Enhanced hover shadow */
+}
 
 .cta-button.is-style-primary {
-    background: var(--gradient-primary, #0052D4);
-    color: var(--text-color-light, #fff);
+    background: var(--gradient-primary, var(--primary-color, #0052D4));
+    color: var(--button-primary-text-color, var(--text-color-light, #fff));
+    border-color: transparent;
 }
-.cta-button.is-style-outline {
-    background-color: transparent;
-    border-color: var(--primary-color, #0052D4); /* Default to primary for outline */
-    color: var(--primary-color, #0052D4);
-}
-.wp-block-milliondollartheme-call-to-action.is-style-glassy .cta-button.is-style-outline,
-.wp-block-milliondollartheme-call-to-action.is-style-gradient-bg .cta-button.is-style-outline {
-    border-color: var(--text-color-light, #fff); /* Outline against dark/gradient bg */
-    color: var(--text-color-light, #fff);
+.cta-button.is-style-primary:hover {
+    filter: brightness(1.1); /* Slight brighten on hover */
 }
 
-.cta-button.is-style-outline:hover { background-color: var(--primary-color); color: var(--text-color-light); }
+.cta-button.is-style-secondary {
+    background: var(--gradient-secondary, var(--secondary-color, #C837C8)); /* Assuming a secondary gradient/color */
+    color: var(--button-secondary-text-color, var(--text-color-light, #fff));
+    border-color: transparent;
+}
+.cta-button.is-style-secondary:hover {
+    filter: brightness(1.1);
+}
+
+
+.cta-button.is-style-outline {
+    background-color: transparent;
+    border-color: var(--button-outline-border-color, var(--primary-color, #0052D4));
+    color: var(--button-outline-text-color, var(--primary-color, #0052D4));
+}
+.wp-block-milliondollartheme-call-to-action.is-style-glassy .cta-button.is-style-outline,
+.wp-block-milliondollartheme-call-to-action.is-style-gradient-bg .cta-button.is-style-outline,
+.wp-block-milliondollartheme-call-to-action.is-style-image-bg .cta-button.is-style-outline {
+    border-color: var(--button-outline-on-dark-border-color, var(--text-color-light, #fff));
+    color: var(--button-outline-on-dark-text-color, var(--text-color-light, #fff));
+}
+
+.cta-button.is-style-outline:hover {
+    background-color: var(--button-outline-hover-bg-color, var(--primary-color, #0052D4));
+    color: var(--button-outline-hover-text-color, var(--text-color-light, #fff));
+    border-color: var(--button-outline-hover-bg-color, var(--primary-color, #0052D4));
+}
 .wp-block-milliondollartheme-call-to-action.is-style-glassy .cta-button.is-style-outline:hover,
-.wp-block-milliondollartheme-call-to-action.is-style-gradient-bg .cta-button.is-style-outline:hover {
-    background-color: var(--text-color-light);
-    color: var(--primary-color); /* Text becomes dark on light hover bg */
-    border-color: var(--text-color-light);
+.wp-block-milliondollartheme-call-to-action.is-style-gradient-bg .cta-button.is-style-outline:hover,
+.wp-block-milliondollartheme-call-to-action.is-style-image-bg .cta-button.is-style-outline:hover {
+    background-color: var(--button-outline-on-dark-hover-bg-color, var(--text-color-light, #fff));
+    color: var(--button-outline-on-dark-hover-text-color, var(--primary-color, #0052D4));
+    border-color: var(--button-outline-on-dark-hover-bg-color, var(--text-color-light, #fff));
 }
 
 
 .cta-button.is-style-glassy {
-    background: var(--glass-bg-color);
+    background: var(--glass-bg-color); /* From global variables */
     backdrop-filter: blur(var(--glass-blur-radius));
     -webkit-backdrop-filter: blur(var(--glass-blur-radius));
     border: 1px solid var(--glass-border-color);
-    color: var(--text-color-light);
-    box-shadow: var(--glass-box-shadow);
+    color: var(--button-glassy-text-color, var(--text-color-light));
+    box-shadow: var(--glass-box-shadow-light, 0 4px 15px rgba(0,0,0,0.1)); /* Lighter shadow for glassy */
 }
-.cta-button.is-style-glassy:hover { background: rgba(255,255,255,0.25); }
+.cta-button.is-style-glassy:hover {
+    background: rgba(255,255,255,0.25);
+    border-color: rgba(255,255,255,0.35);
+    box-shadow: 0 7px 22px rgba(0,0,0,0.18);
+}
 
 
-/* Block Styles */
+/* CTA Block Styles */
 .wp-block-milliondollartheme-call-to-action.is-style-default {
     /* background-color from attribute or theme default */
 }
-.wp-block-milliondollartheme-call-to-action.is-style-glassy {
-    background: var(--glass-bg-color);
-    backdrop-filter: blur(var(--glass-blur-radius));
-    -webkit-backdrop-filter: blur(var(--glass-blur-radius));
-    border: 1px solid var(--glass-border-color);
-    box-shadow: var(--glass-box-shadow);
-    color: var(--text-color-light);
+.wp-block-milliondollartheme-call-to-action.is-style-glassy,
+.wp-block-milliondollartheme-call-to-action.is-style-gradient-bg,
+.wp-block-milliondollartheme-call-to-action.is-style-image-bg {
+    color: var(--text-color-light); /* Default text color for dark/image/gradient backgrounds */
 }
-.wp-block-milliondollartheme-call-to-action.is-style-glassy .cta-heading,
-.wp-block-milliondollartheme-call-to-action.is-style-glassy .cta-text {
-    color: inherit;
+.wp-block-milliondollartheme-call-to-action.is-style-glassy .cta-heading, /* Allow attribute override */
+.wp-block-milliondollartheme-call-to-action.is-style-glassy .cta-text,
+.wp-block-milliondollartheme-call-to-action.is-style-gradient-bg .cta-heading,
+.wp-block-milliondollartheme-call-to-action.is-style-gradient-bg .cta-text,
+.wp-block-milliondollartheme-call-to-action.is-style-image-bg .cta-heading,
+.wp-block-milliondollartheme-call-to-action.is-style-image-bg .cta-text {
+    /* color: inherit; /* Inherit from parent or use attributes if set */
+}
+
+.wp-block-milliondollartheme-call-to-action.is-style-glassy {
+    /* background, backdrop-filter, border, box-shadow applied by blockProps inline style if needed,
+       or use global --glass-bg-color etc. if not overridden by attributes */
+    /* Forcing if attributes are not set: */
+    /* background: var(--glass-bg-color) !important; */ /* Only if JS does not set it */
 }
 .wp-block-milliondollartheme-call-to-action.is-style-gradient-bg {
     /* backgroundImage (gradient) applied inline */
-    color: var(--text-color-light);
+}
+.wp-block-milliondollartheme-call-to-action.is-style-image-bg {
+    /* backgroundImage (url) applied inline */
 }
 
+
 /* Responsive */
-@media (max-width: 767px) {
+@media (max-width: 767px) { /* Mobile */
     .wp-block-milliondollartheme-call-to-action.layout-text-left-button-right .cta-content-wrapper {
         flex-direction: column;
         text-align: center;
     }
     .wp-block-milliondollartheme-call-to-action.layout-text-left-button-right .cta-text-content {
         margin-right: 0;
-        margin-bottom: var(--spacing-lg, 32px); /* Increased space when stacked */
+        margin-bottom: var(--spacing-lg, 32px);
         max-width: 650px;
     }
     .wp-block-milliondollartheme-call-to-action.layout-text-left-button-right .cta-buttons {
         justify-content: center;
     }
-    .cta-heading { font-size: 1.8em; }
+    .cta-heading { font-size: 1.8em; } /* Or use theme responsive heading sizes */
     .cta-text { font-size: 1em; }
-    .cta-buttons { flex-direction: column; align-items: stretch; } /* Stack buttons */
-    .cta-button { width: 100%; max-width:320px; margin-left:auto; margin-right:auto; } /* Full width stacked buttons, with a max */
-    .wp-block-milliondollartheme-call-to-action.layout-text-left-button-right .cta-buttons .cta-button {
-        /* Ensure these also center if needed */
+    .cta-buttons {
+        flex-direction: column;
+        align-items: stretch; /* Make buttons in column take available width */
     }
-
+    .cta-button {
+        width: 100%;
+        max-width:350px; /* Max width for stacked buttons */
+        margin-left:auto;
+        margin-right:auto;
+    }
+}
+@media (max-width: 480px) { /* Smaller Mobile */
+    .cta-heading { font-size: 1.6em; }
+    .cta-button {
+        padding: var(--spacing-xs) var(--spacing-md); /* Slightly smaller padding */
+        font-size: 0.9em;
+    }
 }

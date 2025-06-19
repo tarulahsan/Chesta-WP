@@ -1,0 +1,41 @@
+// --- PHP Integration Note for Tabs Block (functions.php) ---
+// To make the Alpine.js tab switching work with InnerBlocks (core/group panels),
+// we need to add attributes to the saved output of these inner group blocks.
+// Add this filter to your theme's functions.php:
+
+add_filter( 'render_block_core/group', 'milliondollartheme_filter_tabs_inner_group_block', 10, 2 );
+
+function milliondollartheme_filter_tabs_inner_group_block( $block_content, $block ) {
+    // Check if this group block is inside our tabs block and has the data-tab-id attribute set by editor.
+    // This check might need to be more robust, e.g. by checking parent block name if possible,
+    // or ensuring 'data-tab-id' is unique enough not to clash.
+    // A more robust check would involve checking $block->context['postId'] and then get_post_meta or similar,
+    // or checking $block->name if we were filtering a custom "tab-panel" block.
+    // Given we are filtering core/group, we rely on the data-tab-id attribute.
+    if ( isset( $block['attrs']['data-tab-id'] ) && !empty($block['attrs']['data-tab-id']) ) {
+        // We also need to ensure this group block is a direct child of our tabs block.
+        // This is hard to determine reliably from just $block_content and $block alone without parsing block hierarchy.
+        // For this iteration, we assume any core/group with 'data-tab-id' is a candidate.
+        // A more robust solution would be to use a custom 'milliondollartheme/tab-panel' inner block.
+
+        $tab_id = esc_attr( $block['attrs']['data-tab-id'] );
+
+        // Add Alpine's x-show directive and ARIA attributes.
+        $alpine_attrs = sprintf(
+            ' x-show="activeTab === \'%1$s\'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 transform scale-95" x-transition:enter-end="opacity-100 transform scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 transform scale-100" x-transition:leave-end="opacity-0 transform scale-95" role="tabpanel" id="tab-panel-%1$s" aria-labelledby="tab-button-%1$s" tabindex="0"',
+            $tab_id
+        );
+
+        // Inject these attributes into the opening tag of the group block.
+        // This regex looks for the first opening div tag with 'wp-block-group' class.
+        $block_content = preg_replace(
+            '/(<div\s+[^>]*class=(["\'])(?:(?!\2).)*wp-block-group(?:(?!\2).)*\2[^>]*)/',
+            '$1 ' . $alpine_attrs,
+            $block_content,
+            1 // Only replace the first occurrence (outermost div of the group)
+        );
+    }
+    return $block_content;
+}
+
+// --- End PHP Integration Note ---

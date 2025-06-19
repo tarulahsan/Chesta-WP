@@ -4,9 +4,9 @@
 import { __ } from '@wordpress/i18n';
 import { registerBlockType } from '@wordpress/blocks';
 import {
-    useBlockProps, InspectorControls, InnerBlocks, RichText, useInnerBlocksProps, useBlockDisplayInformation
+    useBlockProps, InspectorControls, InnerBlocks, RichText, useInnerBlocksProps
 } from '@wordpress/block-editor';
-import { PanelBody, TextControl, SelectControl, Button, ToolbarGroup, ToolbarButton } from '@wordpress/components';
+import { PanelBody, TextControl, SelectControl, Button, TextareaControl } from '@wordpress/components'; // Added TextareaControl
 import { useState, useEffect } from '@wordpress/element';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -19,22 +19,21 @@ import './index.css';
 
 const { name, title, attributes } = metadata;
 
-const ALLOWED_BLOCKS = ['core/paragraph', 'core/heading', 'core/image', 'core/list', 'milliondollartheme/advanced-button']; // Example
+const ALLOWED_BLOCKS = ['core/paragraph', 'core/heading', 'core/image', 'core/list', 'milliondollartheme/advanced-button'];
 
 registerBlockType(name, {
     title: title,
     attributes: attributes,
 
     edit: ({ attributes, setAttributes, clientId }) => {
-        const { tabs, tabLayout, tabsStyle, activeTab } = attributes;
+        const { tabs, tabLayout, tabsStyle, activeTab, contentPadding, borderRadius, tabTitleColor, tabTitleBgColor, activeTabTitleColor, activeTabTitleBgColor, borderColor, contentBgColor } = attributes;
         const [selectedTab, setSelectedTab] = useState(activeTab || (tabs.length > 0 ? tabs[0].id : null));
 
         useEffect(() => {
-            // Ensure activeTab attribute is updated if selectedTab changes
-            // or if the initial activeTab from attributes needs to be set.
             if (!activeTab && tabs.length > 0 && !selectedTab) {
-                setSelectedTab(tabs[0].id);
-                setAttributes({ activeTab: tabs[0].id });
+                const firstTabId = tabs[0].id;
+                setSelectedTab(firstTabId);
+                setAttributes({ activeTab: firstTabId });
             } else if (activeTab && activeTab !== selectedTab) {
                 setSelectedTab(activeTab);
             }
@@ -44,13 +43,8 @@ registerBlockType(name, {
             className: `is-style-${tabsStyle} layout-${tabLayout}`
         });
 
-        // For InnerBlocks, we need to ensure each tab has a corresponding InnerBlocks area.
-        // The `template` prop of InnerBlocks can be an array of block arrays.
-        // We create one InnerBlocks instance, and its content will be shown/hidden.
-        // A more complex approach might use multiple InnerBlocks instances, one per tab, if required by specific plugins or very distinct templates per tab.
-        // For simplicity with Alpine on front-end, one InnerBlocks whose direct children are "tab panels" (group blocks) is easier.
-
-        const template = tabs.map(tab => ['core/group', {className: 'tab-panel-wrapper', 'data-tab-id': tab.id, lock: { move: true, remove: true} }, [] ] );
+        const defaultTemplate = [['core/paragraph', { placeholder: 'Tab content...' }]];
+        const template = tabs.map(tab => ['core/group', {className: 'tab-panel-wrapper', 'data-tab-id': tab.id, 'aria-labelledby': `tab-button-${tab.id}`, lock: {move: true, remove: true} }, defaultTemplate ] );
         const innerBlocksProps = useInnerBlocksProps(
             { className: 'tabs-content-editor-area' },
             {
@@ -60,12 +54,11 @@ registerBlockType(name, {
             }
         );
 
-
         const addTab = () => {
             const newTabId = `tab-${uuidv4()}`;
             const newTabs = [...tabs, { id: newTabId, title: __('New Tab', 'milliondollartheme') }];
             setAttributes({ tabs: newTabs });
-            if (!selectedTab || tabs.length === 0) { // If it's the first tab or no tab was selected
+            if (!selectedTab || tabs.length === 0) {
                 setSelectedTab(newTabId);
                 setAttributes({activeTab: newTabId});
             }
@@ -87,13 +80,6 @@ registerBlockType(name, {
             }
         };
 
-        // In the editor, we need to visually show/hide the content of InnerBlocks panels.
-        // This is tricky with a single InnerBlocks instance.
-        // A common pattern is to iterate through clientIds of inner blocks and show/hide them via CSS based on selectedTab.
-        // Or, use multiple InnerBlocks instances if state management per tab is simpler.
-        // For now, all InnerBlocks content will be visible in editor, user clicks tab title to conceptually switch.
-        // A more advanced editor would hide non-active InnerBlock groups.
-
         return (
             <>
                 <InspectorControls>
@@ -106,7 +92,7 @@ registerBlockType(name, {
                         />
                         <SelectControl
                             label={__('Initial Active Tab', 'milliondollartheme')}
-                            value={activeTab}
+                            value={activeTab} // This is the ID of the tab
                             options={tabs.map(tab => ({label: tab.title, value: tab.id}))}
                             onChange={(val) => {setAttributes({ activeTab: val }); setSelectedTab(val);}}
                             help={__('Select the tab to be open by default.', 'milliondollartheme')}
@@ -119,9 +105,14 @@ registerBlockType(name, {
                             options={[ {label: 'Default', value: 'default'}, {label: 'Pills', value: 'pills'}, {label: 'Glassy', value: 'glassy'}, {label: 'Line', value: 'line'} ]}
                             onChange={(val) => setAttributes({ tabsStyle: val })}
                         />
-                        {/* TODO: Color pickers for titles, backgrounds, borders */}
-                        <TextControl label={__('Content Area Padding', 'milliondollartheme')} value={attributes.contentPadding} onChange={val => setAttributes({contentPadding: val})} />
-                        <TextControl label={__('Border Radius (for container)', 'milliondollartheme')} value={attributes.borderRadius} onChange={val => setAttributes({borderRadius: val})} />
+                        <TextControl /* TODO: ColorPalette for tabTitleColor */ label={__('Tab Title Color', 'milliondollartheme')} value={tabTitleColor || ''} onChange={val => setAttributes({tabTitleColor: val})} />
+                        <TextControl /* TODO: ColorPalette for tabTitleBgColor */ label={__('Tab Title Background', 'milliondollartheme')} value={tabTitleBgColor || ''} onChange={val => setAttributes({tabTitleBgColor: val})} />
+                        <TextControl /* TODO: ColorPalette for activeTabTitleColor */ label={__('Active Tab Title Color', 'milliondollartheme')} value={activeTabTitleColor || ''} onChange={val => setAttributes({activeTabTitleColor: val})} />
+                        <TextControl /* TODO: ColorPalette for activeTabTitleBgColor */ label={__('Active Tab Title Background', 'milliondollartheme')} value={activeTabTitleBgColor || ''} onChange={val => setAttributes({activeTabTitleBgColor: val})} />
+                        <TextControl /* TODO: ColorPalette for borderColor */ label={__('Border Color (Wrapper/Tabs)', 'milliondollartheme')} value={borderColor || ''} onChange={val => setAttributes({borderColor: val})} />
+                        <TextControl /* TODO: ColorPalette for contentBgColor */ label={__('Content Area Background', 'milliondollartheme')} value={contentBgColor || ''} onChange={val => setAttributes({contentBgColor: val})} />
+                        <TextControl label={__('Content Area Padding', 'milliondollartheme')} value={contentPadding} onChange={val => setAttributes({contentPadding: val})} />
+                        <TextControl label={__('Border Radius (Wrapper)', 'milliondollartheme')} value={borderRadius} onChange={val => setAttributes({borderRadius: val})} />
                     </PanelBody>
                 </InspectorControls>
                 <div {...blockProps}>
@@ -141,7 +132,9 @@ registerBlockType(name, {
                         ))}
                         <Button isSecondary onClick={addTab}>{__('Add Tab', 'milliondollartheme')}</Button>
                     </div>
-                    <div {...innerBlocksProps} /> {/* All tab panels rendered here, editor CSS will hide non-active */}
+                    {/* Editor preview of tab content relies on CSS to show only the active one, or JS to manipulate InnerBlocks children visibility */}
+                    {/* For this iteration, all panels are technically rendered by InnerBlocks, editor CSS provides some basic separation */}
+                    <div {...innerBlocksProps} />
                 </div>
             </>
         );
@@ -155,7 +148,7 @@ registerBlockType(name, {
         const blockProps = useBlockProps.save({
             className: `is-style-${tabsStyle} layout-${tabLayout}`,
             style: {
-                borderRadius: tabsStyle === 'glassy' || tabsStyle === 'default' ? borderRadius : undefined,
+                borderRadius: (tabsStyle === 'glassy' || tabsStyle === 'default' || tabsStyle === 'pills') ? borderRadius : undefined,
                 borderColor: borderColor,
                 borderWidth: borderColor ? '1px' : undefined,
                 borderStyle: borderColor ? 'solid' : undefined,
@@ -167,47 +160,45 @@ registerBlockType(name, {
             })
         });
 
+        const tabContentStyles = {
+            backgroundColor: contentBgColor,
+            padding: contentPadding,
+            borderRadius: (tabsStyle === 'default' && !borderColor) ? borderRadius : ( (tabsStyle === 'pills' || tabsStyle === 'line') ? borderRadius : `0 0 ${borderRadius || '0px'} ${borderRadius || '0px'}`),
+            border: (tabsStyle === 'default' && borderColor) ? `1px solid ${borderColor}` : undefined,
+            borderTop: (tabsStyle === 'default' && borderColor && tabLayout === 'horizontal') ? 'none' : ((tabsStyle === 'default' && borderColor) ? `1px solid ${borderColor}` : undefined),
+        };
+
         return (
             <div {...blockProps}>
                 <div className="tab-buttons-wrapper" role="tablist">
-                    {tabs.map((tab) => (
-                        <button
-                            key={tab.id}
-                            type="button"
-                            className="tab-button" // Base class
-                            role="tab"
-                            // Dynamically bind aria-selected and class with Alpine
-                            dangerouslySetInnerHTML={{__html: tab.title}} // Title from RichText
-                            // Apply custom styling attributes via inline styles if needed, or rely on CSS classes
-                            // Example for direct style binding (though classes are better for themeability):
-                            // style={{
-                            //     backgroundColor: `isTabActive('${tab.id}') ? '${activeTabTitleBgColor}' : '${tabTitleBgColor}'`, // This needs Alpine x-bind:style
-                            //     color: `isTabActive('${tab.id}') ? '${activeTabTitleColor}' : '${tabTitleColor}'`,
-                            // }}
-                            x-bind:aria-selected={`isTabActive('${tab.id}')`}
-                            x-bind:class="{'is-active': isTabActive('${tab.id}')}"
-                            x-on:click={`setActiveTab('${tab.id}')`}
-                            aria-controls={`tab-panel-${tab.id}`} // Link to panel
-                            id={`tab-button-${tab.id}`} // ID for button
-                        >
-                        </button>
-                    ))}
+                    {tabs.map((tab) => {
+                        // const tabButtonStyles = {}; // Defined for clarity for x-bind:style
+                        return (
+                            <button
+                                key={tab.id}
+                                type="button"
+                                className="tab-button" // Base class, Alpine adds 'is-active'
+                                role="tab"
+                                aria-controls={`tab-panel-${tab.id}`}
+                                id={`tab-button-${tab.id}`}
+                                x-on:click={`setActiveTab('${tab.id}')`}
+                                x-bind:aria-selected={`isTabActive('${tab.id}')`}
+                                x-bind:class={`{ 'is-active': isTabActive('${tab.id}') }`}
+                                x-bind:style={`{
+                                    backgroundColor: isTabActive('${tab.id}') ? '${activeTabTitleBgColor || ''}' : '${tabTitleBgColor || ''}',
+                                    color: isTabActive('${tab.id}') ? '${activeTabTitleColor || ''}' : '${tabTitleColor || ''}',
+                                    borderColor: isTabActive('${tab.id}') && (tabsStyle === 'line' || tabsStyle === 'default') ? (activeTabTitleBgColor || 'transparent') : 'transparent',
+                                }`}
+                            >
+                                <RichText.Content tagName="span" value={tab.title} />
+                            </button>
+                        );
+                    })}
                 </div>
-                <div className="tab-content-panels-wrapper" style={{ backgroundColor: contentBgColor, padding: contentPadding, borderRadius: borderRadius ? `0 0 ${borderRadius} ${borderRadius}` : undefined }}>
+                <div className="tab-content-panels-wrapper" style={tabContentStyles}>
+                    {/* InnerBlocks.Content renders all core/group blocks. */}
+                    {/* A PHP filter 'render_block_core/group' is needed to add x-show to these panels */}
                     <InnerBlocks.Content />
-                    {/*
-                      IMPORTANT for Alpine.js to work with InnerBlocks.Content:
-                      Each direct child of InnerBlocks.Content (which are the core/group blocks from our template)
-                      needs to have an x-show directive. This is typically done by:
-                      1. Using a custom "tab-panel" block that includes x-show in its save function.
-                      2. Filtering 'core/group' block's save output to inject x-show if it's within our 'tabs' block.
-                      For this iteration, we assume this connection will be made or handled by more advanced JS/PHP.
-                      The `data-tab-id` on group blocks (from edit template) is crucial for Alpine to target them.
-                      Example of how a panel would look if we iterated here (but InnerBlocks.Content does it):
-                      <div role="tabpanel" id={`tab-panel-${tab.id}`} x-show={`isTabActive('${tab.id}')`}>
-                         ... content of that tab ...
-                      </div>
-                    */}
                 </div>
             </div>
         );

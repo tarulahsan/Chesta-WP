@@ -1,52 +1,99 @@
 /* --- Tabs Block Editor Styles (index.css) --- */
 .wp-block-milliondollartheme-tabs {
-    border: 1px dashed #ccc;
-    padding: 8px;
+    border: 1px dashed var(--border-color, #ccc);
+    padding: var(--spacing-sm, 8px);
 }
 .tab-titles-editor {
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: 8px;
+    margin-bottom: var(--spacing-sm, 8px);
     align-items: center;
+    border-bottom: 1px solid var(--border-color, #ccc); /* Visual separator */
 }
+.wp-block-milliondollartheme-tabs.layout-vertical-left .tab-titles-editor,
+.wp-block-milliondollartheme-tabs.layout-vertical-right .tab-titles-editor {
+    flex-direction: column;
+    border-bottom: none;
+    border-right: 1px solid var(--border-color, #ccc);
+    margin-right: var(--spacing-sm);
+    margin-bottom: 0;
+    align-items: stretch; /* Make tab titles full width of vertical nav */
+}
+.wp-block-milliondollartheme-tabs.layout-vertical-right .tab-titles-editor {
+    border-right: none;
+    border-left: 1px solid var(--border-color, #ccc);
+    margin-right: 0;
+    margin-left: var(--spacing-sm);
+}
+
+
 .tab-title-item-editor {
     display: flex;
     align-items: center;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color, #ddd);
     margin-right: 4px;
-    margin-bottom: 4px;
+    margin-bottom: -1px; /* Overlap bottom border for active effect */
     background: #f0f0f0;
+    border-radius: var(--border-radius-sm) var(--border-radius-sm) 0 0;
 }
-.tab-title-item-editor.is-active {
-    background: #fff;
-    border-bottom-color: #fff; /* For visual cue */
-}
-.tab-title-editor .rich-text { /* Target inner RichText */
-    padding: 6px 10px;
-    min-width: 80px;
-}
-.tab-title-item-editor .components-button.is-destructive { /* Remove button */
-    min-width: auto;
-    padding: 6px;
-    height: auto;
-    line-height: 1;
+.wp-block-milliondollartheme-tabs.layout-vertical-left .tab-title-item-editor,
+.wp-block-milliondollartheme-tabs.layout-vertical-right .tab-title-item-editor {
+    margin-right: -1px; /* Overlap side border */
+    margin-bottom: 4px;
+    border-radius: var(--border-radius-sm) 0 0 var(--border-radius-sm);
 }
 
-/* In editor, all tab panels (InnerBlocks children) are visible by default.
-   We need CSS to hide non-active panels for a better WYSIWYG.
-   This requires JS in edit() to add/remove a class or style to the InnerBlocks children.
-   The current edit() renders all and relies on user clicking to conceptually switch.
-   For a true WYSIWYG preview of active tab content, the InnerBlocks children (core/group)
-   would need conditional rendering or display:none based on selectedTab.
-*/
+
+.tab-title-item-editor.is-active {
+    background: var(--background-color-light, #fff);
+    border-bottom-color: var(--background-color-light, #fff);
+    font-weight: bold;
+    z-index: 1; /* Ensure active tab border overlaps correctly */
+}
+.wp-block-milliondollartheme-tabs.layout-vertical-left .tab-title-item-editor.is-active {
+    border-right-color: var(--background-color-light, #fff);
+}
+.wp-block-milliondollartheme-tabs.layout-vertical-right .tab-title-item-editor.is-active {
+    border-left-color: var(--background-color-light, #fff);
+}
+
+
+.tab-title-editor .rich-text {
+    padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+    min-width: 80px;
+}
+.tab-title-item-editor .components-button.is-destructive {
+    min-width: auto;
+    padding: var(--spacing-xs, 4px);
+    height: auto;
+    line-height: 1;
+    margin-left: var(--spacing-xs, 4px);
+}
+
+.tabs-content-editor-area {
+    padding: var(--spacing-sm, 8px);
+    background: var(--background-color-light, #fff); /* Content area background in editor */
+    border: 1px solid var(--border-color, #ccc);
+    border-top: none; /* If horizontal tabs */
+}
+.wp-block-milliondollartheme-tabs.layout-vertical-left .tabs-content-editor-area {
+    border-top: 1px solid var(--border-color, #ccc);
+    border-left: none;
+}
+.wp-block-milliondollartheme-tabs.layout-vertical-right .tabs-content-editor-area {
+    border-top: 1px solid var(--border-color, #ccc);
+    border-right: none;
+}
+
+
+/* Editor: Show only the active tab panel for better WYSIWYG */
+/* This requires JS in edit() to add/remove 'is-editor-panel-active' to the group block wrappers */
 .tabs-content-editor-area > .block-editor-inner-blocks > .block-editor-block-list__layout > [data-block] {
-    /* By default, show all. JS should add a class to hide non-active ones. */
-    /* display: none; */ /* If JS adds .is-active-editor-panel */
+    display: none;
     border: 1px dashed #eee;
     padding: 8px;
-    margin-top: 8px;
+    /* margin-top: 8px; /* No margin needed if only one is shown */
 }
-/* Example if JS adds .is-active-editor-panel to the active group block wrapper */
-/* .tabs-content-editor-area > .block-editor-inner-blocks > .block-editor-block-list__layout > [data-block].is-active-editor-panel {
+.tabs-content-editor-area > .block-editor-inner-blocks > .block-editor-block-list__layout > [data-block].is-editor-panel-active {
     display: block;
-} */
+}
