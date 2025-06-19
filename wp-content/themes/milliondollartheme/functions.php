@@ -375,4 +375,34 @@ function milliondollartheme_render_posts_display_block( $attributes ) {
     return $output;
 }
 
+/**
+ * Specific registration for dynamic blocks that require a PHP render_callback.
+ * This ensures they are registered correctly if the main loop doesn't handle them.
+ */
+function milliondollartheme_register_dynamic_block_callbacks() {
+    // For Posts Display Block
+    if ( function_exists('milliondollartheme_render_posts_display_block') && class_exists('WP_Block_Type_Registry') && WP_Block_Type_Registry::get_instance()->is_registered('milliondollartheme/posts-display') ) {
+        // If already registered by the loop, unregister it first to re-register with callback
+        // This is to ensure our version with the callback takes precedence.
+        // Note: unregister_block_type might not be ideal if other filters/actions were tied to the first registration.
+        // A cleaner way is if the main loop could be modified to pass the callback.
+        // However, for a targeted fix:
+        unregister_block_type('milliondollartheme/posts-display');
+    }
+
+    // Check if function exists before trying to use it as callback
+    if ( function_exists('milliondollartheme_render_posts_display_block') ) {
+        register_block_type( 'milliondollartheme/posts-display', array(
+            // Attributes should be automatically sourced from block.json in WP 5.8+
+            // For older versions or to be explicit, they would be listed here.
+            // 'attributes' => array( ... define attributes here ... ),
+            'render_callback' => 'milliondollartheme_render_posts_display_block',
+        ) );
+        // error_log("Re-registered milliondollartheme/posts-display with render_callback."); // For debugging
+    }
+}
+// Hook this after the main block registration, or with same priority if it handles overrides well.
+// Using priority 11 to run after the default 10 of the main loop, ensuring it can override if needed.
+add_action( 'init', 'milliondollartheme_register_dynamic_block_callbacks', 11 );
+
 EOF
