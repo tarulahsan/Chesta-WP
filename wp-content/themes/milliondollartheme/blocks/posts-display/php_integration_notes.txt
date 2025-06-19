@@ -1,0 +1,45 @@
+// --- PHP Integration Note for functions.php ---
+// The following logic needs to be integrated into your theme's functions.php
+// to correctly register the 'milliondollartheme/posts-display' block with its PHP render callback.
+
+// 1. Ensure block attributes are available to PHP if not using WP 5.8+ block.json attribute sourcing:
+/*
+function metadata_miljoen_posts_display_get_attributes() {
+    return array(
+        'numberOfPosts' => array('type' => 'number', 'default' => 3),
+        // ... (mirror all attributes from block.json with their types and defaults)
+        'align' => array('type' => 'string', 'default' => ''),
+        'postsDisplayStyle' => array('type' => 'string', 'default' => 'default'),
+    );
+}
+*/
+
+// 2. Modify your existing 'milliondollartheme_register_blocks' function:
+// Inside the loop, when $block_folder === 'posts-display', register with render_callback:
+/*
+if ( $block_folder === 'posts-display' ) {
+    register_block_type( $theme_blocks_dir . $block_folder, array(
+        // 'attributes' => metadata_miljoen_posts_display_get_attributes(), // For older WP versions
+        'render_callback' => 'milliondollartheme_render_posts_display_block'
+    ) );
+} else {
+    register_block_type( $theme_blocks_dir . $block_folder );
+}
+*/
+// OR, if your WP version properly supports 'render' field in block.json, you can point it to a PHP file.
+// For now, we assume direct registration with callback.
+// The simplest immediate way if the loop is complex to modify is a separate registration:
+
+/*
+add_action( 'init', function() {
+    if (function_exists('milliondollartheme_render_posts_display_block')) {
+        register_block_type( 'milliondollartheme/posts-display', array(
+            'render_callback' => 'milliondollartheme_render_posts_display_block',
+            // Ensure attributes from block.json are automatically picked up (WP 5.8+)
+            // For older versions, you might need to list them here too.
+        ) );
+    }
+}, 20 ); // Higher priority to ensure it's registered
+*/
+
+// --- End PHP Integration Note ---

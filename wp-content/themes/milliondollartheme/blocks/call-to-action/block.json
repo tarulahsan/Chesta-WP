@@ -1,0 +1,49 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/call-to-action",
+    "title": "Call to Action (CTA)",
+    "category": "milliondollartheme-blocks",
+    "description": "A section designed to engage users and prompt action, with heading, text, and buttons.",
+    "icon": "megaphone",
+    "keywords": ["cta", "call to action", "banner", "prompt", "button"],
+    "attributes": {
+        "heading": { "type": "string", "source": "html", "selector": ".cta-heading", "default": "Engaging Call to Action Heading!" },
+        "headingTag": { "type": "string", "default": "h2" },
+        "headingColor": { "type": "string" },
+        "text": { "type": "string", "source": "html", "selector": ".cta-text", "default": "Compelling text to encourage users to click the button below." },
+        "textColor": { "type": "string" },
+        "layout": { "type": "string", "default": "text-center-button-center" }, /* text-left-button-right, text-center-button-center, text-above-button-center */
+        "ctaStyle": { "type": "string", "default": "default" }, /* default, glassy, gradient-bg */
+        "backgroundColor": { "type": "string" },
+        "gradient": { "type": "string", "default": "var(--gradient-primary)" },
+        "backgroundImageUrl": { "type": "string" },
+        "backgroundImageId": { "type": "number" },
+        "overlayColor": { "type": "string", "default": "rgba(0,0,0,0.3)"},
+        "overlayOpacity": { "type": "number", "default": 30 },
+        "padding": { "type": "string", "default": "var(--spacing-xl)" },
+        "borderRadius": { "type": "string", "default": "var(--border-radius-md)" },
+        "showButton1": { "type": "boolean", "default": true },
+        "button1Text": { "type": "string", "default": "Get Started" },
+        "button1Url": { "type": "string", "default": "#" },
+        "button1Style": { "type": "string", "default": "primary" },
+        "button1NewTab": { "type": "boolean", "default": false },
+        "showButton2": { "type": "boolean", "default": false },
+        "button2Text": { "type": "string", "default": "Learn More" },
+        "button2Url": { "type": "string", "default": "#" },
+        "button2Style": { "type": "string", "default": "outline" },
+        "button2NewTab": { "type": "boolean", "default": false },
+        "align": { "type": "string", "default": "full" }
+    },
+    "supports": {
+        "align": ["wide", "full"],
+        "html": false,
+        "anchor": true,
+        "color": { "text": false, "background": false, "link": false, "gradients": false },
+        "spacing": { "margin": true }
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css"
+}

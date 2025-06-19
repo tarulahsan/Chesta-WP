@@ -1,0 +1,36 @@
+/* --- Call to Action Block Editor Styles (index.css) --- */
+.wp-block-milliondollartheme-call-to-action {
+    /* border: 1px dashed #ccc; */
+}
+/* Ensure overlay does not obstruct content selection in editor */
+.wp-block-milliondollartheme-call-to-action .cta-overlay {
+    pointer-events: none;
+}
+.wp-block-milliondollartheme-call-to-action .cta-content-wrapper {
+    /* display, flex-direction, align-items, text-align set by layout class in JS preview */
+}
+
+/* Editor preview for different layouts - JS now adds classes to the main blockProps wrapper */
+.wp-block-milliondollartheme-call-to-action.layout-text-left-button-right .cta-content-wrapper {
+    /* These specific styles for editor might not be needed if JS preview is accurate */
+}
+
+/* Style for glassy/gradient preview in editor if inline styles from JS are not enough */
+.wp-block-milliondollartheme-call-to-action.is-style-glassy {
+    /* background: rgba(50, 50, 150, 0.1); */ /* JS applies this */
+}
+.wp-block-milliondollartheme-call-to-action.is-style-gradient-bg {
+    /* background: linear-gradient(45deg, #333, #777); */ /* JS applies this */
+}
+
+.wp-block-milliondollartheme-call-to-action .cta-button {
+    padding: 8px 15px;
+    background-color: #ddd;
+    border-radius: 4px;
+    display: inline-block;
+    margin: 5px;
+    text-decoration: none;
+    color: #333;
+}
+.wp-block-milliondollartheme-call-to-action .cta-button.is-style-primary { background-color: var(--primary-color); color: #fff; }
+.wp-block-milliondollartheme-call-to-action .cta-button.is-style-outline { border: 1px solid var(--primary-color); color: var(--primary-color); background:transparent; }

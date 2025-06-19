@@ -1,0 +1,43 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/single-testimonial",
+    "title": "Single Testimonial",
+    "category": "milliondollartheme-blocks",
+    "description": "Displays a single customer testimonial with quote, author details, image, and rating.",
+    "icon": "format-quote",
+    "keywords": ["testimonial", "quote", "rating", "customer", "feedback"],
+    "attributes": {
+        "quote": { "type": "string", "source": "html", "selector": ".testimonial-quote", "default": "This is an amazing product! It exceeded all my expectations." },
+        "authorName": { "type": "string", "source": "html", "selector": ".testimonial-author-name", "default": "Jane Doe" },
+        "authorTitle": { "type": "string", "source": "html", "selector": ".testimonial-author-title", "default": "CEO, ExampleCorp" },
+        "authorImageUrl": { "type": "string" },
+        "authorImageId": { "type": "number" },
+        "imageShape": { "type": "string", "default": "circle" },
+        "showRating": { "type": "boolean", "default": true },
+        "rating": { "type": "number", "default": 5 },
+        "testimonialStyle": { "type": "string", "default": "glassy" },
+        "alignment": { "type": "string", "default": "center" }, /* Text alignment within block */
+        "quoteFontSize": { "type": "string", "default": "1.3em" },
+        "quoteColor": { "type": "string" },
+        "authorNameColor": { "type": "string" },
+        "authorTitleColor": { "type": "string" },
+        "starColor": { "type": "string", "default": "var(--accent-color)" },
+        "backgroundColor": { "type": "string" },
+        "borderColor": { "type": "string" },
+        "borderRadius": { "type": "string", "default": "var(--border-radius-md)" },
+        "padding": { "type": "string", "default": "var(--spacing-lg)" },
+        "align": { "type": "string", "default": "" } /* Block alignment (wide, full) */
+    },
+    "supports": {
+        "align": ["wide", "full"],
+        "html": false,
+        "anchor": true,
+        "color": { "text": false, "background": false, "link": false, "gradients": false },
+        "spacing": { "margin": true }
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css"
+}

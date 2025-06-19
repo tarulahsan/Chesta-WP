@@ -1,0 +1,121 @@
+/* --- Posts Display Block Styles (style-index.css) --- */
+.wp-block-milliondollartheme-posts-display {
+    /* Base styles for the wrapper */
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Grid Layout */
+.wp-block-milliondollartheme-posts-display.layout-grid {
+    display: grid;
+    gap: var(--spacing-md, 16px);
+}
+.wp-block-milliondollartheme-posts-display.layout-grid.columns-1 { grid-template-columns: 1fr; }
+.wp-block-milliondollartheme-posts-display.layout-grid.columns-2 { grid-template-columns: repeat(2, 1fr); }
+.wp-block-milliondollartheme-posts-display.layout-grid.columns-3 { grid-template-columns: repeat(3, 1fr); }
+.wp-block-milliondollartheme-posts-display.layout-grid.columns-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* List Layout */
+.wp-block-milliondollartheme-posts-display.layout-list .post-item {
+    display: flex;
+    gap: var(--spacing-md, 16px);
+    margin-bottom: var(--spacing-md, 16px);
+    align-items: flex-start; /* Align items to the top */
+}
+.wp-block-milliondollartheme-posts-display.layout-list .post-item-thumbnail {
+    flex-basis: 150px; /* Fixed width for thumbnail in list layout */
+    flex-shrink: 0;
+}
+.wp-block-milliondollartheme-posts-display.layout-list .post-item-content {
+    flex-grow: 1;
+}
+
+
+/* Individual Post Item Styling */
+.wp-block-milliondollartheme-posts-display .post-item {
+    /* Common styles for each post item */
+}
+
+/* Default Item Style */
+.wp-block-milliondollartheme-posts-display.item-style-default .post-item {
+    background-color: var(--milliondollartheme-postitem-default-bg, #f9f9f9);
+    padding: var(--spacing-sm, 8px);
+    border-radius: var(--border-radius-sm, 4px);
+    border: 1px solid var(--milliondollartheme-postitem-default-border, #eee);
+}
+
+/* Card Glassy Item Style */
+.wp-block-milliondollartheme-posts-display.item-style-card-glassy .post-item {
+    background: var(--glass-bg-color, rgba(255, 255, 255, 0.1));
+    backdrop-filter: blur(var(--glass-blur-radius, 10px));
+    -webkit-backdrop-filter: blur(var(--glass-blur-radius, 10px));
+    border: 1px solid var(--glass-border-color, rgba(255, 255, 255, 0.18));
+    box-shadow: var(--glass-box-shadow, 0 8px 32px 0 rgba(31, 38, 135, 0.37));
+    padding: var(--spacing-md, 16px);
+    border-radius: var(--border-radius-md, 12px);
+}
+.wp-block-milliondollartheme-posts-display.item-style-card-glassy .post-item-title a,
+.wp-block-milliondollartheme-posts-display.item-style-card-glassy .post-item-date,
+.wp-block-milliondollartheme-posts-display.item-style-card-glassy .post-item-excerpt {
+    color: var(--text-color-light, #fff); /* Assuming glassy on dark bg */
+}
+.wp-block-milliondollartheme-posts-display.item-style-card-glassy .post-item-title a:hover {
+    color: var(--accent-color); /* Or a lighter shade of text-color-light */
+}
+
+
+.post-item-thumbnail {
+    margin-bottom: var(--spacing-sm, 8px);
+}
+.post-item-thumbnail img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: var(--border-radius-sm, 4px);
+}
+
+.post-item-title {
+    font-family: var(--font-family-heading);
+    font-size: 1.3em; /* Example */
+    margin-top: 0;
+    margin-bottom: var(--spacing-xs, 4px);
+}
+.post-item-title a {
+    text-decoration: none;
+    color: var(--primary-color);
+}
+.post-item-title a:hover {
+    color: var(--accent-color);
+}
+
+.post-item-date {
+    font-size: 0.85em;
+    color: var(--text-color-dark);
+    opacity: 0.7;
+    margin-bottom: var(--spacing-sm, 8px);
+}
+
+.post-item-excerpt p:last-child {
+    margin-bottom: 0;
+}
+
+/* Responsive adjustments for grid */
+@media (max-width: 991px) { /* Tablet */
+    .wp-block-milliondollartheme-posts-display.layout-grid.columns-4,
+    .wp-block-milliondollartheme-posts-display.layout-grid.columns-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 767px) { /* Mobile */
+    .wp-block-milliondollartheme-posts-display.layout-grid {
+        grid-template-columns: 1fr; /* Stack grid items on mobile */
+    }
+    .wp-block-milliondollartheme-posts-display.layout-list .post-item {
+        flex-direction: column; /* Stack thumbnail and content */
+    }
+    .wp-block-milliondollartheme-posts-display.layout-list .post-item-thumbnail {
+        flex-basis: auto; /* Allow thumbnail to take full width when stacked */
+        width: 100%;
+        max-width: 200px; /* Optional max width for stacked image */
+        margin-left: auto; margin-right: auto; /* Center if max-width is used */
+    }
+}

@@ -1,0 +1,159 @@
+/* --- Tabs Block Styles (style-index.css) --- */
+.wp-block-milliondollartheme-tabs {
+    /* border: 1px solid #ccc; /* Default wrapper border if not glassy/styled */
+    /* border-radius from attribute */
+    display: flex; /* Default for horizontal tabs, changed by layout-* class */
+    flex-direction: column; /* Default: titles above content */
+}
+
+/* Layouts */
+.wp-block-milliondollartheme-tabs.layout-vertical-left { flex-direction: row; }
+.wp-block-milliondollartheme-tabs.layout-vertical-right { flex-direction: row-reverse; }
+
+.tab-buttons-wrapper {
+    display: flex;
+    flex-wrap: wrap; /* Allow tabs to wrap if many */
+    /* border-bottom: 1px solid #ccc; /* Default style */
+}
+.layout-vertical-left .tab-buttons-wrapper,
+.layout-vertical-right .tab-buttons-wrapper {
+    flex-direction: column;
+    /* border-bottom: none; */
+    /* border-right: 1px solid #ccc; /* For vertical-left */
+}
+/* .layout-vertical-right .tab-buttons-wrapper { border-right: none; border-left: 1px solid #ccc; } */
+
+
+.tab-button {
+    padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+    cursor: pointer;
+    border: 1px solid transparent; /* Base for consistent height */
+    border-bottom: none; /* For default horizontal tabs */
+    background-color: #f0f0f0; /* Default inactive tab */
+    color: var(--text-color-dark);
+    margin-right: 4px; /* Spacing between horizontal tabs */
+    border-radius: var(--border-radius-sm, 8px) var(--border-radius-sm, 8px) 0 0; /* Top rounded corners */
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    font-weight: 600;
+}
+.layout-vertical-left .tab-button,
+.layout-vertical-right .tab-button {
+    margin-right: 0;
+    margin-bottom: 4px;
+    border-radius: var(--border-radius-sm, 8px) 0 0 var(--border-radius-sm, 8px); /* Left rounded for vertical */
+    border-bottom: 1px solid transparent;
+    /* border-right: none; */ /* For vertical-left */
+}
+/* .layout-vertical-right .tab-button { border-radius: 0 var(--border-radius-sm, 8px) var(--border-radius-sm, 8px) 0; } */
+
+
+.tab-button:hover {
+    background-color: #e0e0e0;
+}
+.tab-button.is-active {
+    background-color: var(--background-color-light, #fff); /* Active tab matches content bg */
+    /* border-color: #ccc; */ /* Match wrapper/content border */
+    /* border-bottom-color: var(--background-color-light, #fff); /* "Punch out" effect */
+    color: var(--primary-color);
+    font-weight: 700;
+}
+/* .layout-vertical-left .tab-button.is-active { border-right-color: var(--background-color-light, #fff); } */
+/* .layout-vertical-right .tab-button.is-active { border-left-color: var(--background-color-light, #fff); } */
+
+
+.tab-content-panels-wrapper {
+    /* padding from attribute */
+    /* background-color from attribute */
+    /* border: 1px solid #ccc; /* Default */
+    /* border-top: none; /* For horizontal tabs */
+    /* border-radius from attribute for bottom corners */
+    flex-grow: 1; /* For vertical layouts */
+}
+
+/* Individual tab panels (core/group blocks with data-tab-id) */
+.tab-panel-wrapper { /* This is the core/group block */
+    /* display: none; /* Alpine handles this with x-show */
+    /* padding: var(--spacing-md); /* Or rely on group block's own padding */
+}
+/* .tab-panel-wrapper.is-active { display: block; } /* CSS fallback if Alpine fails */
+
+
+/* Style Variations */
+/* Style: Pills */
+.wp-block-milliondollartheme-tabs.is-style-pills .tab-buttons-wrapper { border-bottom: none; }
+.wp-block-milliondollartheme-tabs.is-style-pills .tab-button {
+    border-radius: var(--border-radius-md, 12px); /* Full pill shape */
+    border: 1px solid #ddd;
+    margin: 4px;
+}
+.wp-block-milliondollartheme-tabs.is-style-pills .tab-button.is-active {
+    background-color: var(--primary-color);
+    color: var(--text-color-light);
+    border-color: var(--primary-color);
+}
+
+/* Style: Line */
+.wp-block-milliondollartheme-tabs.is-style-line .tab-buttons-wrapper { border-bottom: 2px solid #ddd; }
+.wp-block-milliondollartheme-tabs.is-style-line .tab-button {
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px; /* Overlap wrapper border */
+    border-radius: 0;
+}
+.wp-block-milliondollartheme-tabs.is-style-line .tab-button.is-active {
+    border-bottom-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: transparent;
+}
+
+
+/* Style: Glassy */
+.wp-block-milliondollartheme-tabs.is-style-glassy {
+    background: var(--glass-bg-color);
+    backdrop-filter: blur(var(--glass-blur-radius));
+    -webkit-backdrop-filter: blur(var(--glass-blur-radius));
+    border: 1px solid var(--glass-border-color);
+    box-shadow: var(--glass-box-shadow);
+    /* border-radius from attribute */
+    padding: var(--spacing-sm); /* Padding for the whole glassy container */
+}
+.wp-block-milliondollartheme-tabs.is-style-glassy .tab-buttons-wrapper { border-bottom-color: var(--glass-border-color); }
+.wp-block-milliondollartheme-tabs.is-style-glassy .tab-button {
+    background-color: transparent;
+    color: var(--text-color-light); /* Assuming glassy on dark */
+    border-color: transparent;
+}
+.wp-block-milliondollartheme-tabs.is-style-glassy .tab-button:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+.wp-block-milliondollartheme-tabs.is-style-glassy .tab-button.is-active {
+    background-color: rgba(255,255,255,0.2);
+    border-bottom-color: transparent; /* For horizontal */
+    /* For line style within glassy, it would be different */
+}
+.wp-block-milliondollartheme-tabs.is-style-glassy .tab-content-panels-wrapper {
+    /* background-color from attribute, or make it transparent for full glass */
+    /* border-color: var(--glass-border-color); */
+    /* color: var(--text-color-light); /* If content is also on glass */
+}
+
+
+/* Responsive */
+@media (max-width: 767px) {
+    /* Stack horizontal tabs if too many, or make them scrollable */
+    .wp-block-milliondollartheme-tabs.layout-horizontal .tab-buttons-wrapper {
+        /* overflow-x: auto; /* Example for scrollable tabs */
+    }
+    .wp-block-milliondollartheme-tabs.layout-vertical-left,
+    .wp-block-milliondollartheme-tabs.layout-vertical-right {
+        flex-direction: column; /* Stack vertical tabs on mobile */
+    }
+    .wp-block-milliondollartheme-tabs.layout-vertical-left .tab-buttons-wrapper,
+    .wp-block-milliondollartheme-tabs.layout-vertical-right .tab-buttons-wrapper {
+        border-right: none; border-left: none;
+        border-bottom: 1px solid #ccc; /* Separator for stacked vertical tabs */
+        flex-direction: row; /* Horizontal buttons again when stacked */
+        overflow-x: auto; /* Allow scrolling if many tabs */
+    }
+}

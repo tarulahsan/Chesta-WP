@@ -1,0 +1,132 @@
+/* --- Accordion/Toggle Block Styles (style-index.css) --- */
+.wp-block-milliondollartheme-accordion-toggle {
+    /* border: 1px solid var(--border-color, #ccc); /* Default border for main wrapper */
+    /* border-radius: var(--border-radius-sm, 4px); /* Default wrapper radius */
+    /* overflow: hidden; /* To contain children border-radius */
+}
+
+.accordion-item {
+    /* Styles for when items are not 'separated' */
+}
+.wp-block-milliondollartheme-accordion-toggle.is-style-default .accordion-item {
+    border-bottom: 1px solid var(--accordion-item-border-color, #ddd);
+}
+.wp-block-milliondollartheme-accordion-toggle.is-style-default .accordion-item:last-child {
+    border-bottom: none;
+}
+
+/* Separated Style */
+.wp-block-milliondollartheme-accordion-toggle.is-style-separated {
+    /* Individual items get border/bg/radius from inline styles or specific CSS */
+}
+.wp-block-milliondollartheme-accordion-toggle.is-style-separated .accordion-item {
+    /* border-radius is applied inline for the whole item */
+    overflow: hidden; /* ensure children like title/content respect this radius */
+}
+.wp-block-milliondollartheme-accordion-toggle.is-style-separated .accordion-title {
+    /* For separated, top corners of title get radius if item is not open */
+    border-radius: var(--dynamic-accordion-title-radius);
+}
+.wp-block-milliondollartheme-accordion-toggle.is-style-separated .accordion-content {
+    /* For separated, bottom corners of content get radius */
+     border-radius: var(--dynamic-accordion-content-radius);
+}
+
+
+.accordion-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+    text-align: left;
+    background-color: var(--accordion-title-bg, #f0f0f0);
+    color: var(--accordion-title-color, inherit);
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    /* border-radius applied inline based on open state for top corners */
+}
+.accordion-title:hover {
+    background-color: var(--accordion-title-bg-hover, #e0e0e0);
+}
+.accordion-title .accordion-title-text { /* The H_TAG or P_TAG */
+    margin: 0;
+    font-size: 1.1em; /* Example */
+    flex-grow: 1;
+}
+
+.accordion-title::after { /* Icon placeholder */
+    content: '+'; /* Default, will be overridden by iconSet */
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-left: var(--spacing-sm, 8px);
+    transition: transform 0.2s ease;
+}
+.accordion-title[aria-expanded="true"]::after {
+    transform: rotate(45deg);
+}
+
+/* Icon Sets */
+.wp-block-milliondollartheme-accordion-toggle.icon-set-chevron .accordion-title::after {
+    content: '\25BC'; /* ▼ (Down arrow) */
+    font-size: 0.8em;
+    transform: rotate(0deg);
+}
+.wp-block-milliondollartheme-accordion-toggle.icon-set-chevron .accordion-title[aria-expanded="true"]::after {
+    transform: rotate(180deg); /* ▲ (Up arrow) */
+}
+.wp-block-milliondollartheme-accordion-toggle.icon-set-none .accordion-title::after {
+    content: none;
+}
+
+
+.accordion-content {
+    padding: var(--spacing-md, 16px);
+    background-color: var(--accordion-content-bg, #fff);
+    /* border-top: 1px solid var(--accordion-item-border-color, #ddd); /* Separator if not using title bg */
+    /* border-radius applied inline for bottom corners */
+    /* Alpine handles the show/hide with x-collapse */
+}
+.accordion-content-inner > *:last-child {
+    margin-bottom: 0;
+}
+
+/* Glassy Style */
+.wp-block-milliondollartheme-accordion-toggle.is-style-glassy .accordion-item {
+    /* Each item could be glassy */
+    background: var(--glass-bg-color);
+    backdrop-filter: blur(var(--glass-blur-radius));
+    -webkit-backdrop-filter: blur(var(--glass-blur-radius));
+    border: 1px solid var(--glass-border-color);
+    box-shadow: var(--glass-box-shadow);
+    margin-bottom: var(--spacing-sm);
+    border-radius: var(--border-radius-md); /* Applied to item if separated, or wrapper */
+    overflow: hidden; /* For child border radius */
+}
+.wp-block-milliondollartheme-accordion-toggle.is-style-glassy .accordion-title {
+    background-color: transparent; /* Or a slightly different transparent shade */
+    color: var(--text-color-light); /* Assuming glassy on dark */
+}
+.wp-block-milliondollartheme-accordion-toggle.is-style-glassy .accordion-title:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+.wp-block-milliondollartheme-accordion-toggle.is-style-glassy .accordion-content {
+    background-color: transparent; /* Or slightly different transparent shade */
+    color: var(--text-color-light); /* Assuming glassy on dark */
+    border-top: 1px solid var(--glass-border-color);
+}
+.wp-block-milliondollartheme-accordion-toggle.is-style-glassy .accordion-title::after {
+    color: var(--text-color-light);
+}
+
+
+/* Responsive */
+@media (max-width: 767px) {
+    .accordion-title .accordion-title-text {
+        font-size: 1em; /* Adjust title size for mobile */
+    }
+    .accordion-content {
+        padding: var(--spacing-sm); /* Adjust padding */
+    }
+}

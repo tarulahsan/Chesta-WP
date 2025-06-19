@@ -1,0 +1,7 @@
+/* Posts Display Block - Editor Styles (index.css) */
+/* For ServerSideRender blocks, front-end styles are typically used directly in the editor. */
+/* This file can be used for editor-only wrapper adjustments if needed. */
+.wp-block-milliondollartheme-posts-display {
+    border: 1px dashed #ccc; /* Optional: visual guide in editor for the block bounds */
+    padding: 8px; /* Minimal padding if the ServerSideRender output itself doesnt have it */
+}

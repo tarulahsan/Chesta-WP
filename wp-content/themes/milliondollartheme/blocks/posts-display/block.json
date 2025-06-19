@@ -1,0 +1,34 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/posts-display",
+    "title": "Posts Display",
+    "category": "milliondollartheme-blocks",
+    "description": "Displays a list or grid of posts based on selected criteria.",
+    "icon": "layout",
+    "keywords": ["posts", "grid", "list", "query", "latest", "loop"],
+    "attributes": {
+        "numberOfPosts": { "type": "number", "default": 3 },
+        "layout": { "type": "string", "default": "grid" }, /* grid, list */
+        "columns": { "type": "number", "default": 3 }, /* For grid layout */
+        "displayFeaturedImage": { "type": "boolean", "default": true },
+        "displayPostTitle": { "type": "boolean", "default": true },
+        "displayPostDate": { "type": "boolean", "default": true },
+        "displayPostExcerpt": { "type": "boolean", "default": true },
+        "excerptLength": { "type": "number", "default": 25 },
+        "categories": { "type": "string" }, /* Comma-separated IDs or slugs */
+        "orderBy": { "type": "string", "default": "date" },
+        "order": { "type": "string", "default": "DESC" },
+        "align": { "type": "string", "default": "" }, /* wide, full */
+        "postsDisplayStyle": { "type": "string", "default": "default" } /* default, card-glassy */
+    },
+    "supports": {
+        "align": ["wide", "full"],
+        "html": false, /* Content is dynamic */
+        "anchor": true
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "style": "file:./style-index.css" /* Front-end styles */
+    /* "render": "file:./render.php" // Alternative if render callback is in block folder */
+}

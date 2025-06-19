@@ -1,0 +1,44 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/tabs",
+    "title": "Tabs",
+    "category": "milliondollartheme-blocks",
+    "description": "Displays content in tabbed sections, allowing users to switch between views.",
+    "icon": "index-card",
+    "keywords": ["tabs", "tabbed content", "layout", "navigation"],
+    "attributes": {
+        "tabs": {
+            "type": "array",
+            "default": [
+                { "id": "tab1", "title": "Tab 1 Title" },
+                { "id": "tab2", "title": "Tab 2 Title" },
+                { "id": "tab3", "title": "Tab 3 Title" }
+            ]
+            // Note: Content is handled by InnerBlocks, so not directly in item attributes here
+        },
+        "activeTab": { "type": "string" }, // Store ID of the initially active tab
+        "tabLayout": { "type": "string", "default": "horizontal" }, /* horizontal, vertical-left, vertical-right */
+        "tabsStyle": { "type": "string", "default": "default" }, /* default, pills, glassy, line */
+        "tabTitleColor": { "type": "string" },
+        "tabTitleBgColor": { "type": "string" },
+        "activeTabTitleColor": { "type": "string" },
+        "activeTabTitleBgColor": { "type": "string" },
+        "borderColor": { "type": "string" }, // For borders around tabs/content
+        "contentBgColor": { "type": "string" },
+        "contentPadding": { "type": "string", "default": "var(--spacing-md)"},
+        "borderRadius": { "type": "string", "default": "var(--border-radius-sm)"},
+        "align": { "type": "string", "default": "" }
+    },
+    "supports": {
+        "align": ["wide", "full"],
+        "html": false,
+        "anchor": true,
+        "color": false,
+        "spacing": { "margin": true }
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css"
+}

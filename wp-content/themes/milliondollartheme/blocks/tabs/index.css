@@ -1,0 +1,52 @@
+/* --- Tabs Block Editor Styles (index.css) --- */
+.wp-block-milliondollartheme-tabs {
+    border: 1px dashed #ccc;
+    padding: 8px;
+}
+.tab-titles-editor {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+    align-items: center;
+}
+.tab-title-item-editor {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    background: #f0f0f0;
+}
+.tab-title-item-editor.is-active {
+    background: #fff;
+    border-bottom-color: #fff; /* For visual cue */
+}
+.tab-title-editor .rich-text { /* Target inner RichText */
+    padding: 6px 10px;
+    min-width: 80px;
+}
+.tab-title-item-editor .components-button.is-destructive { /* Remove button */
+    min-width: auto;
+    padding: 6px;
+    height: auto;
+    line-height: 1;
+}
+
+/* In editor, all tab panels (InnerBlocks children) are visible by default.
+   We need CSS to hide non-active panels for a better WYSIWYG.
+   This requires JS in edit() to add/remove a class or style to the InnerBlocks children.
+   The current edit() renders all and relies on user clicking to conceptually switch.
+   For a true WYSIWYG preview of active tab content, the InnerBlocks children (core/group)
+   would need conditional rendering or display:none based on selectedTab.
+*/
+.tabs-content-editor-area > .block-editor-inner-blocks > .block-editor-block-list__layout > [data-block] {
+    /* By default, show all. JS should add a class to hide non-active ones. */
+    /* display: none; */ /* If JS adds .is-active-editor-panel */
+    border: 1px dashed #eee;
+    padding: 8px;
+    margin-top: 8px;
+}
+/* Example if JS adds .is-active-editor-panel to the active group block wrapper */
+/* .tabs-content-editor-area > .block-editor-inner-blocks > .block-editor-block-list__layout > [data-block].is-active-editor-panel {
+    display: block;
+} */

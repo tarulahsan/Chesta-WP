@@ -1,0 +1,39 @@
+/* --- Accordion/Toggle Block Editor Styles (index.css) --- */
+.wp-block-milliondollartheme-accordion-toggle .accordion-item-editor {
+    border: 1px solid #ddd;
+    margin-bottom: 8px;
+    padding: 8px;
+    border-radius: 4px;
+    background: #f9f9f9;
+}
+.accordion-item-header-editor {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 4px 0; /* Minimal padding for editor header */
+}
+.accordion-title-text-editor .rich-text { /* Target the inner RichText if needed */
+    font-weight: bold;
+}
+.accordion-icon-editor {
+    font-weight: bold;
+}
+.accordion-content-editor {
+    padding: 8px;
+    border-top: 1px solid #eee;
+    margin-top: 4px;
+    background: #fff;
+}
+.accordion-content-inner-editor .rich-text p:first-child { margin-top: 0; }
+.accordion-content-inner-editor .rich-text p:last-child { margin-bottom: 0; }
+
+/* Preview for style variations in editor */
+.wp-block-milliondollartheme-accordion-toggle.is-style-glassy .accordion-item-editor {
+    background: rgba(var(--primary-color-rgb, 0,82,212),0.1); /* Simplified glassy preview */
+    border: 1px solid rgba(var(--primary-color-rgb, 0,82,212),0.2);
+}
+.wp-block-milliondollartheme-accordion-toggle.is-style-separated .accordion-item-editor {
+    /* Styling for 'separated' in editor if different from default item */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}

@@ -1,0 +1,23 @@
+/* --- Single Testimonial Block Editor Styles (index.css) --- */
+.wp-block-milliondollartheme-single-testimonial {
+    /* border: 1px dashed #ccc; */ /* Optional visual guide */
+}
+
+/* Ensure text alignment from block props is reflected for child containers in editor */
+.wp-block-milliondollartheme-single-testimonial.has-text-align-center .testimonial-image-wrapper {
+    /* display: flex; justify-content: center; */ /* Handled by text-align on parent and inline-block on child */
+}
+.wp-block-milliondollartheme-single-testimonial.has-text-align-center .testimonial-image-wrapper img {
+    margin-left: auto; margin-right: auto; /* Center img if it is block */
+}
+
+
+.wp-block-milliondollartheme-single-testimonial .testimonial-image-wrapper img {
+    display: block; /* Consistent display */
+}
+
+/* Style for glassy preview in editor if inline styles are not enough */
+.wp-block-milliondollartheme-single-testimonial.is-style-glassy {
+    /* background: rgba(50, 50, 150, 0.1); */ /* JS applies this via inline style */
+    /* border: 1px solid rgba(255,255,255,0.1); */
+}

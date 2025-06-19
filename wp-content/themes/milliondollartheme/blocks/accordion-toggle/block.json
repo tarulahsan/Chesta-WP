@@ -1,0 +1,48 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/accordion-toggle",
+    "title": "Accordion / Toggle",
+    "category": "milliondollartheme-blocks",
+    "description": "Displays collapsible content sections, ideal for FAQs or organized information.",
+    "icon": "menu-alt",
+    "keywords": ["accordion", "toggle", "faq", "collapsible", "spoiler"],
+    "attributes": {
+        "items": {
+            "type": "array",
+            "default": [
+                { "id": "item1", "title": "Accordion Title 1", "content": "Content for item 1. Add more details here." },
+                { "id": "item2", "title": "Accordion Title 2", "content": "Content for item 2. This can be extensive." }
+            ],
+            "source": "query",
+            "selector": ".accordion-item",
+            "query": {
+                "title": { "type": "string", "source": "html", "selector": ".accordion-title-text" },
+                "content": { "type": "string", "source": "html", "selector": ".accordion-content-inner" },
+                "id": { "type": "string", "source": "attribute", "selector": ".accordion-item", "attribute": "data-id" }
+            }
+        },
+        "openMultiple": { "type": "boolean", "default": false },
+        "defaultOpenIndex": { "type": "number", "default": -1 }, /* -1 means all closed, 0 for first, etc. */
+        "accordionStyle": { "type": "string", "default": "default" }, /* e.g., default, glassy, separated */
+        "iconSet": { "type": "string", "default": "plus-minus" }, /* plus-minus, chevron, none */
+        "titleTag": { "type": "string", "default": "h4" },
+        "titleColor": { "type": "string" },
+        "titleBgColor": { "type": "string" },
+        "contentBgColor": { "type": "string" },
+        "borderColor": { "type": "string" },
+        "borderRadius": { "type": "string", "default": "var(--border-radius-sm)"},
+        "align": { "type": "string", "default": "" }
+    },
+    "supports": {
+        "align": ["wide", "full"],
+        "html": false,
+        "anchor": true,
+        "color": false, /* Using own color controls */
+        "spacing": { "margin": true }
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css"
+}
