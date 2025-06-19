@@ -1,0 +1,35 @@
+/* --- Icon Box Block Editor Styles (index.css) --- */
+.wp-block-milliondollartheme-icon-box {
+    /* border: 1px dashed #ccc; */ /* Optional: visual guide in editor */
+    /* min-height: 100px; */ /* Ensure it's clickable */
+}
+
+/* Make RichText areas more visible if needed */
+.wp-block-milliondollartheme-icon-box .icon-box-title {
+    /* WordPress default RichText styling is usually good. */
+}
+
+.wp-block-milliondollartheme-icon-box .icon-box-text {
+    /* WordPress default RichText styling is usually good. */
+}
+
+/* Editor preview for icon position */
+.wp-block-milliondollartheme-icon-box.icon-pos-top {
+    display: flex;
+    flex-direction: column;
+    /* text-align from attribute will apply */
+}
+.wp-block-milliondollartheme-icon-box.icon-pos-left {
+    display: flex;
+    flex-direction: row;
+    gap: 16px; /* Use var if available, or fixed value */
+    /* align-items from attribute will apply */
+}
+
+.wp-block-milliondollartheme-icon-box .icon-box-icon-placeholder {
+    /* Basic styling for placeholder */
+    padding: 5px;
+    background: #f0f0f0;
+    border-radius: 3px;
+    line-height: 1;
+}

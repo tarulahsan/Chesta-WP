@@ -1,0 +1,110 @@
+/* Gutenberg Editor Styles for MillionDollarTheme */
+
+/* Import the main stylesheet to inherit theme styles.
+   Adjust path if your main style.css is in a different location relative to this file.
+   This assumes editor-style.css is in the theme root.
+   WordPress handles the actual loading, this @import is for SASS/CSS compilation sense,
+   but for direct CSS, it might not work as expected in all contexts.
+   A better approach for editor styles is to specifically style the .editor-styles-wrapper
+   and elements within it, possibly by copying relevant parts of style.css.
+*/
+/* @import url('style.css'); */ /* This often doesn't work well directly in WP */
+
+/* --- Basic Editor Body Styling --- */
+/* Target the editor wrapper to apply body-like styles */
+/* WordPress 5.8+ uses a namespaced body class: .editor-styles-wrapper */
+.editor-styles-wrapper {
+    font-family: var(--font-family-body, sans-serif); /* Use CSS vars from main stylesheet */
+    color: var(--text-color-dark, #1A1A1A);
+    line-height: 1.6;
+    padding: 20px; /* Add some padding around the editor content */
+}
+
+/* Headings in Editor */
+.editor-styles-wrapper h1,
+.editor-styles-wrapper h2,
+.editor-styles-wrapper h3,
+.editor-styles-wrapper h4,
+.editor-styles-wrapper h5,
+.editor-styles-wrapper h6 {
+    font-family: var(--font-family-heading, sans-serif);
+    color: var(--primary-color, #0052D4); /* Use CSS vars */
+    margin-top: var(--spacing-lg, 32px);
+    margin-bottom: var(--spacing-md, 16px);
+    line-height: 1.3;
+    font-weight: 700;
+}
+
+.editor-styles-wrapper h1 { font-size: 2.8em; font-weight: 900; }
+.editor-styles-wrapper h2 { font-size: 2.2em; }
+.editor-styles-wrapper h3 { font-size: 1.8em; }
+.editor-styles-wrapper h4 { font-size: 1.5em; }
+.editor-styles-wrapper h5 { font-size: 1.25em; }
+.editor-styles-wrapper h6 { font-size: 1em; }
+
+/* Paragraphs in Editor */
+.editor-styles-wrapper p {
+    margin-bottom: var(--spacing-md, 16px);
+    font-size: 1em; /* Ensure base font size is applied */
+}
+
+/* Links in Editor */
+.editor-styles-wrapper a {
+    color: var(--accent-color, #00C6AD);
+    text-decoration: none;
+}
+.editor-styles-wrapper a:hover {
+    text-decoration: underline;
+}
+
+/* Ensure wide and full alignments have space */
+.editor-styles-wrapper .alignwide {
+    margin-left: -40px; /* Example, adjust as needed */
+    margin-right: -40px;
+}
+.editor-styles-wrapper .alignfull {
+    margin-left: calc(-50vw + 50%); /* Should match front-end behavior */
+    margin-right: calc(-50vw + 50%);
+    max-width: 100vw;
+    width: 100vw;
+}
+
+/* Import Google Fonts directly in editor styles if not inherited via other means */
+/* This is crucial if the main style.css variables are not fully available here */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&family=Inter:wght@400;700&display=swap');
+
+/*
+To make CSS Custom Properties from style.css available in editor-style.css,
+WordPress typically processes style.css and makes them available.
+If they are not available, you might need to redeclare them here or use a build process.
+For now, assume they are available or use fallbacks as done in the var() calls.
+*/
+
+/*
+It's also good practice to enqueue the Google Fonts in functions.php specifically for the editor
+using 'enqueue_block_editor_assets' hook if this @import proves unreliable.
+*/
+
+/* Example of styling a core block to match theme styles */
+.editor-styles-wrapper .wp-block-button__link {
+    /* Assuming global button styles are defined with .button class or similar variables */
+    display: inline-block;
+    padding: var(--spacing-md, 16px) var(--spacing-lg, 32px);
+    font-family: var(--font-family-heading, sans-serif);
+    font-size: 1em;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text-color-light, #F0F0F0) !important; /* Important to override default editor button colors */
+    background: var(--gradient-primary); /* Uses variable from main style.css */
+    border: none;
+    border-radius: var(--border-radius-sm, 8px);
+    transition: transform var(--transition-speed, 0.3s) var(--transition-timing, ease-in-out), box-shadow var(--transition-speed, 0.3s) var(--transition-timing, ease-in-out);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.editor-styles-wrapper .wp-block-button__link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+EOF

@@ -1,0 +1,54 @@
+/* --- Advanced Button Block Editor Styles (index.css) --- */
+.wp-block-milliondollartheme-advanced-button {
+    /* Styles for the block wrapper in the editor if needed */
+    /* Example: to ensure it behaves like inline-block for text alignment */
+    /* display: inline-block; */ /* This is handled by block supports align */
+}
+
+.wp-block-milliondollartheme-advanced-button .adv-button-link-wrapper {
+    /* This is the span used in edit mode to wrap RichText and icon */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm, 8px);
+    padding: var(--spacing-sm, 8px) var(--spacing-md, 16px); /* Mimic medium size for editor */
+    /* Apply some default styling to make it look like a button in editor */
+    background: #f0f0f0;
+    border-radius: var(--border-radius-sm, 8px);
+    border: 1px solid #ccc;
+    cursor: default; /* It's not a real link in edit mode */
+}
+
+/* Apply style previews in editor */
+.wp-block-milliondollartheme-advanced-button.is-style-primary .adv-button-link-wrapper {
+    background: var(--gradient-primary, #0052D4);
+    color: var(--text-color-light, #fff);
+    border-color: transparent;
+}
+.wp-block-milliondollartheme-advanced-button.is-style-outline .adv-button-link-wrapper {
+    background-color: transparent;
+    border-color: var(--primary-color, #0052D4);
+    color: var(--primary-color, #0052D4);
+}
+.wp-block-milliondollartheme-advanced-button.is-style-glassy .adv-button-link-wrapper {
+    /* Glassy effect is hard to preview accurately without backdrop, use simplified version */
+    background: rgba(50, 50, 150, 0.3); /* bluish transparent */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-color-light, #fff);
+}
+
+
+/* Size previews in editor */
+.wp-block-milliondollartheme-advanced-button.is-size-small .adv-button-link-wrapper {
+    padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+    font-size: 0.85em;
+}
+.wp-block-milliondollartheme-advanced-button.is-size-large .adv-button-link-wrapper {
+    padding: var(--spacing-md, 16px) var(--spacing-lg, 32px);
+    font-size: 1.15em;
+}
+
+
+.wp-block-milliondollartheme-advanced-button .adv-button-text .rich-text {
+    /* Ensure RichText input field is visible and usable */
+}

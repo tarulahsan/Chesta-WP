@@ -1,0 +1,48 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/icon-box",
+    "title": "Icon Box / Feature Box",
+    "category": "milliondollartheme-blocks",
+    "description": "A box with an icon, title, and text content, often used for features or services.",
+    "icon": "star",
+    "keywords": ["icon", "feature", "box", "service", "info"],
+    "attributes": {
+        "icon": { "type": "string", "default": "check-circle" },
+        "iconSize": { "type": "string", "default": "medium" },
+        "iconCustomSize": { "type": "number" },
+        "iconColor": { "type": "string", "default": "var(--primary-color)" },
+        "iconPosition": { "type": "string", "default": "top" },
+        "iconVerticalAlignment": { "type": "string", "default": "center" },
+        "title": { "type": "string", "source": "html", "selector": ".icon-box-title", "default": "Feature Title" },
+        "titleTag": { "type": "string", "default": "h4" },
+        "titleColor": { "type": "string" },
+        "text": { "type": "string", "source": "html", "selector": ".icon-box-text", "default": "Describe the feature or benefit here." },
+        "textColor": { "type": "string" },
+        "boxStyle": { "type": "string", "default": "default" },
+        "boxBackgroundColor": { "type": "string" },
+        "boxBorderColor": { "type": "string" },
+        "boxPadding": { "type": "string", "default": "var(--spacing-md)" },
+        "borderRadius": { "type": "string", "default": "var(--border-radius-md)" },
+        "textAlign": { "type": "string", "default": "center" },
+        "enableLink": { "type": "boolean", "default": false },
+        "url": { "type": "string", "default": "#" },
+        "target": { "type": "boolean", "default": false },
+        "rel": { "type": "string", "default": "" }
+    },
+    "supports": {
+        "html": false,
+        "anchor": true,
+        "align": ["left", "center", "right", "wide"],
+        "color": {
+            "text": false, "background": false, "link": false, "gradients": false
+        },
+        "spacing": {
+            "margin": true
+        }
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css"
+}

@@ -1,0 +1,22 @@
+/* --- Advanced Heading Block Editor Styles (index.css) --- */
+.wp-block-milliondollartheme-advanced-heading {
+    /* border: 1px dashed #ccc; */ /* Optional visual guide */
+}
+.wp-block-milliondollartheme-advanced-heading .adv-heading-main.rich-text-placeholder,
+.wp-block-milliondollartheme-advanced-heading .adv-heading-sub.rich-text-placeholder {
+    /* Styles for the RichText placeholder text if needed */
+    /* opacity: 0.5; */
+}
+
+/* Editor preview for gradient text if possible */
+.wp-block-milliondollartheme-advanced-heading .adv-heading-main.has-gradient-text {
+    /* This will use the front-end style, which is good.
+       Ensure the --heading-gradient var is available or provide fallback in editor. */
+}
+
+.wp-block-milliondollartheme-advanced-heading .adv-heading-decorator {
+    /* Basic preview for decorator in editor */
+    /* background-color: #ccc; */ /* Fallback if color is not set */
+    /* min-height: 3px; */
+    /* min-width: 50px; */
+}

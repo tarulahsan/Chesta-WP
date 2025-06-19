@@ -1,0 +1,31 @@
+/* --- Custom Spacer/Divider Block Editor Styles (index.css) --- */
+.wp-block-milliondollartheme-custom-spacer-divider .spacer-preview {
+    background: rgba(0, 0, 255, 0.1); /* Light blue, semi-transparent */
+    border: 1px dashed rgba(0, 0, 255, 0.3);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(0, 0, 255, 0.5);
+    font-size: 0.9em;
+    width: 100%; /* Take full width of block editor column */
+    box-sizing: border-box;
+}
+
+.wp-block-milliondollartheme-custom-spacer-divider .divider-preview-wrapper {
+    display: flex; /* For alignment */
+    width: 100%;
+    padding: var(--spacing-md, 16px) 0;
+}
+.wp-block-milliondollartheme-custom-spacer-divider .divider-line-preview {
+    /* Styles for thickness, color, style are applied inline */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+.wp-block-milliondollartheme-custom-spacer-divider .divider-line-preview .divider-icon-placeholder {
+    background: #fff; /* Editor background */
+    padding: 0 8px;
+    position: relative;
+}

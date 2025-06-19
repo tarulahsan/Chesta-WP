@@ -1,0 +1,100 @@
+/* --- Hero Section Block Styles (style-index.css) --- */
+.wp-block-milliondollartheme-hero-section {
+    position: relative;
+    overflow: hidden; /* Important if overlay is pseudo or bg is img/video */
+    display: flex; /* Changed from planning to use this as the main flex container for content alignment */
+    /* align-items and justify-content will be set by attributes via inline styles in save() if needed,
+       or applied to hero-section-content-wrapper */
+    /* Default padding if not overridden by attributes */
+    padding: var(--spacing-xl) var(--spacing-md);
+}
+
+.wp-block-milliondollartheme-hero-section .hero-section-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* Below content */
+}
+
+.wp-block-milliondollartheme-hero-section .hero-section-content-wrapper {
+    position: relative;
+    z-index: 2; /* Above overlay */
+    width: 100%; /* Take full width of the block */
+    display: flex;
+    flex-direction: column;
+    /* alignItems, justifyContent, textAlign will be set by attributes via inline styles in save() */
+    /* Example: if textAlign is center, this div's items might be centered */
+}
+
+.wp-block-milliondollartheme-hero-section .hero-title {
+    font-family: var(--font-family-heading);
+    font-weight: 900;
+    color: var(--text-color-light); /* Default for dark overlay/bg */
+    /* font-size will come from h1,h2 etc. global styles or specific block settings */
+    margin-bottom: var(--spacing-md);
+}
+
+.wp-block-milliondollartheme-hero-section .hero-text {
+    font-family: var(--font-family-body);
+    color: var(--text-color-light); /* Default for dark overlay/bg */
+    font-size: 1.2em;
+    max-width: 700px; /* Prevent text from becoming too wide */
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.7;
+}
+
+/* Adjust text alignment for children based on parent's text-align style */
+.wp-block-milliondollartheme-hero-section[style*="text-align: center;"] .hero-title,
+.wp-block-milliondollartheme-hero-section[style*="text-align: center;"] .hero-text,
+.wp-block-milliondollartheme-hero-section[style*="text-align: center;"] .hero-buttons {
+    margin-left: auto;
+    margin-right: auto;
+}
+.wp-block-milliondollartheme-hero-section[style*="text-align: right;"] .hero-title,
+.wp-block-milliondollartheme-hero-section[style*="text-align: right;"] .hero-text,
+.wp-block-milliondollartheme-hero-section[style*="text-align: right;"] .hero-buttons {
+    margin-left: auto;
+    margin-right: 0; /* or text-align: right on the elements themselves */
+}
+
+
+.wp-block-milliondollartheme-hero-section .hero-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+    /* justify-content will be inherited from parent's text-align effectively, or set directly */
+}
+
+.wp-block-milliondollartheme-hero-section .hero-button {
+    /* Using global .button styles as a base and extending */
+    /* This assumes .button styles are defined globally in theme's style.css */
+    /* For this example, let's define some basic button styles here */
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-family: var(--font-family-heading);
+    font-size: 1em;
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    border-radius: var(--border-radius-sm);
+    transition: transform var(--transition-speed) var(--transition-timing), box-shadow var(--transition-speed) var(--transition-timing);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: inline-block;
+}
+.wp-block-milliondollartheme-hero-section .hero-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.wp-block-milliondollartheme-hero-section .hero-button.button-style-primary {
+    background: var(--gradient-primary);
+    color: var(--text-color-light);
+    border: none;
+}
+
+.wp-block-milliondollartheme-hero-section .hero-button.button-style-outline {
+    background: transparent;
+    border: 2px solid var(--text-color-light); /* Assuming dark bg/overlay */
+    color: var(--text-color-light);
+}
+/* Add more styles for other button types if defined */

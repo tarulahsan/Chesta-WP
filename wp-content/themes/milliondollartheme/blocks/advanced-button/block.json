@@ -1,0 +1,44 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/advanced-button",
+    "title": "Advanced Button",
+    "category": "milliondollartheme-blocks",
+    "description": "A highly customizable button with more styling options like gradients, icons, and sizes.",
+    "icon": "button",
+    "keywords": ["button", "link", "cta", "advanced"],
+    "attributes": {
+        "text": { "type": "string", "source": "html", "selector": ".wp-block-button__link", "default": "Click Me" },
+        "url": { "type": "string", "default": "#" },
+        "target": { "type": "boolean", "default": false },
+        "rel": { "type": "string", "default": "" },
+        "buttonStyle": { "type": "string", "default": "primary" },
+        "customBackgroundColor": { "type": "string" },
+        "customTextColor": { "type": "string" },
+        "customBorderColor": { "type": "string" },
+        "gradient": { "type": "string" },
+        "size": { "type": "string", "default": "medium" },
+        "width": { "type": "string", "default": "auto" },
+        "borderRadius": { "type": "string" },
+        "icon": { "type": "string" },
+        "iconPosition": { "type": "string", "default": "left" },
+        "addShadow": { "type": "boolean", "default": true },
+        "hoverEffect": { "type": "string", "default": "lift" },
+        "align": { "type": "string" } /* For block alignment itself */
+    },
+    "supports": {
+        "align": ["left", "center", "right", "wide", "full"], /* Button block can have these alignments */
+        "html": false,
+        "anchor": true,
+        "color": {
+            "text": false, "background": false, "link": false, "gradients": false
+        },
+        "spacing": {
+            "padding": true, "margin": true /* Allow padding/margin controls on the wrapper */
+        }
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css"
+}

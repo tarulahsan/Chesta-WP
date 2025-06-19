@@ -1,0 +1,49 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/advanced-heading",
+    "title": "Advanced Heading",
+    "category": "milliondollartheme-blocks",
+    "description": "Heading with options for gradient text, sub-heading, text shadow, and decorative elements.",
+    "icon": "heading",
+    "keywords": ["heading", "title", "text", "gradient", "advanced"],
+    "attributes": {
+        "content": { "type": "string", "source": "html", "selector": ".adv-heading-main", "default": "Advanced Heading Title" },
+        "level": { "type": "number", "default": 2 },
+        "textAlign": { "type": "string", "default": "left" },
+        "colorType": { "type": "string", "default": "solid" },
+        "textColor": { "type": "string", "default": "var(--primary-color)" },
+        "gradient": { "type": "string", "default": "var(--gradient-primary)" },
+        "enableTextShadow": { "type": "boolean", "default": false },
+        "textShadowOffsetX": { "type": "string", "default": "1px" }, /* Simplified defaults for iteration 1 */
+        "textShadowOffsetY": { "type": "string", "default": "1px" },
+        "textShadowBlur": { "type": "string", "default": "1px" },
+        "textShadowColor": { "type": "string", "default": "rgba(0,0,0,0.2)" },
+        "showSubHeading": { "type": "boolean", "default": false },
+        "subHeadingContent": { "type": "string", "source": "html", "selector": ".adv-heading-sub", "default": "Optional sub-heading text." },
+        "subHeadingPosition": { "type": "string", "default": "below" },
+        "subHeadingColor": { "type": "string", "default": "var(--text-color-dark)" },
+        "subHeadingSize": { "type": "string", "default": "0.9em" }, /* Relative to main heading */
+        "showDecorativeElement": { "type": "boolean", "default": false },
+        "decorativeElementType": { "type": "string", "default": "underline" },
+        "decorativeElementColor": { "type": "string", "default": "var(--accent-color)" },
+        "decorativeElementThickness": { "type": "string", "default": "3px" },
+        "decorativeElementWidth": { "type": "string", "default": "50px" },
+        "align": { "type": "string", "default": "" }
+    },
+    "supports": {
+        "align": ["wide", "full"],
+        "html": false,
+        "anchor": true,
+        "color": {
+            "text": false, "background": false, "link": false, "gradients": false
+        },
+        "spacing": {
+            "margin": true, "padding": true
+        }
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css"
+}

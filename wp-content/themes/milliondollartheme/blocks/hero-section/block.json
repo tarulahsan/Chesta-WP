@@ -1,0 +1,60 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/hero-section",
+    "title": "Hero Section",
+    "category": "milliondollartheme-blocks",
+    "description": "A customizable hero section with background, overlay, text, and buttons.",
+    "icon": "cover-image",
+    "keywords": ["hero", "banner", "cover", "header"],
+    "attributes": {
+        "backgroundType": { "type": "string", "default": "color" },
+        "backgroundColor": { "type": "string", "default": "var(--primary-color)" },
+        "gradient": { "type": "string", "default": "var(--gradient-primary)" },
+        "backgroundImageUrl": { "type": "string" },
+        "backgroundImageId": { "type": "number" },
+        "backgroundVideoUrl": { "type": "string" },
+        "backgroundVideoId": { "type": "number" },
+        "overlayOpacity": { "type": "number", "default": 50 },
+        "overlayColor": { "type": "string", "default": "#000000" },
+        "minHeight": { "type": "string", "default": "50vh" },
+        "contentVerticalAlignment": { "type": "string", "default": "center" },
+        "contentHorizontalAlignment": { "type": "string", "default": "center" },
+        "textAlign": { "type": "string", "default": "center" },
+        "title": { "type": "string", "source": "html", "selector": ".hero-title", "default": "Amazing Hero Title" },
+        "titleTag": { "type": "string", "default": "h2" },
+        "titleColor": { "type": "string" },
+        "text": { "type": "string", "source": "html", "selector": ".hero-text", "default": "This is some compelling text for the hero section." },
+        "textColor": { "type": "string" },
+        "showButton1": { "type": "boolean", "default": true },
+        "button1Text": { "type": "string", "default": "Learn More" },
+        "button1Url": { "type": "string", "default": "#" },
+        "button1Style": { "type": "string", "default": "primary" },
+        "button1NewTab": { "type": "boolean", "default": false },
+        "showButton2": { "type": "boolean", "default": false },
+        "button2Text": { "type": "string", "default": "Get Started" },
+        "button2Url": { "type": "string", "default": "#" },
+        "button2Style": { "type": "string", "default": "outline" },
+        "button2NewTab": { "type": "boolean", "default": false },
+        "paddingTop": { "type": "string", "default": "var(--spacing-xl)"},
+        "paddingBottom": { "type": "string", "default": "var(--spacing-xl)"},
+        "paddingLeft": { "type": "string", "default": "var(--spacing-md)"},
+        "paddingRight": { "type": "string", "default": "var(--spacing-md)"},
+        "align": { "type": "string", "default": "full" }
+    },
+    "supports": {
+        "align": ["wide", "full"],
+        "html": false,
+        "anchor": true,
+        "color": {
+            "text": false, "background": false, "link": false, "gradients": false
+        },
+        "spacing": {
+            "padding": false, "margin": true
+        }
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css"
+}

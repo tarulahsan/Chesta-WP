@@ -1,0 +1,41 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/custom-spacer-divider",
+    "title": "Custom Spacer / Divider",
+    "category": "milliondollartheme-blocks",
+    "description": "Advanced spacer, styled horizontal divider, or shape separator.",
+    "icon": "minus",
+    "keywords": ["spacer", "divider", "separator", "gap", "shape"],
+    "attributes": {
+        "type": { "type": "string", "default": "spacer" },
+        "height": { "type": "string", "default": "50px" },
+        "dividerStyle": { "type": "string", "default": "solid" },
+        "dividerColor": { "type": "string", "default": "var(--accent-color)" },
+        "dividerGradient": { "type": "string" },
+        "dividerThickness": { "type": "number", "default": 2 },
+        "dividerWidth": { "type": "string", "default": "100%" },
+        "dividerAlignment": { "type": "string", "default": "center" },
+        "addIcon": { "type": "boolean", "default": false },
+        "icon": { "type": "string", "default": "star" },
+        "iconSize": { "type": "string", "default": "24px" }, /* Can be number too */
+        "iconColor": { "type": "string" },
+        "shapeType": { "type": "string", "default": "wave" }, /* Placeholder for future */
+        "shapeColor": { "type": "string", "default": "var(--primary-color)" }, /* Placeholder */
+        "shapeHeight": { "type": "number", "default": 100 }, /* Placeholder */
+        "align": { "type": "string", "default": "full" }
+    },
+    "supports": {
+        "align": ["wide", "full"],
+        "html": false,
+        "anchor": true,
+        "color": false,
+        "spacing": {
+            "margin": true /* Allow margin controls on the wrapper */
+        }
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css"
+}

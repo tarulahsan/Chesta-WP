@@ -1,0 +1,114 @@
+/* --- Icon Box Block Styles (style-index.css) --- */
+.wp-block-milliondollartheme-icon-box {
+    display: flex; /* Default for icon-pos-left */
+    flex-direction: column; /* Default for icon-pos-top */
+    gap: var(--spacing-md, 16px);
+    /* Default padding and border-radius are applied as inline styles from attributes */
+    /* Default style, can be overridden by .is-style-* classes */
+    background-color: #f9f9f9; /* A very light grey for default */
+    border: 1px solid #eee;
+    transition: transform var(--transition-speed, 0.3s) ease, box-shadow var(--transition-speed, 0.3s) ease;
+}
+.wp-block-milliondollartheme-icon-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+/* Icon Position: Top */
+.wp-block-milliondollartheme-icon-box.icon-pos-top {
+    align-items: stretch; /* Default, content will stretch if not controlled by text-align */
+}
+.wp-block-milliondollartheme-icon-box.icon-pos-top .icon-box-icon-placeholder,
+.wp-block-milliondollartheme-icon-box.icon-pos-top .icon-box-content {
+    /* Text alignment will handle centering of icon/text if textAlign is center */
+}
+.wp-block-milliondollartheme-icon-box.icon-pos-top.text-align-center { text-align: center; }
+.wp-block-milliondollartheme-icon-box.icon-pos-top.text-align-left { text-align: left; }
+.wp-block-milliondollartheme-icon-box.icon-pos-top.text-align-right { text-align: right; }
+
+
+/* Icon Position: Left */
+.wp-block-milliondollartheme-icon-box.icon-pos-left {
+    flex-direction: row;
+    align-items: center; /* Default vertical alignment for icon-pos-left */
+}
+.wp-block-milliondollartheme-icon-box.icon-pos-left.icon-valign-top { align-items: flex-start; }
+.wp-block-milliondollartheme-icon-box.icon-pos-left.icon-valign-bottom { align-items: flex-end; }
+
+.wp-block-milliondollartheme-icon-box.icon-pos-left .icon-box-icon-placeholder {
+    flex-shrink: 0;
+}
+.wp-block-milliondollartheme-icon-box.icon-pos-left .icon-box-content {
+    flex-grow: 1;
+    /* Text alignment applies to content within this div */
+}
+.wp-block-milliondollartheme-icon-box.icon-pos-left.text-align-center .icon-box-content { text-align: center; }
+.wp-block-milliondollartheme-icon-box.icon-pos-left.text-align-left .icon-box-content { text-align: left; }
+.wp-block-milliondollartheme-icon-box.icon-pos-left.text-align-right .icon-box-content { text-align: right; }
+
+
+.icon-box-icon-placeholder {
+    /* Color, width, height are applied as inline styles from attributes */
+    display: inline-block; /* So text-align:center on parent works for icon-pos-top */
+    line-height: 1; /* Prevent extra space */
+}
+/* Actual SVG icon will need fill: currentColor or specific color */
+.icon-box-icon-placeholder svg {
+    display: block; /* Remove any bottom space */
+}
+
+
+.icon-box-title {
+    font-family: var(--font-family-heading, sans-serif);
+    font-weight: 700;
+    /* Color from attributes or defaults */
+    margin-top: 0;
+    margin-bottom: var(--spacing-sm, 8px);
+}
+
+.icon-box-text {
+    font-family: var(--font-family-body, sans-serif);
+    font-size: 0.95em;
+    line-height: 1.6;
+    /* Color from attributes or defaults */
+}
+.icon-box-text p:last-child {
+    margin-bottom: 0;
+}
+
+/* Box Styles */
+.wp-block-milliondollartheme-icon-box.is-style-default {
+    /* Already defined base styles */
+}
+
+.wp-block-milliondollartheme-icon-box.is-style-outline {
+    background-color: transparent;
+    border: 2px solid var(--primary-color, #0052D4);
+}
+
+.wp-block-milliondollartheme-icon-box.is-style-glassy {
+    background: var(--glass-bg-color, rgba(255, 255, 255, 0.1));
+    backdrop-filter: blur(var(--glass-blur-radius, 10px));
+    -webkit-backdrop-filter: blur(var(--glass-blur-radius, 10px));
+    border: 1px solid var(--glass-border-color, rgba(255, 255, 255, 0.18));
+    box-shadow: var(--glass-box-shadow, 0 8px 32px 0 rgba(31, 38, 135, 0.37));
+}
+.wp-block-milliondollartheme-icon-box.is-style-glassy .icon-box-title {
+    color: var(--text-color-light); /* Assuming glassy is on dark bg or for contrast */
+}
+.wp-block-milliondollartheme-icon-box.is-style-glassy .icon-box-text {
+    color: var(--text-color-light); /* Assuming glassy is on dark bg or for contrast */
+}
+.wp-block-milliondollartheme-icon-box.is-style-glassy .icon-box-icon-placeholder {
+    /* Icon color is attribute, but default might need to be light */
+}
+
+
+/* Linked Box */
+a.wp-block-milliondollartheme-icon-box {
+    text-decoration: none;
+    color: inherit; /* Inherit text colors defined by other styles */
+}
+a.wp-block-milliondollartheme-icon-box:hover {
+    /* Hover effect is on the main class already */
+}

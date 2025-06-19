@@ -1,0 +1,68 @@
+/* --- Advanced Heading Block Styles (style-index.css) --- */
+.wp-block-milliondollartheme-advanced-heading {
+    /* text-align is applied to this wrapper by WP based on blockProps */
+    /* Default margin/padding from block supports if user adds them */
+}
+.wp-block-milliondollartheme-advanced-heading.text-align-left { text-align: left; }
+.wp-block-milliondollartheme-advanced-heading.text-align-center { text-align: center; }
+.wp-block-milliondollartheme-advanced-heading.text-align-right { text-align: right; }
+
+
+.adv-heading-main {
+    font-family: var(--font-family-heading, sans-serif);
+    font-weight: 900; /* Default, can be overridden by H_TAG styles from theme */
+    line-height: 1.3;
+    margin-top: 0; /* Reset margin if sub-heading handles spacing */
+    margin-bottom: 0; /* Reset margin if sub-heading handles spacing */
+    /* Color/gradient applied inline or via class */
+}
+
+.adv-heading-main.has-gradient-text {
+    background: var(--heading-gradient, var(--gradient-primary)); /* Use CSS var passed from save() or fallback */
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent !important; /* Important to override inline color from solid type */
+}
+
+.adv-heading-sub {
+    font-family: var(--font-family-body, sans-serif);
+    font-weight: 400;
+    line-height: 1.5;
+    opacity: 0.9;
+    /* Color and size applied inline */
+}
+
+.adv-heading-sub.is-position-above {
+    margin-bottom: var(--spacing-sm, 8px);
+}
+
+.adv-heading-sub.is-position-below {
+    margin-top: var(--spacing-sm, 8px);
+}
+
+.adv-heading-decorator {
+    margin-top: var(--spacing-sm, 8px);
+    /* Alignment based on parent's text-align */
+}
+/* Center decorator if heading is centered */
+.wp-block-milliondollartheme-advanced-heading.text-align-center .adv-heading-decorator {
+    margin-left: auto;
+    margin-right: auto;
+}
+/* Align decorator right if heading is right */
+.wp-block-milliondollartheme-advanced-heading.text-align-right .adv-heading-decorator {
+    margin-left: auto;
+    margin-right: 0;
+}
+/* Align decorator left if heading is left (default for block element) */
+.wp-block-milliondollartheme-advanced-heading.text-align-left .adv-heading-decorator {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+
+.adv-heading-decorator.is-type-underline {
+    /* Height, width, background-color applied inline */
+    /* Example: if it's a line */
+}
+/* .is-type-overline, .is-type-accent-shape would have their own styles */

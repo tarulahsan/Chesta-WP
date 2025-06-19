@@ -1,0 +1,113 @@
+/* --- Advanced Button Block Styles (style-index.css) --- */
+.wp-block-milliondollartheme-advanced-button {
+    /* Wrapper for alignment (text-align: left/center/right on this) */
+    /* Margin for spacing between buttons if multiple are used side-by-side */
+}
+.wp-block-milliondollartheme-advanced-button.is-width-full {
+    width: 100%;
+}
+.wp-block-milliondollartheme-advanced-button.is-width-full .adv-button-link {
+    width: 100%;
+    justify-content: center; /* Center text/icon within a full-width button */
+}
+
+
+.adv-button-link {
+    display: inline-flex; /* To align icon and text */
+    align-items: center;
+    justify-content: center; /* Center content by default */
+    gap: var(--spacing-sm, 8px); /* Gap between icon and text */
+    text-decoration: none;
+    font-family: var(--font-family-heading, sans-serif);
+    font-weight: 700;
+    transition: transform var(--transition-speed, 0.3s) var(--transition-timing, ease-in-out),
+                box-shadow var(--transition-speed, 0.3s) var(--transition-timing, ease-in-out),
+                background-color var(--transition-speed, 0.3s) var(--transition-timing, ease-in-out),
+                border-color var(--transition-speed, 0.3s) var(--transition-timing, ease-in-out),
+                color var(--transition-speed, 0.3s) var(--transition-timing, ease-in-out);
+    cursor: pointer;
+    border: 2px solid transparent; /* Base border for consistent sizing */
+}
+
+.adv-button-link .adv-button-text {
+    /* No specific styles needed here unless for ordering with icon */
+}
+.adv-button-link .adv-button-icon {
+    display: inline-flex;
+    align-items: center;
+}
+/* Icon positioning (handled by flex order if needed or just spacing) */
+.adv-button-link.icon-pos-right .adv-button-text { order: 1; }
+.adv-button-link.icon-pos-right .adv-button-icon { order: 2; }
+.adv-button-link.icon-pos-left .adv-button-text { order: 2; }
+.adv-button-link.icon-pos-left .adv-button-icon { order: 1; }
+
+
+/* Sizes */
+.adv-button-link.is-size-small {
+    padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+    font-size: 0.85em;
+}
+.adv-button-link.is-size-medium {
+    padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+    font-size: 1em;
+}
+.adv-button-link.is-size-large {
+    padding: var(--spacing-md, 16px) var(--spacing-lg, 32px);
+    font-size: 1.15em;
+}
+
+/* Styles */
+.adv-button-link.is-style-primary {
+    background: var(--gradient-primary, #0052D4);
+    color: var(--text-color-light, #fff);
+    border-color: transparent; /* Or match gradient edge if possible */
+}
+.adv-button-link.is-style-primary:hover {
+    /* Example: Darken or shift gradient. For now, simple transform. */
+    transform: translateY(-2px);
+}
+
+.adv-button-link.is-style-outline {
+    background-color: transparent;
+    border-color: var(--primary-color, #0052D4);
+    color: var(--primary-color, #0052D4);
+}
+.adv-button-link.is-style-outline:hover {
+    background-color: var(--primary-color, #0052D4);
+    color: var(--text-color-light, #fff);
+    transform: translateY(-2px);
+}
+
+.adv-button-link.is-style-glassy {
+    background: var(--glass-bg-color, rgba(255, 255, 255, 0.1));
+    backdrop-filter: blur(var(--glass-blur-radius, 10px));
+    -webkit-backdrop-filter: blur(var(--glass-blur-radius, 10px));
+    border: 1px solid var(--glass-border-color, rgba(255, 255, 255, 0.18));
+    color: var(--text-color-light, #fff); /* Assuming glassy is on dark bg */
+    box-shadow: var(--glass-box-shadow, 0 8px 32px 0 rgba(31, 38, 135, 0.37));
+}
+.adv-button-link.is-style-glassy:hover {
+    background: rgba(255, 255, 255, 0.2); /* Slightly more opaque */
+    transform: translateY(-2px);
+}
+
+
+/* Shadow */
+.adv-button-link.has-shadow {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.adv-button-link.has-shadow:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/* Hover Effects (basic lift is default with shadow) */
+.adv-button-link.hover-effect-darken:hover { /* Needs JS to change colors or use filters */ }
+.adv-button-link.hover-effect-lighten:hover { }
+.adv-button-link.hover-effect-pulse:hover { animation: pulse-animation 1s infinite; }
+
+@keyframes pulse-animation {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}

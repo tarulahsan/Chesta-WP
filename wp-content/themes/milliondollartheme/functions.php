@@ -100,6 +100,71 @@ if ( ! function_exists( 'milliondollartheme_setup' ) ) :
                 'flex-height' => true,
             )
         );
+
+        // Gutenberg Support
+        add_theme_support( 'wp-block-styles' );
+        add_theme_support( 'align-wide' );
+        add_theme_support( 'editor-styles' ); // Enables add_editor_style()
+        add_editor_style( 'editor-style.css' ); // Path to your editor styles
+
+        // Define editor color palette
+        add_theme_support( 'editor-color-palette', array(
+            array(
+                'name'  => esc_html__( 'Primary Color', 'milliondollartheme' ),
+                'slug'  => 'primary',
+                'color' => 'var(--primary-color)',
+            ),
+            array(
+                'name'  => esc_html__( 'Secondary Color', 'milliondollartheme' ),
+                'slug'  => 'secondary',
+                'color' => 'var(--secondary-color)',
+            ),
+            array(
+                'name'  => esc_html__( 'Accent Color', 'milliondollartheme' ),
+                'slug'  => 'accent',
+                'color' => 'var(--accent-color)',
+            ),
+            array(
+                'name'  => esc_html__( 'Text Dark', 'milliondollartheme' ),
+                'slug'  => 'text-dark',
+                'color' => 'var(--text-color-dark)',
+            ),
+            array(
+                'name'  => esc_html__( 'Text Light', 'milliondollartheme' ),
+                'slug'  => 'text-light',
+                'color' => 'var(--text-color-light)',
+            ),
+        ) );
+
+        // Define editor font sizes
+        add_theme_support( 'editor-font-sizes', array(
+            array(
+                'name' => esc_html__( 'Small', 'milliondollartheme' ),
+                'size' => 12,
+                'slug' => 'small'
+            ),
+            array(
+                'name' => esc_html__( 'Normal', 'milliondollartheme' ),
+                'size' => 16,
+                'slug' => 'normal'
+            ),
+            array(
+                'name' => esc_html__( 'Medium', 'milliondollartheme' ),
+                'size' => 20,
+                'slug' => 'medium'
+            ),
+            array(
+                'name' => esc_html__( 'Large', 'milliondollartheme' ),
+                'size' => 24,
+                'slug' => 'large'
+            ),
+            array(
+                'name' => esc_html__( 'Huge', 'milliondollartheme' ),
+                'size' => 32,
+                'slug' => 'huge'
+            ),
+        ) );
+
     }
 endif;
 add_action( 'after_setup_theme', 'milliondollartheme_setup' );
@@ -192,5 +257,37 @@ function milliondollartheme_add_defer_to_alpinejs( $tag, $handle, $src ) {
     return $tag;
 }
 add_filter( 'script_loader_tag', 'milliondollartheme_add_defer_to_alpinejs', 10, 3 );
+
+/**
+ * Register custom Gutenberg blocks.
+ */
+function milliondollartheme_register_blocks() {
+    // Define a custom block category
+    add_filter( 'block_categories_all', function( $categories ) {
+        $categories[] = array(
+            'slug'  => 'milliondollartheme-blocks',
+            'title' => __( 'MillionDollarTheme Blocks', 'milliondollartheme' ),
+            'icon'  => 'star-filled', // Or a custom SVG icon URL
+        );
+        return $categories;
+    }, 10, 1 );
+
+    // Register blocks by iterating over directories in the /blocks/ folder
+    $theme_blocks_dir = get_template_directory() . '/blocks/';
+    if ( file_exists( $theme_blocks_dir ) ) {
+        $block_folders = scandir( $theme_blocks_dir );
+        foreach ( $block_folders as $block_folder ) {
+            if ( $block_folder === '.' || $block_folder === '..' ) {
+                continue;
+            }
+            $block_json_file = $theme_blocks_dir . $block_folder . '/block.json';
+            if ( file_exists( $block_json_file ) ) {
+                register_block_type( $theme_blocks_dir . $block_folder );
+                // error_log("Registered block: " . $block_folder); // For debugging
+            }
+        }
+    }
+}
+add_action( 'init', 'milliondollartheme_register_blocks' );
 
 EOF

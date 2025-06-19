@@ -1,0 +1,35 @@
+/* --- Custom Spacer/Divider Block Styles (style-index.css) --- */
+.wp-block-milliondollartheme-custom-spacer-divider {
+    /* Base styles for the wrapper */
+    margin-top: var(--spacing-md, 16px);
+    margin-bottom: var(--spacing-md, 16px);
+}
+
+/* Spacer type has no visual output, height applied inline */
+
+/* Divider type */
+.wp-block-milliondollartheme-custom-spacer-divider.is-style-divider .divider-line {
+    /* Styles for thickness, color, style are applied inline */
+    /* Ensure it doesn't have default HR browser styles if using HR tag */
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+    margin: 0; /* Reset any default margin if using HR */
+    padding: 0;
+}
+
+.wp-block-milliondollartheme-custom-spacer-divider.is-style-divider .divider-icon-wrapper {
+    background: var(--background-color-light, #fff); /* Match page background to "punch out" the icon */
+    padding: 0 var(--spacing-sm, 8px);
+    position: relative; /* To sit on top of the line */
+    display: inline-block;
+    line-height: 1;
+}
+
+.wp-block-milliondollartheme-custom-spacer-divider.is-style-divider .divider-icon-placeholder svg {
+    /* Styles for actual SVG icon if needed */
+    display: block;
+}
+
+/* Shape type would have its own styles */
+/* .is-style-shape svg { ... } */
