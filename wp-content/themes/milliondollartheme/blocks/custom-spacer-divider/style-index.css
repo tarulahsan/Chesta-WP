@@ -1,35 +1,78 @@
 /* --- Custom Spacer/Divider Block Styles (style-index.css) --- */
 .wp-block-milliondollartheme-custom-spacer-divider {
     /* Base styles for the wrapper */
-    margin-top: var(--spacing-md, 16px);
-    margin-bottom: var(--spacing-md, 16px);
+    margin-top: var(--spacing-md, 16px); /* Default, user can override with block supports */
+    margin-bottom: var(--spacing-md, 16px); /* Default, user can override with block supports */
+    /* width: 100%; */ /* Usually takes full width of its container or alignwide/full */
 }
 
-/* Spacer type has no visual output, height applied inline */
+/* Spacer type has no visual output on front-end, height applied inline to its div by save() */
 
 /* Divider type */
-.wp-block-milliondollartheme-custom-spacer-divider.is-style-divider .divider-line {
-    /* Styles for thickness, color, style are applied inline */
-    /* Ensure it doesn't have default HR browser styles if using HR tag */
-    border-bottom: none;
-    border-left: none;
-    border-right: none;
-    margin: 0; /* Reset any default margin if using HR */
-    padding: 0;
+.wp-block-milliondollartheme-custom-spacer-divider.is-style-divider {
+    /* The wrapper div for the divider line, its style (justifyContent) is set inline by save() for alignment */
+    /* display: flex; /* Set by save function inline */
+    /* width: 100%; /* Set by save function inline */
 }
 
-.wp-block-milliondollartheme-custom-spacer-divider.is-style-divider .divider-icon-wrapper {
+.wp-block-milliondollartheme-custom-spacer-divider .divider-line {
+    /* Styles for thickness, color, style, width, gradient are applied inline by save() */
+    /* Ensure it doesn't have default HR browser styles if using HR tag (we use div) */
+    border-bottom: none !important; /* Override any browser defaults if it was an hr */
+    border-left: none !important;
+    border-right: none !important;
+    margin: 0;
+    padding: 0;
+    /* display: flex; /* Set by save function inline */
+    /* align-items: center; /* Set by save function inline */
+    /* justify-content: center; /* Set by save function inline */
+    /* position: relative; /* Set by save function inline */
+    /* For gradient lines, border-top-color should be transparent if gradient is applied to background-image */
+}
+
+.wp-block-milliondollartheme-custom-spacer-divider .divider-icon-wrapper {
     background: var(--background-color-light, #fff); /* Match page background to "punch out" the icon */
     padding: 0 var(--spacing-sm, 8px);
-    position: relative; /* To sit on top of the line */
-    display: inline-block;
-    line-height: 1;
+    position: relative; /* To sit on top of the line, but z-index might be needed if line is thick */
+    z-index: 1; /* Ensure icon is above the line */
+    display: inline-flex; /* Changed from inline-block for better flex alignment with potential SVG content */
+    align-items: center; /* Vertically center icon content if it has height */
+    line-height: 1; /* Prevent extra space for span */
+    /* Icon color and size are applied inline to the IconComponent placeholder or actual SVG */
 }
 
-.wp-block-milliondollartheme-custom-spacer-divider.is-style-divider .divider-icon-placeholder svg {
-    /* Styles for actual SVG icon if needed */
+/* Actual SVG icon styling if IconComponent renders an SVG */
+.wp-block-milliondollartheme-custom-spacer-divider .divider-icon-wrapper .divider-icon-placeholder svg,
+.wp-block-milliondollartheme-custom-spacer-divider .divider-icon-wrapper svg { /* If IconComponent directly renders SVG */
     display: block;
+    /* width and height should be controlled by iconSize attribute via inline style on the SVG or its wrapper */
+    /* fill: currentColor; /* Color from iconColor attribute via inline style */
 }
 
-/* Shape type would have its own styles */
-/* .is-style-shape svg { ... } */
+
+/* Shape type would have its own styles - Placeholder for future */
+/* .wp-block-milliondollartheme-custom-spacer-divider.is-style-shape svg { ... } */
+
+
+/* --- Responsiveness for Spacer/Divider --- */
+@media (max-width: 767px) { /* Mobile */
+    .wp-block-milliondollartheme-custom-spacer-divider {
+        /* Adjust default margins if needed for mobile */
+        /* margin-top: var(--spacing-sm, 8px); */
+        /* margin-bottom: var(--spacing-sm, 8px); */
+    }
+
+    /* If spacer height is in vh, it might become too large on mobile.
+       This would ideally be handled by offering responsive height controls in the block,
+       or users can use multiple spacer blocks with show/hide on device.
+       No generic CSS fix here without knowing the specific vh value.
+    */
+
+    .wp-block-milliondollartheme-custom-spacer-divider .divider-line {
+        /* Potentially reduce thickness or width if needed, but attributes should control this */
+    }
+
+    .wp-block-milliondollartheme-custom-spacer-divider .divider-icon-wrapper {
+        /* Potentially adjust icon size or padding if needed via responsive attributes or specific CSS */
+    }
+}

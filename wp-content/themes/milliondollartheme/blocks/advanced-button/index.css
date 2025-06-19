@@ -10,7 +10,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--spacing-sm, 8px);
+    gap: var(--spacing-sm, 8px); /* From main styles */
     padding: var(--spacing-sm, 8px) var(--spacing-md, 16px); /* Mimic medium size for editor */
     /* Apply some default styling to make it look like a button in editor */
     background: #f0f0f0;
@@ -20,30 +20,35 @@
 }
 
 /* Apply style previews in editor */
-.wp-block-milliondollartheme-advanced-button.is-style-primary .adv-button-link-wrapper {
-    background: var(--gradient-primary, #0052D4);
-    color: var(--text-color-light, #fff);
-    border-color: transparent;
+.wp-block-milliondollartheme-advanced-button .adv-button-link-wrapper.is-style-primary {
+    /* background: var(--gradient-primary, #0052D4); */ /* Handled by JS inline style */
+    /* color: var(--text-color-light, #fff); */
 }
-.wp-block-milliondollartheme-advanced-button.is-style-outline .adv-button-link-wrapper {
-    background-color: transparent;
-    border-color: var(--primary-color, #0052D4);
-    color: var(--primary-color, #0052D4);
+.wp-block-milliondollartheme-advanced-button .adv-button-link-wrapper.is-style-secondary {
+    /* background: var(--secondary-color, #C837C8); */
+    /* color: var(--text-color-light, #fff); */
 }
-.wp-block-milliondollartheme-advanced-button.is-style-glassy .adv-button-link-wrapper {
-    /* Glassy effect is hard to preview accurately without backdrop, use simplified version */
-    background: rgba(50, 50, 150, 0.3); /* bluish transparent */
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: var(--text-color-light, #fff);
+.wp-block-milliondollartheme-advanced-button .adv-button-link-wrapper.is-style-outline {
+    /* background-color: transparent; */
+    /* border-color: var(--primary-color, #0052D4); */
+    /* color: var(--primary-color, #0052D4); */
+}
+.wp-block-milliondollartheme-advanced-button .adv-button-link-wrapper.is-style-glassy {
+    /* background: rgba(50, 50, 150, 0.3); */ /* Handled by JS inline style */
+    /* border: 1px solid rgba(255, 255, 255, 0.2); */
+    /* color: var(--text-color-light, #fff); */
+}
+.wp-block-milliondollartheme-advanced-button .adv-button-link-wrapper.has-shadow {
+    /* box-shadow: 0 4px 15px rgba(0,0,0,0.1); */ /* Handled by JS inline style */
 }
 
 
 /* Size previews in editor */
-.wp-block-milliondollartheme-advanced-button.is-size-small .adv-button-link-wrapper {
+.wp-block-milliondollartheme-advanced-button .adv-button-link-wrapper.is-size-small {
     padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
     font-size: 0.85em;
 }
-.wp-block-milliondollartheme-advanced-button.is-size-large .adv-button-link-wrapper {
+.wp-block-milliondollartheme-advanced-button .adv-button-link-wrapper.is-size-large {
     padding: var(--spacing-md, 16px) var(--spacing-lg, 32px);
     font-size: 1.15em;
 }
@@ -51,4 +56,12 @@
 
 .wp-block-milliondollartheme-advanced-button .adv-button-text .rich-text {
     /* Ensure RichText input field is visible and usable */
+}
+
+/* Editor placeholder for icon */
+.wp-block-milliondollartheme-advanced-button .adv-button-icon-placeholder {
+    /* display: inline-block; */ /* IconComponent is already span */
+}
+.wp-block-milliondollartheme-advanced-button .adv-button-icon-placeholder svg {
+    width: 1em; height: 1em; fill: currentColor;
 }

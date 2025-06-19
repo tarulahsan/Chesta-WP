@@ -1,31 +1,48 @@
 /* --- Custom Spacer/Divider Block Editor Styles (index.css) --- */
 .wp-block-milliondollartheme-custom-spacer-divider .spacer-preview {
-    background: rgba(0, 0, 255, 0.1); /* Light blue, semi-transparent */
-    border: 1px dashed rgba(0, 0, 255, 0.3);
+    background: rgba(var(--primary-color-rgb, 0, 82, 212), 0.05); /* Use theme color based variable */
+    border: 1px dashed rgba(var(--primary-color-rgb, 0, 82, 212), 0.3);
     text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(0, 0, 255, 0.5);
+    color: rgba(var(--primary-color-rgb, 0, 82, 212), 0.7);
     font-size: 0.9em;
-    width: 100%; /* Take full width of block editor column */
+    width: 100%;
     box-sizing: border-box;
+    /* Height is applied inline from JS */
 }
 
 .wp-block-milliondollartheme-custom-spacer-divider .divider-preview-wrapper {
-    display: flex; /* For alignment */
+    display: flex; /* For alignment, set by JS */
     width: 100%;
-    padding: var(--spacing-md, 16px) 0;
+    padding: var(--spacing-md, 16px) 0; /* Consistent padding for preview area */
+    /* justifyContent is applied inline from JS */
 }
 .wp-block-milliondollartheme-custom-spacer-divider .divider-line-preview {
-    /* Styles for thickness, color, style are applied inline */
+    /* Styles for thickness, color, style, width, gradient are applied inline from JS */
     display: flex;
     align-items: center;
-    justify-content: center;
-    position: relative;
+    justify-content: center; /* Center icon if line is full width */
+    position: relative; /* For icon positioning */
+    /* Ensure it doesn't have default HR browser styles if it were an HR */
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+    margin: 0;
+    padding: 0;
 }
+
 .wp-block-milliondollartheme-custom-spacer-divider .divider-line-preview .divider-icon-placeholder {
-    background: #fff; /* Editor background */
-    padding: 0 8px;
-    position: relative;
+    background: var(--wp-admin-theme-color-Lighter-20, #fff); /* Match editor background, or use a var */
+    padding: 0 8px; /* From main styles */
+    position: relative; /* To sit on top of the line */
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+    /* color and fontSize (for icon size) applied inline from JS */
+}
+.wp-block-milliondollartheme-custom-spacer-divider .divider-line-preview .divider-icon-placeholder svg {
+    display: block;
 }

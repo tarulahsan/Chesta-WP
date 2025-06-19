@@ -2,34 +2,68 @@
 .wp-block-milliondollartheme-icon-box {
     /* border: 1px dashed #ccc; */ /* Optional: visual guide in editor */
     /* min-height: 100px; */ /* Ensure it's clickable */
+    /* Base flex from front-end styles will apply */
 }
 
-/* Make RichText areas more visible if needed */
-.wp-block-milliondollartheme-icon-box .icon-box-title {
-    /* WordPress default RichText styling is usually good. */
-}
+/* Apply text-align to wrapper for editor preview consistency */
+.wp-block-milliondollartheme-icon-box.text-align-left { text-align: left; }
+.wp-block-milliondollartheme-icon-box.text-align-center { text-align: center; }
+.wp-block-milliondollartheme-icon-box.text-align-right { text-align: right; }
 
-.wp-block-milliondollartheme-icon-box .icon-box-text {
-    /* WordPress default RichText styling is usually good. */
-}
 
-/* Editor preview for icon position */
+/* Editor preview for icon position, should match front-end flex rules */
 .wp-block-milliondollartheme-icon-box.icon-pos-top {
-    display: flex;
-    flex-direction: column;
-    /* text-align from attribute will apply */
+    /* flex-direction: column; from front-end */
 }
+.wp-block-milliondollartheme-icon-box.icon-pos-top.text-align-center .icon-box-icon-placeholder,
+.wp-block-milliondollartheme-icon-box.icon-pos-top.text-align-center .icon-box-icon-wrapper {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
 .wp-block-milliondollartheme-icon-box.icon-pos-left {
-    display: flex;
-    flex-direction: row;
-    gap: 16px; /* Use var if available, or fixed value */
-    /* align-items from attribute will apply */
+    /* flex-direction: row; from front-end */
+    /* align-items from class icon-valign-* from front-end */
 }
+.wp-block-milliondollartheme-icon-box.icon-pos-left .icon-box-icon-placeholder,
+.wp-block-milliondollartheme-icon-box.icon-pos-left .icon-box-icon-wrapper {
+    /* margin-right: 16px; from front-end */
+}
+
 
 .wp-block-milliondollartheme-icon-box .icon-box-icon-placeholder {
-    /* Basic styling for placeholder */
+    /* Basic styling for placeholder if not using actual SVG rendering in editor */
     padding: 5px;
     background: #f0f0f0;
     border-radius: 3px;
     line-height: 1;
+    display: inline-block; /* Important for text-align to work on it when icon-pos-top */
+    /* Font size (for [ICON]) and color are applied via inline style from JS */
+}
+.wp-block-milliondollartheme-icon-box .icon-box-icon-wrapper {
+    /* Wrapper for actual SVG, if used in editor */
+    display: inline-flex; /* Or flex */
+    line-height: 1;
+}
+.wp-block-milliondollartheme-icon-box .icon-box-icon-wrapper svg {
+    /* fill: currentColor; */ /* Color from inline style */
+}
+
+/* Ensure RichText areas are clearly editable and respect color attributes */
+.wp-block-milliondollartheme-icon-box .icon-box-title,
+.wp-block-milliondollartheme-icon-box .icon-box-text {
+    /* Colors are applied via inline styles from JS */
+}
+
+/* Preview for box styles */
+.wp-block-milliondollartheme-icon-box.is-style-glassy {
+    /* Inline styles from JS should provide a good preview */
+    /* Fallback if needed: */
+    /* background: rgba(50, 50, 150, 0.1); */
+    /* border: 1px solid rgba(255,255,255,0.1); */
+}
+.wp-block-milliondollartheme-icon-box.is-style-outline {
+    /* background: transparent; */
+    /* border: 2px solid #ccc; */ /* Fallback border */
 }

@@ -1,22 +1,51 @@
 /* --- Advanced Heading Block Editor Styles (index.css) --- */
 .wp-block-milliondollartheme-advanced-heading {
     /* border: 1px dashed #ccc; */ /* Optional visual guide */
-}
-.wp-block-milliondollartheme-advanced-heading .adv-heading-main.rich-text-placeholder,
-.wp-block-milliondollartheme-advanced-heading .adv-heading-sub.rich-text-placeholder {
-    /* Styles for the RichText placeholder text if needed */
-    /* opacity: 0.5; */
+    /* text-align is applied by WP based on blockProps.className */
 }
 
-/* Editor preview for gradient text if possible */
+/* Ensure RichText fields are clearly editable and reflect styles */
+.wp-block-milliondollartheme-advanced-heading .adv-heading-main.rich-text {
+    /* Inline styles from JS (color, gradient preview, text-shadow) should apply */
+    /* Fallback if needed, but JS should handle it */
+    /* font-weight: 700; */ /* Default from theme */
+    /* line-height: 1.3; */
+}
+
+.wp-block-milliondollartheme-advanced-heading .adv-heading-sub.rich-text {
+    /* Inline styles from JS (color, font-size) should apply */
+    /* opacity: 0.9; */ /* Default from front-end */
+}
+
 .wp-block-milliondollartheme-advanced-heading .adv-heading-main.has-gradient-text {
-    /* This will use the front-end style, which is good.
-       Ensure the --heading-gradient var is available or provide fallback in editor. */
+    /* Editor preview for gradient text is applied via inline styles in JS */
+    /* This class hook is for front-end primarily */
 }
 
 .wp-block-milliondollartheme-advanced-heading .adv-heading-decorator {
-    /* Basic preview for decorator in editor */
-    /* background-color: #ccc; */ /* Fallback if color is not set */
+    /* Basic preview for decorator in editor, inline styles from JS provide dimensions/color */
+    /* Example fallback visual if inline styles fail: */
+    /* background-color: #eee; */
     /* min-height: 3px; */
     /* min-width: 50px; */
+}
+.wp-block-milliondollartheme-advanced-heading .adv-heading-decorator.is-type-underline {
+    margin-top: 8px;
+}
+.wp-block-milliondollartheme-advanced-heading .adv-heading-decorator.is-type-overline {
+    margin-bottom: 8px;
+}
+
+/* Ensure alignment classes from WP are respected for decorator centering in editor */
+.wp-block-milliondollartheme-advanced-heading.has-text-align-center .adv-heading-decorator {
+    margin-left: auto;
+    margin-right: auto;
+}
+.wp-block-milliondollartheme-advanced-heading.has-text-align-right .adv-heading-decorator {
+    margin-left: auto;
+    margin-right: 0;
+}
+.wp-block-milliondollartheme-advanced-heading.has-text-align-left .adv-heading-decorator {
+    margin-left: 0;
+    margin-right: auto;
 }

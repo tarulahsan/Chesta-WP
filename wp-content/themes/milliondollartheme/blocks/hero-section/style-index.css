@@ -98,3 +98,136 @@
     color: var(--text-color-light);
 }
 /* Add more styles for other button types if defined */
+
+/* --- Hero Section Block Refinements (Iteration 2 - CSS Enhancements) --- */
+
+/* Background Image Handling */
+.wp-block-milliondollartheme-hero-section {
+    /* Ensure background properties are ready if an image URL is provided */
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    /* transition for background changes if ever needed, though typically static per block instance */
+}
+
+/* If a background image is applied via inline style (from attribute), these ensure it behaves well. */
+/* No specific class needed if background-image is directly applied to the main block element. */
+
+/* Video Background (Basic Structure - more styling if using <video> element) */
+.wp-block-milliondollartheme-hero-section .hero-section-background-media.hero-video {
+    /* Assuming a <video> element is absolutely positioned */
+    object-fit: cover;
+}
+
+
+/* Content Wrapper Refinements for Vertical Alignment in Edit/Save */
+/* The save function already has display:flex and alignment properties for content-wrapper.
+   The edit function's preview should also reflect this.
+   Current edit preview directly styles the main blockProps div with textAlign.
+   For more complex flex alignments (vertical), the .hero-section-content-wrapper needs flex properties.
+*/
+.wp-block-milliondollartheme-hero-section .hero-section-content-wrapper {
+    display: flex; /* Already there from previous iteration */
+    flex-direction: column; /* Already there */
+    /* Vertical and horizontal alignment are set via inline styles from attributes:
+       alignItems: contentHorizontalAlignment (maps to cross-axis for column flex)
+       justifyContent: contentVerticalAlignment (maps to main-axis for column flex)
+       textAlign: textAlign (for text within items)
+    */
+    /* Ensure it stretches if minHeight is large */
+    flex-grow: 1;
+    height: 100%; /* If parent has fixed height or min-height */
+}
+
+
+/* Typography & Color Polish */
+.wp-block-milliondollartheme-hero-section .hero-title {
+    /* Using clamp() for fluid typography if desired, or rely on global heading responsive styles */
+    /* Example: font-size: clamp(2rem, 5vw, 3.5rem); */
+    /* titleColor is applied inline */
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2); /* Subtle default text shadow for readability on images */
+}
+
+.wp-block-milliondollartheme-hero-section .hero-text {
+    /* Example: font-size: clamp(1rem, 2.5vw, 1.25rem); */
+    /* textColor is applied inline */
+    text-shadow: 0 1px 2px rgba(0,0,0,0.15); /* Subtle default text shadow */
+    /* Ensure max-width is respected, already set to 700px */
+}
+
+/* Button Polish */
+.wp-block-milliondollartheme-hero-section .hero-buttons {
+    /* Styles for gap already exist */
+    /* Ensure buttons can wrap if needed */
+    flex-wrap: wrap;
+}
+/* Individual button styles from previous iteration are a good base. */
+/* Add specific hover/focus states for glassy buttons if not distinct enough */
+.wp-block-milliondollartheme-hero-section .hero-button.button-style-glassy:hover,
+.wp-block-milliondollartheme-hero-section .hero-button.button-style-glassy:focus {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px) scale(1.02); /* Add scale for more pop */
+}
+
+
+/* --- Responsiveness for Hero Section --- */
+
+/* Tablet and Mobile */
+@media (max-width: 1023px) {
+    .wp-block-milliondollartheme-hero-section {
+        /* Adjust minHeight if it's set in vh, or use a different attribute for mobileHeight */
+        /* For now, global padding adjustments */
+        padding-top: var(--spacing-lg, 64px); /* Example: reduce padding from xl */
+        padding-bottom: var(--spacing-lg, 64px);
+    }
+
+    .wp-block-milliondollartheme-hero-section .hero-title {
+        font-size: 2.5em; /* Adjust based on theme's responsive heading scale */
+    }
+    .wp-block-milliondollartheme-hero-section .hero-text {
+        font-size: 1.1em; /* Adjust */
+    }
+}
+
+/* Mobile Only */
+@media (max-width: 767px) {
+    .wp-block-milliondollartheme-hero-section {
+        /* Example: Override minHeight for mobile if needed, or use a specific mobileMinHeight attribute */
+        /* min-height: 60vh; /* Or a pixel value like 400px */
+        padding-top: var(--spacing-md, 32px);
+        padding-bottom: var(--spacing-md, 32px);
+        padding-left: var(--spacing-sm, 16px);
+        padding-right: var(--spacing-sm, 16px);
+    }
+
+    .wp-block-milliondollartheme-hero-section .hero-title {
+        font-size: 2em; /* Smaller for mobile */
+        line-height: 1.2;
+    }
+
+    .wp-block-milliondollartheme-hero-section .hero-text {
+        font-size: 1em; /* Standard body size for mobile */
+        line-height: 1.6;
+    }
+
+    .wp-block-milliondollartheme-hero-section .hero-buttons {
+        flex-direction: column; /* Stack buttons on mobile */
+        align-items: stretch; /* Make buttons full width of their container */
+        width: 100%;
+        max-width: 320px; /* Optional: prevent buttons from being overly wide */
+    }
+    .wp-block-milliondollartheme-hero-section .hero-buttons .hero-button {
+        width: 100%; /* Make each button full width if stacked */
+        margin-bottom: var(--spacing-sm, 8px); /* Space between stacked buttons */
+    }
+    .wp-block-milliondollartheme-hero-section .hero-buttons .hero-button:last-child {
+        margin-bottom: 0;
+    }
+
+    /* If content alignment is centered, ensure buttons also center when stacked */
+    .wp-block-milliondollartheme-hero-section[style*="text-align: center;"] .hero-buttons,
+    .wp-block-milliondollartheme-hero-section .hero-section-content-wrapper[style*="text-align: center;"] .hero-buttons {
+         align-items: center; /* If buttons wrapper itself is not full width due to max-width */
+    }
+}

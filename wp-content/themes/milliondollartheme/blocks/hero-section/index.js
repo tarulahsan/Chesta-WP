@@ -50,11 +50,15 @@ registerBlockType(name, {
                             value={title}
                             onChange={(val) => setAttributes({ title: val })}
                         />
+                        {/* TODO: Add ColorPalette for titleColor here */}
+                        <TextControl label={__('Title Color (temp)','milliondollartheme')} value={attributes.titleColor || ''} onChange={(val) => setAttributes({ titleColor: val })} />
                         <TextControl /* Using TextControl for simple RichText for now */
                             label={__('Paragraph Text', 'milliondollartheme')}
                             value={text}
                             onChange={(val) => setAttributes({ text: val })}
                         />
+                        {/* TODO: Add ColorPalette for textColor here */}
+                        <TextControl label={__('Text Color (temp)','milliondollartheme')} value={attributes.textColor || ''} onChange={(val) => setAttributes({ textColor: val })} />
                          <SelectControl
                             label={__('Text Align', 'milliondollartheme')}
                             value={textAlign}
@@ -82,7 +86,14 @@ registerBlockType(name, {
                             ]}
                             onChange={(val) => setAttributes({ backgroundType: val })}
                         />
+                                { attributes.backgroundType === 'image' && (
+                                    <div>
+                                        {/* TODO: Implement MediaUpload here for backgroundImage */}
+                                        <TextControl label={__('Image URL (temp)','milliondollartheme')} value={attributes.backgroundImageUrl || ''} onChange={(val) => setAttributes({ backgroundImageUrl: val })} />
+                                    </div>
+                                )}
                         {backgroundType === 'color' && (
+                            // TODO: Replace TextControl with ColorPalette for backgroundColor
                             <TextControl /* Basic ColorPicker would be better */
                                 label={__('Background Color', 'milliondollartheme')}
                                 value={backgroundColor}
@@ -96,6 +107,7 @@ registerBlockType(name, {
                                 onChange={(val) => setAttributes({ gradient: val })}
                             />
                         )}
+                        {/* TODO: Replace TextControl with ColorPalette for overlayColor */}
                         <TextControl /* Basic ColorPicker would be better */
                             label={__('Overlay Color', 'milliondollartheme')}
                             value={overlayColor}

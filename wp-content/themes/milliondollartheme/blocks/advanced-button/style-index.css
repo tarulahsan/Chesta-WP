@@ -111,3 +111,85 @@
     50% { transform: scale(1.05); }
     100% { transform: scale(1); }
 }
+
+/* --- Advanced Button Block Refinements (Iteration 2 - CSS Enhancements) --- */
+
+/* Secondary Style */
+.adv-button-link.is-style-secondary {
+    background: var(--secondary-color, #C837C8); /* Fallback if CSS var not defined */
+    color: var(--text-color-light, #fff);
+    border-color: transparent;
+}
+.adv-button-link.is-style-secondary:hover {
+    /* Example: Darken or shift gradient. For now, simple transform. */
+    transform: translateY(-2px);
+    /* Add a filter or adjust background for hover if not using transform only */
+    filter: brightness(0.9);
+}
+
+/* Custom Style - Relies on inline styles for colors, but can have base structure */
+.adv-button-link.is-style-custom {
+    /* Base structure, specific colors are applied inline via attributes */
+    /* Ensure border is visible if customBorderColor is set */
+    border-width: 2px; /* Default border width for custom if border color is set */
+    border-style: solid; /* Default border style */
+}
+.adv-button-link.is-style-custom:hover {
+    /* Generic hover for custom, could be enhanced with hoverEffect attribute */
+    filter: brightness(0.9); /* Simple darken effect */
+    transform: translateY(-2px);
+}
+
+
+/* Icon Styling */
+.adv-button-link .adv-button-icon svg { /* Assuming IconComponent renders an SVG */
+    width: 1em; /* Relative to button font size */
+    height: 1em; /* Relative to button font size */
+    display: block;
+    /* fill: currentColor; /* Icon color inherits button text color by default */
+}
+/* Specific icon sizes if needed, or control via font-size of icon span */
+.adv-button-link.is-size-small .adv-button-icon svg { /* width: 0.8em; height: 0.8em; */ }
+.adv-button-link.is-size-large .adv-button-icon svg { /* width: 1.2em; height: 1.2em; */ }
+
+
+/* Shadow - ensure .has-shadow is effective */
+.adv-button-link.has-shadow {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.12); /* Slightly adjusted */
+}
+.adv-button-link.has-shadow:hover {
+    box-shadow: 0 7px 22px rgba(0,0,0,0.18); /* Enhanced hover shadow */
+}
+
+/* Hover Effects - CSS for different hoverEffect classes */
+.adv-button-link.hover-effect-lift:hover { /* Default, already has transform and shadow change */
+    transform: translateY(-3px) scale(1.02); /* Slightly more lift */
+}
+
+.adv-button-link.hover-effect-darken:hover {
+    filter: brightness(0.85);
+    transform: none; /* May override lift */
+}
+.adv-button-link.hover-effect-lighten:hover {
+    filter: brightness(1.15);
+    transform: none;
+}
+/* Pulse animation is already defined globally from previous iteration */
+.adv-button-link.hover-effect-pulse:hover {
+    animation: pulse-animation 0.8s infinite; /* Ensure animation name matches */
+}
+
+
+/* Responsiveness */
+@media (max-width: 767px) {
+    .wp-block-milliondollartheme-advanced-button.is-width-full .adv-button-link,
+    .wp-block-milliondollartheme-advanced-button .adv-button-link.is-width-full { /* if full width applied directly to link */
+        width: 100%;
+        display: flex; /* Ensure full width for flex container */
+    }
+
+    /* Adjust padding for smaller buttons on mobile if needed */
+    .adv-button-link.is-size-small {
+        /* padding: calc(var(--spacing-xs, 4px) * 0.8) calc(var(--spacing-sm, 8px) * 0.8); */
+    }
+}

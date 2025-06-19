@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps, RichText, InspectorControls, AlignmentControl, BlockControls } from '@wordpress/block-editor';
-import { PanelBody, TextControl, SelectControl, ToggleControl, RangeControl, ToolbarGroup, ToolbarButton } from '@wordpress/components'; // Placeholder for ColorPalette, GradientPicker
+import { PanelBody, TextControl, SelectControl, ToggleControl, RangeControl, ToolbarGroup, ToolbarButton, TextareaControl } from '@wordpress/components'; // Added TextareaControl
 
 /**
  * Internal dependencies
@@ -22,22 +22,41 @@ registerBlockType(name, {
     edit: ({ attributes, setAttributes }) => {
         const {
             content, level, textAlign, colorType, textColor, gradient,
-            showSubHeading, subHeadingContent, subHeadingPosition,
-            showDecorativeElement, decorativeElementType
+            enableTextShadow, textShadowOffsetX, textShadowOffsetY, textShadowBlur, textShadowColor,
+            showSubHeading, subHeadingContent, subHeadingPosition, subHeadingColor, subHeadingSize,
+            showDecorativeElement, decorativeElementType, decorativeElementColor, decorativeElementThickness, decorativeElementWidth
         } = attributes;
 
         const blockProps = useBlockProps({
-            // className will be dynamically set based on textAlign if needed by CSS
-            // style: { textAlign: textAlign } // text-align is better handled by a wrapper or CSS class
+            className: `text-align-${textAlign || 'left'}`
         });
 
         const TagName = 'h' + level;
 
-        const mainHeadingStyles = {};
+        const mainHeadingPreviewStyles = {};
         if (colorType === 'solid') {
-            mainHeadingStyles.color = textColor;
+            mainHeadingPreviewStyles.color = textColor;
+        } else if (colorType === 'gradient') {
+            mainHeadingPreviewStyles.background = gradient; // For preview, actual gradient text is CSS
+            mainHeadingPreviewStyles.WebkitBackgroundClip = 'text';
+            mainHeadingPreviewStyles.backgroundClip = 'text';
+            mainHeadingPreviewStyles.color = 'transparent';
         }
-        // Gradient text applied via class '.has-gradient-text'
+        if (enableTextShadow) {
+            mainHeadingPreviewStyles.textShadow = `${textShadowOffsetX || '0px'} ${textShadowOffsetY || '0px'} ${textShadowBlur || '0px'} ${textShadowColor || 'rgba(0,0,0,0.3)'}`;
+        }
+
+        const subHeadingPreviewStyles = {
+            color: subHeadingColor,
+            fontSize: subHeadingSize,
+        };
+
+        const decoratorPreviewStyles = {
+            backgroundColor: decorativeElementColor,
+            height: decorativeElementType !== 'accent-shape' ? (decorativeElementThickness || '3px') : 'auto',
+            width: decorativeElementType !== 'accent-shape' ? (decorativeElementWidth || '50px') : 'auto',
+            // Add more specific styles for different decorator types if needed for preview
+        };
 
         return (
             <>
@@ -55,7 +74,9 @@ registerBlockType(name, {
                             options={[1,2,3,4,5,6].map(l => ({label: 'H'+l, value: l}))}
                             onChange={(val) => setAttributes({ level: parseInt(val) })}
                         />
+                        {/* Text Alignment is now in BlockControls */}
                     </PanelBody>
+
                     <PanelBody title={__('Color & Appearance', 'milliondollartheme')}>
                         <SelectControl
                             label={__('Color Type', 'milliondollartheme')}
@@ -64,22 +85,38 @@ registerBlockType(name, {
                             onChange={(val) => setAttributes({ colorType: val })}
                         />
                         {colorType === 'solid' && (
-                            <TextControl /* Placeholder for ColorPalette */
+                            <TextControl /* TODO: Replace with ColorPalette */
                                 label={__('Text Color', 'milliondollartheme')}
                                 value={textColor}
                                 onChange={(val) => setAttributes({ textColor: val })}
                             />
                         )}
                         {colorType === 'gradient' && (
-                            <TextControl /* Placeholder for GradientPicker */
+                            <TextareaControl /* TODO: Replace with GradientPicker */
                                 label={__('Gradient CSS', 'milliondollartheme')}
                                 value={gradient}
                                 onChange={(val) => setAttributes({ gradient: val })}
                             />
                         )}
-                        {/* Text Shadow controls here later */}
                     </PanelBody>
-                    <PanelBody title={__('Sub Heading', 'milliondollartheme')}>
+
+                    <PanelBody title={__('Text Shadow', 'milliondollartheme')} initialOpen={false}>
+                        <ToggleControl
+                            label={__('Enable Text Shadow', 'milliondollartheme')}
+                            checked={!!enableTextShadow}
+                            onChange={() => setAttributes({ enableTextShadow: !enableTextShadow })}
+                        />
+                        {enableTextShadow && (
+                            <>
+                                <TextControl label={__('Offset X', 'milliondollartheme')} value={textShadowOffsetX} onChange={(val) => setAttributes({ textShadowOffsetX: val })} />
+                                <TextControl label={__('Offset Y', 'milliondollartheme')} value={textShadowOffsetY} onChange={(val) => setAttributes({ textShadowOffsetY: val })} />
+                                <TextControl label={__('Blur Radius', 'milliondollartheme')} value={textShadowBlur} onChange={(val) => setAttributes({ textShadowBlur: val })} />
+                                <TextControl /* TODO: Replace with ColorPalette */ label={__('Shadow Color', 'milliondollartheme')} value={textShadowColor} onChange={(val) => setAttributes({ textShadowColor: val })} />
+                            </>
+                        )}
+                    </PanelBody>
+
+                    <PanelBody title={__('Sub Heading', 'milliondollartheme')} initialOpen={false}>
                         <ToggleControl
                             label={__('Show Sub Heading', 'milliondollartheme')}
                             checked={!!showSubHeading}
@@ -87,40 +124,32 @@ registerBlockType(name, {
                         />
                         {showSubHeading && (
                             <>
-                                <TextControl
-                                    label={__('Sub Heading Text', 'milliondollartheme')}
-                                    value={subHeadingContent}
-                                    onChange={(val) => setAttributes({ subHeadingContent: val })}
-                                />
-                                <SelectControl
-                                    label={__('Position', 'milliondollartheme')}
-                                    value={subHeadingPosition}
-                                    options={[ {label: 'Above', value: 'above'}, {label: 'Below', value: 'below'} ]}
-                                    onChange={(val) => setAttributes({ subHeadingPosition: val })}
-                                />
-                                {/* Sub-heading color/size controls later */}
+                                <TextControl /* RichText in block, this for attribute */ label={__('Sub Heading Text', 'milliondollartheme')} value={subHeadingContent} onChange={(val) => setAttributes({ subHeadingContent: val })} />
+                                <SelectControl label={__('Position', 'milliondollartheme')} value={subHeadingPosition} options={[ {label: 'Above', value: 'above'}, {label: 'Below', value: 'below'} ]} onChange={(val) => setAttributes({ subHeadingPosition: val })} />
+                                <TextControl /* TODO: Replace with ColorPalette */ label={__('Sub Heading Color', 'milliondollartheme')} value={subHeadingColor} onChange={(val) => setAttributes({ subHeadingColor: val })} />
+                                <TextControl label={__('Sub Heading Size (e.g., 0.8em, 1rem)', 'milliondollartheme')} value={subHeadingSize} onChange={(val) => setAttributes({ subHeadingSize: val })} />
                             </>
                         )}
                     </PanelBody>
-                    <PanelBody title={__('Decorative Element', 'milliondollartheme')}>
+
+                    <PanelBody title={__('Decorative Element', 'milliondollartheme')} initialOpen={false}>
                         <ToggleControl
                             label={__('Show Decorative Element', 'milliondollartheme')}
                             checked={!!showDecorativeElement}
                             onChange={() => setAttributes({ showDecorativeElement: !showDecorativeElement })}
                         />
                         {showDecorativeElement && (
-                             <SelectControl
-                                label={__('Type', 'milliondollartheme')}
-                                value={decorativeElementType}
-                                options={[ {label: 'Underline', value: 'underline'}, /* more later */ ]}
-                                onChange={(val) => setAttributes({ decorativeElementType: val })}
-                            />
-                            // Controls for color, thickness, width later
+                            <>
+                                <SelectControl label={__('Type', 'milliondollartheme')} value={decorativeElementType} options={[ {label: 'Underline', value: 'underline'}, {label: 'Overline', value: 'overline'} /* more later */ ]} onChange={(val) => setAttributes({ decorativeElementType: val })} />
+                                <TextControl /* TODO: Replace with ColorPalette */ label={__('Decorator Color', 'milliondollartheme')} value={decorativeElementColor} onChange={(val) => setAttributes({ decorativeElementColor: val })} />
+                                <TextControl label={__('Decorator Thickness (e.g., 3px)', 'milliondollartheme')} value={decorativeElementThickness} onChange={(val) => setAttributes({ decorativeElementThickness: val })} />
+                                <TextControl label={__('Decorator Width (e.g., 50px, 100%)', 'milliondollartheme')} value={decorativeElementWidth} onChange={(val) => setAttributes({ decorativeElementWidth: val })} />
+                            </>
                         )}
                     </PanelBody>
                 </InspectorControls>
 
-                <div {...blockProps} className={`${blockProps.className} text-align-${textAlign}`}>
+                <div {...blockProps}>
                     {showSubHeading && subHeadingPosition === 'above' && (
                         <RichText
                             tagName="p"
@@ -128,12 +157,13 @@ registerBlockType(name, {
                             value={subHeadingContent}
                             onChange={(val) => setAttributes({ subHeadingContent: val })}
                             placeholder={__('Sub-heading...', 'milliondollartheme')}
+                            style={subHeadingPreviewStyles}
                         />
                     )}
                     <RichText
                         tagName={TagName}
                         className={`adv-heading-main ${colorType === 'gradient' ? 'has-gradient-text' : ''}`}
-                        style={mainHeadingStyles}
+                        style={mainHeadingPreviewStyles}
                         value={content}
                         onChange={(val) => setAttributes({ content: val })}
                         placeholder={__('Heading...', 'milliondollartheme')}
@@ -146,10 +176,11 @@ registerBlockType(name, {
                             value={subHeadingContent}
                             onChange={(val) => setAttributes({ subHeadingContent: val })}
                             placeholder={__('Sub-heading...', 'milliondollartheme')}
+                            style={subHeadingPreviewStyles}
                         />
                     )}
                     {showDecorativeElement && (
-                        <div className={`adv-heading-decorator is-type-${decorativeElementType}`}></div>
+                        <div className={`adv-heading-decorator is-type-${decorativeElementType}`} style={decoratorPreviewStyles}></div>
                     )}
                 </div>
             </>
