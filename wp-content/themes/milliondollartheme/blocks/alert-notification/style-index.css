@@ -1,0 +1,141 @@
+/* --- Alert/Notification Block Styles (style-index.css) --- */
+.wp-block-milliondollartheme-alert-notification {
+    display: flex;
+    align-items: flex-start; /* Align icon and content top */
+    gap: var(--spacing-sm, 8px);
+    /* padding and borderRadius applied inline from attributes */
+    /* Default colors based on alertType, can be overridden by core color support */
+    border-left-width: 5px; /* Prominent left border for type indication */
+    border-left-style: solid;
+    position: relative; /* For dismiss button */
+}
+
+.alert-icon {
+    flex-shrink: 0;
+    font-size: 1.5em; /* Default icon size */
+    line-height: 1.3; /* Align with first line of text better */
+    margin-top: 2px; /* Fine-tune alignment */
+}
+
+.alert-content-wrapper {
+    flex-grow: 1;
+}
+.alert-message {
+    margin: 0;
+    line-height: 1.6;
+}
+.alert-message p:last-child {
+    margin-bottom: 0;
+}
+
+.alert-dismiss-button {
+    background: transparent;
+    border: none;
+    color: inherit; /* Inherit color from parent, can be styled for contrast */
+    opacity: 0.7;
+    font-size: 1.5em;
+    line-height: 1;
+    padding: 0 var(--spacing-xs, 4px);
+    cursor: pointer;
+    margin-left: var(--spacing-sm, 8px);
+    align-self: flex-start; /* Align with top of text */
+    transition: opacity var(--transition-speed) ease;
+}
+.alert-dismiss-button:hover {
+    opacity: 1;
+}
+
+/* Alert Types - Default Colors (can be overridden by core color support or custom attributes later) */
+/* Using CSS variables for easy theming of these default type colors */
+.wp-block-milliondollartheme-alert-notification.alert-type-info {
+    background-color: var(--alert-info-bg, rgba(var(--primary-color-rgb,0,82,212), 0.1));
+    border-left-color: var(--alert-info-border, var(--primary-color, #0052D4));
+    color: var(--alert-info-text, var(--primary-color, #0052D4));
+}
+.wp-block-milliondollartheme-alert-notification.alert-type-info .alert-icon {
+    color: var(--alert-info-icon, var(--primary-color, #0052D4));
+}
+
+.wp-block-milliondollartheme-alert-notification.alert-type-success {
+    background-color: var(--alert-success-bg, #d4edda);
+    border-left-color: var(--alert-success-border, #28a745);
+    color: var(--alert-success-text, #155724);
+}
+.wp-block-milliondollartheme-alert-notification.alert-type-success .alert-icon {
+    color: var(--alert-success-icon, #28a745);
+}
+
+.wp-block-milliondollartheme-alert-notification.alert-type-warning {
+    background-color: var(--alert-warning-bg, #fff3cd);
+    border-left-color: var(--alert-warning-border, #ffc107);
+    color: var(--alert-warning-text, #856404);
+}
+.wp-block-milliondollartheme-alert-notification.alert-type-warning .alert-icon {
+    color: var(--alert-warning-icon, #ffc107);
+}
+
+.wp-block-milliondollartheme-alert-notification.alert-type-error {
+    background-color: var(--alert-error-bg, #f8d7da);
+    border-left-color: var(--alert-error-border, #dc3545);
+    color: var(--alert-error-text, #721c24);
+}
+.wp-block-milliondollartheme-alert-notification.alert-type-error .alert-icon {
+    color: var(--alert-error-icon, #dc3545);
+}
+
+
+/* Alert Styles */
+.wp-block-milliondollartheme-alert-notification.is-style-default {
+    /* Colors are primarily from .alert-type-* classes */
+    /* box-shadow: 0 2px 5px rgba(0,0,0,0.05); */
+}
+
+.wp-block-milliondollartheme-alert-notification.is-style-outlined {
+    background-color: transparent !important; /* Override type bg */
+    border-width: 1px; /* Full border */
+    border-style: solid;
+    /* border-color from .alert-type-* will apply to left, others will be this color */
+    border-right-color: var(--alert-border-color, currentColor); /* Match text color or type border */
+    border-top-color: var(--alert-border-color, currentColor);
+    border-bottom-color: var(--alert-border-color, currentColor);
+    /* Text color from .alert-type-* */
+}
+
+.wp-block-milliondollartheme-alert-notification.is-style-glassy {
+    background: var(--glass-bg-color);
+    backdrop-filter: blur(var(--glass-blur-radius));
+    -webkit-backdrop-filter: blur(var(--glass-blur-radius));
+    border: 1px solid var(--glass-border-color) !important; /* Override type border */
+    box-shadow: var(--glass-box-shadow);
+    /* Text color should be light for glassy, potentially overriding .alert-type-* text color */
+    /* color: var(--text-color-light); /* This might need !important or more specificity */
+}
+.wp-block-milliondollartheme-alert-notification.is-style-glassy.alert-type-info,
+.wp-block-milliondollartheme-alert-notification.is-style-glassy.alert-type-success,
+.wp-block-milliondollartheme-alert-notification.is-style-glassy.alert-type-warning,
+.wp-block-milliondollartheme-alert-notification.is-style-glassy.alert-type-error {
+    color: var(--text-color-light); /* Ensure text is light on glassy bg */
+}
+.wp-block-milliondollartheme-alert-notification.is-style-glassy .alert-icon {
+    /* Icon color might also need to be light, or use its type color for accent */
+    /* color: var(--text-color-light); */
+}
+.wp-block-milliondollartheme-alert-notification.is-style-glassy .alert-dismiss-button {
+    color: var(--text-color-light);
+    opacity: 0.8;
+}
+.wp-block-milliondollartheme-alert-notification.is-style-glassy .alert-dismiss-button:hover {
+    opacity: 1;
+}
+
+
+/* Responsive */
+@media (max-width: 767px) {
+    .wp-block-milliondollartheme-alert-notification {
+        /* padding might be adjusted via attribute, or here for smaller screens */
+        /* font-size: 0.9em; */ /* Scale down text if needed */
+    }
+    .alert-icon {
+        font-size: 1.3em; /* Slightly smaller icon on mobile */
+    }
+}

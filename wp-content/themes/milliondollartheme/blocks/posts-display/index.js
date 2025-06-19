@@ -41,7 +41,7 @@ registerBlockType(name, {
                             min={1}
                             max={12}
                         />
-                        <TextControl
+                        <TextControl /* TODO: Replace with proper CategorySelect component */
                             label={__('Categories (slugs, comma-separated)', 'milliondollartheme')}
                             value={categories}
                             onChange={(val) => setAttributes({ categories: val })}

@@ -1,0 +1,176 @@
+/* --- Team Member Block Styles (style-index.css) --- */
+.wp-block-milliondollartheme-team-member {
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    /* padding, borderRadius, backgroundColor, borderColor applied inline by save() */
+    /* text-align from has-text-align-* class applied by WP */
+}
+.wp-block-milliondollartheme-team-member.has-text-align-left { text-align: left; }
+.wp-block-milliondollartheme-team-member.has-text-align-center { text-align: center; }
+.wp-block-milliondollartheme-team-member.has-text-align-right { text-align: right; }
+
+.wp-block-milliondollartheme-team-member:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(var(--primary-color-rgb, 0,82,212), 0.1);
+}
+
+/* Layout: Image Top (Default) */
+.wp-block-milliondollartheme-team-member.layout-image-top .team-member-image-wrapper {
+    margin-bottom: var(--spacing-md, 16px);
+}
+.wp-block-milliondollartheme-team-member.layout-image-top.has-text-align-center .team-member-image-wrapper img {
+    margin-left: auto; margin-right: auto;
+}
+.wp-block-milliondollartheme-team-member.layout-image-top.has-text-align-right .team-member-image-wrapper img {
+    margin-left: auto; margin-right: 0;
+}
+
+
+/* Layout: Image Left */
+.wp-block-milliondollartheme-team-member.layout-image-left {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-lg, 32px); /* Increased gap */
+}
+.wp-block-milliondollartheme-team-member.layout-image-left .team-member-image-wrapper {
+    flex-shrink: 0;
+    width: 120px; /* Slightly larger for side layout */
+    margin-bottom: 0;
+}
+.wp-block-milliondollartheme-team-member.layout-image-left .team-member-content {
+    flex-grow: 1;
+    /* Text alignment for content when image is left still comes from main block alignment class */
+}
+
+
+.team-member-image-wrapper img {
+    display: block;
+    max-width: 150px;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1/1; /* Ensure image is square before border-radius for circle */
+    object-fit: cover;
+    border: 3px solid var(--background-color-light, #fff);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+.wp-block-milliondollartheme-team-member.layout-image-left .team-member-image-wrapper img {
+    max-width: 120px;
+}
+
+.team-member-image-wrapper img.is-shape-circle { border-radius: 50%; }
+.team-member-image-wrapper img.is-shape-rounded { border-radius: var(--border-radius-lg, 16px); }
+.team-member-image-wrapper img.is-shape-square { border-radius: 0; }
+
+.team-member-name {
+    font-family: var(--font-family-heading);
+    font-size: 1.6em; /* More prominent */
+    font-weight: 700;
+    margin: 0 0 var(--spacing-xs, 4px) 0;
+    /* color applied inline */
+}
+.team-member-role {
+    font-size: 0.95em; /* Slightly larger */
+    font-weight: 600;
+    color: var(--primary-color);
+    margin: 0 0 var(--spacing-md, 16px) 0; /* More space after role */
+    /* color can be overridden by attribute */
+}
+.team-member-bio {
+    font-size: 0.9em;
+    line-height: 1.7; /* More line height for bio */
+    margin: 0 0 var(--spacing-md, 16px) 0;
+    /* color applied inline */
+}
+.team-member-bio p:last-child { margin-bottom: 0; }
+
+.team-member-social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md, 16px); /* More gap */
+}
+.wp-block-milliondollartheme-team-member.has-text-align-left .team-member-social-links { justify-content: flex-start; }
+.wp-block-milliondollartheme-team-member.has-text-align-center .team-member-social-links { justify-content: center; }
+.wp-block-milliondollartheme-team-member.has-text-align-right .team-member-social-links { justify-content: flex-end; }
+
+
+.team-member-social-link {
+    display: inline-flex;
+    color: var(--text-color-dark); /* Default color */
+    opacity: 0.8;
+    transition: opacity var(--transition-speed) ease, color var(--transition-speed) ease, transform var(--transition-speed) ease;
+    /* color from attribute applied inline */
+}
+.team-member-social-link:hover {
+    opacity: 1;
+    color: var(--accent-color);
+    transform: scale(1.1); /* Slight scale on hover */
+}
+.team-member-social-link .dashicons {
+    font-size: 22px; /* Slightly larger social icons */
+    width: 22px; height: 22px;
+}
+
+/* Card Styles */
+.wp-block-milliondollartheme-team-member.is-style-default {
+    background-color: var(--team-member-default-bg, var(--background-color-light, #fff)); /* Use light bg */
+    border: 1px solid var(--team-member-default-border, var(--border-color, #e0e0e0));
+}
+.wp-block-milliondollartheme-team-member.is-style-outline {
+    background-color: transparent;
+    border-width: 2px !important;
+    border-style: solid !important;
+    /* border-color from attribute or a theme variable */
+    border-color: var(--team-member-outline-border-color, var(--primary-color));
+}
+.wp-block-milliondollartheme-team-member.is-style-outline:hover {
+    border-color: var(--accent-color);
+}
+
+.wp-block-milliondollartheme-team-member.is-style-glassy {
+    background: var(--glass-bg-color);
+    backdrop-filter: blur(var(--glass-blur-radius));
+    -webkit-backdrop-filter: blur(var(--glass-blur-radius));
+    border: 1px solid var(--glass-border-color);
+    box-shadow: var(--glass-box-shadow);
+    color: var(--text-color-light); /* Default text for glassy */
+}
+.wp-block-milliondollartheme-team-member.is-style-glassy .team-member-name,
+.wp-block-milliondollartheme-team-member.is-style-glassy .team-member-role,
+.wp-block-milliondollartheme-team-member.is-style-glassy .team-member-bio,
+.wp-block-milliondollartheme-team-member.is-style-glassy .team-member-social-link {
+    /* color: inherit; /* Inherit light color, or allow attribute override */
+    /* Specific overrides for glassy if needed */
+}
+.wp-block-milliondollartheme-team-member.is-style-glassy .team-member-role {
+    color: var(--accent-color-on-glass, var(--accent-color)); /* Ensure role stands out on glass */
+}
+.wp-block-milliondollartheme-team-member.is-style-glassy .team-member-social-link {
+    color: var(--text-color-light); opacity: 0.85;
+}
+.wp-block-milliondollartheme-team-member.is-style-glassy .team-member-social-link:hover {
+    color: var(--text-color-light); opacity: 1;
+}
+.wp-block-milliondollartheme-team-member.is-style-glassy .team-member-image-wrapper img {
+    border-color: var(--glass-border-color);
+}
+
+
+/* Responsive */
+@media (max-width: 767px) {
+    .wp-block-milliondollartheme-team-member.layout-image-left {
+        flex-direction: column;
+        text-align: center; /* Default to center for stacked mobile view */
+    }
+    .wp-block-milliondollartheme-team-member.layout-image-left .team-member-image-wrapper {
+        width: 150px; /* Can be larger when stacked and centered */
+        max-width: 150px;
+        margin-left: auto; margin-right: auto;
+        margin-bottom: var(--spacing-md);
+    }
+    /* Social links justification for all layouts on mobile */
+    .wp-block-milliondollartheme-team-member .team-member-social-links {
+        justify-content: center;
+    }
+    .team-member-name { font-size: 1.3em; }
+    .team-member-role { font-size: 0.9em; }
+    .team-member-bio { font-size: 0.85em; }
+}

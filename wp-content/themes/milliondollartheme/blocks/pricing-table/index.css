@@ -1,0 +1,18 @@
+/* Pricing Table Editor Styles */
+.wp-block-milliondollartheme-pricing-table .block-editor-inner-blocks > .block-editor-block-list__layout {
+    display: grid; /* Mirror front-end grid for better WYSIWYG */
+    gap: var(--pricing-table-gap, 16px); /* Use CSS var if possible, or fallback */
+}
+/* Apply column classes for editor preview */
+.wp-block-milliondollartheme-pricing-table.columns-1 .block-editor-inner-blocks > .block-editor-block-list__layout { grid-template-columns: 1fr; }
+.wp-block-milliondollartheme-pricing-table.columns-2 .block-editor-inner-blocks > .block-editor-block-list__layout { grid-template-columns: repeat(2, 1fr); }
+.wp-block-milliondollartheme-pricing-table.columns-3 .block-editor-inner-blocks > .block-editor-block-list__layout { grid-template-columns: repeat(3, 1fr); }
+.wp-block-milliondollartheme-pricing-table.columns-4 .block-editor-inner-blocks > .block-editor-block-list__layout { grid-template-columns: repeat(4, 1fr); }
+
+/* Ensure child pricing plan items stretch to full height of their grid cell in editor */
+.wp-block-milliondollartheme-pricing-table .block-editor-inner-blocks > .block-editor-block-list__layout > [data-block] {
+    display: flex; /* Make the block editor wrapper for the child block flex */
+}
+.wp-block-milliondollartheme-pricing-table .block-editor-inner-blocks > .block-editor-block-list__layout > [data-block] > * {
+    flex-grow: 1; /* Make the actual child block content grow */
+}

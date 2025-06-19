@@ -1,0 +1,133 @@
+/* --- Masonry Portfolio Gallery Block Styles (style-index.css) --- */
+.wp-block-milliondollartheme-masonry-portfolio-gallery {
+    /* display: grid; or flex, depending on Masonry JS library needs */
+    /* The Masonry JS will typically handle item positioning. */
+    /* We use CSS vars for gap and column-min-width passed from PHP. */
+    margin-bottom: var(--spacing-lg);
+    /* Clearfix if items are floated by Masonry (older versions) */
+}
+/* Basic grid setup that Masonry JS can work with */
+.portfolio-gallery-masonry {
+    display: flex;
+    flex-wrap: wrap;
+    margin: calc(-1 * var(--masonry-gap, 16px) / 2); /* Negative margin trick for gap */
+}
+
+.masonry-grid-sizer, /* For columnWidth calculation by Masonry.js */
+.portfolio-item.masonry-item {
+    width: calc(100% / var(--masonry-columns, 3) - var(--masonry-gap, 16px)); /* Fallback, JS sets width */
+    /* Actual width calculation for responsive columns based on min-width:
+       Example: if container is 1000px, min-width 250px -> 4 columns. item width ~250px.
+       Masonry JS usually calculates this. For CSS-only masonry (grid), it's different.
+       For JS-based, we might set item width to something like:
+       width: var(--masonry-column-min-width, 250px);
+       Or use percentage based on how many columns fit.
+    */
+    margin: calc(var(--masonry-gap, 16px) / 2); /* Gutter for items */
+    box-sizing: border-box;
+}
+
+.portfolio-item {
+    position: relative; /* For overlay */
+    overflow: hidden; /* For image hover effects & border-radius */
+    border-radius: var(--border-radius-sm);
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+.wp-block-milliondollartheme-masonry-portfolio-gallery.item-style-default .portfolio-item {
+    background-color: var(--background-color-light, #f0f0f0);
+}
+.wp-block-milliondollartheme-masonry-portfolio-gallery.item-style-default .portfolio-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.07);
+}
+
+
+.portfolio-item-thumbnail {
+    display: block;
+    position: relative;
+    overflow: hidden; /* Ensure overlay and image effects are contained */
+}
+.portfolio-item-thumbnail img {
+    display: block;
+    width: 100%;
+    height: auto; /* Masonry relies on image actual height */
+    transition: transform 0.4s ease-out;
+}
+.portfolio-item-thumbnail a:hover img {
+    transform: scale(1.1);
+}
+
+.portfolio-item-thumbnail.is-placeholder {
+    background-color: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px; /* Placeholder height */
+    aspect-ratio: var(--image-aspect-ratio, 16/9); /* Use variable if aspect ratio attr added */
+}
+.portfolio-item-thumbnail.is-placeholder .placeholder-icon {
+    font-size: 48px;
+    color: #adb5bd;
+}
+
+
+.portfolio-item-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(var(--primary-color-rgb, 0,82,212), 0.75); /* Theme color overlay */
+    color: var(--text-color-light, #fff);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: var(--spacing-sm);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    border-radius: inherit; /* Match item's border radius */
+}
+.portfolio-item-thumbnail a:hover .portfolio-item-overlay {
+    opacity: 1;
+}
+.portfolio-item-title {
+    font-family: var(--font-family-heading);
+    font-size: 1.2em;
+    margin: 0;
+    color: inherit; /* Inherits from overlay */
+}
+
+/* Glassy Item Style */
+.wp-block-milliondollartheme-masonry-portfolio-gallery.item-style-glassy-card .portfolio-item {
+    background: var(--glass-bg-color);
+    backdrop-filter: blur(var(--glass-blur-radius));
+    -webkit-backdrop-filter: blur(var(--glass-blur-radius));
+    border: 1px solid var(--glass-border-color);
+    box-shadow: var(--glass-box-shadow-light);
+    border-radius: var(--border-radius-md); /* Glassy items have larger radius */
+}
+.wp-block-milliondollartheme-masonry-portfolio-gallery.item-style-glassy-card .portfolio-item-thumbnail img {
+    /* border-radius: var(--border-radius-md) var(--border-radius-md) 0 0; /* If title is shown below */
+}
+.wp-block-milliondollartheme-masonry-portfolio-gallery.item-style-glassy-card .portfolio-item-overlay {
+    background: rgba(var(--glass-bg-color-rgb, 50,50,80), 0.5); /* Darker glass for overlay on glass */
+}
+.wp-block-milliondollartheme-masonry-portfolio-gallery.item-style-glassy-card .portfolio-item-title {
+    color: var(--text-color-light);
+}
+
+
+/* Responsive: Masonry JS usually handles column recalculation.
+   CSS below is for fallback or if CSS-driven masonry is used. */
+@media (max-width: 767px) {
+    /* .masonry-grid-sizer, .portfolio-item.masonry-item {
+        width: calc(100% / var(--masonry-columns-mobile, 1) - var(--masonry-gap));
+    } */
+}
+@media (max-width: 1023px) and (min-width: 768px) {
+    /* .masonry-grid-sizer, .portfolio-item.masonry-item {
+        width: calc(100% / var(--masonry-columns-tablet, 2) - var(--masonry-gap));
+    } */
+}

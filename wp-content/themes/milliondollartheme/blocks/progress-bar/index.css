@@ -1,0 +1,16 @@
+/* --- Progress Bar Block Editor Styles (index.css) --- */
+.wp-block-milliondollartheme-progress-bar {
+    /* border: 1px dashed #ccc; */ /* Optional visual guide */
+}
+.progress-bar-title.rich-text { /* Targeting the RichText component wrapper */
+    margin-bottom: 4px; /* Ensure some space in editor */
+}
+.progress-bar-track {
+    /* Preview of track in editor */
+}
+.progress-bar-fill {
+    /* Preview of fill in editor, width is dynamic */
+}
+.progress-bar-label {
+    /* Preview of label */
+}

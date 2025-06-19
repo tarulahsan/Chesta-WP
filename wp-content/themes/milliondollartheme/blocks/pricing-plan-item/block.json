@@ -1,0 +1,29 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/pricing-plan-item",
+    "title": "Pricing Plan Item",
+    "category": "milliondollartheme-blocks",
+    "description": "A single pricing plan column, intended for use within the Pricing Table block.",
+    "icon": "cart",
+    "parent": ["milliondollartheme/pricing-table"],
+    "attributes": {
+        "planName": { "type": "string", "source": "html", "selector": ".plan-name", "default": "Basic Plan" },
+        "price": { "type": "string", "source": "html", "selector": ".plan-price-amount", "default": "$19" },
+        "priceInterval": { "type": "string", "source": "html", "selector": ".plan-price-interval", "default": "/ month" },
+        "features": { "type": "string", "source": "html", "selector": ".plan-features", "default": "<li>Feature 1</li><li>Feature 2</li><li>Feature 3</li>", "multiline": "li" },
+        "buttonText": { "type": "string", "default": "Sign Up" },
+        "buttonUrl": { "type": "string", "default": "#" },
+        "buttonStyle": { "type": "string", "default": "primary" },
+        "isFeatured": { "type": "boolean", "default": false },
+        "itemStyle": { "type": "string", "default": "default" }
+    },
+    "supports": {
+        "html": false,
+        "reusable": false,
+        "inserter": false
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "style": "file:./style-index.css"
+}

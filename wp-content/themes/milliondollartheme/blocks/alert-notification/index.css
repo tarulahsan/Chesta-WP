@@ -1,0 +1,9 @@
+/* --- Alert/Notification Block Editor Styles (index.css) --- */
+.wp-block-milliondollartheme-alert-notification {
+    /* border: 1px dashed #ccc; */ /* Optional visual guide in editor */
+    /* Preview of colors and styles primarily comes from style-index.css and core color support */
+}
+.wp-block-milliondollartheme-alert-notification .alert-dismiss-button {
+    /* Ensure dismiss button is visible in editor but not functional without JS */
+    /* opacity: 0.5; */ /* Example to differentiate from front-end */
+}

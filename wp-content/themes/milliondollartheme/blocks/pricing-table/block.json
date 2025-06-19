@@ -1,0 +1,25 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/pricing-table",
+    "title": "Pricing Table",
+    "category": "milliondollartheme-blocks",
+    "description": "Displays multiple pricing plans in a responsive table.",
+    "icon": "table-col-delete",
+    "keywords": ["pricing", "table", "plans", "comparison"],
+    "attributes": {
+        "columns": { "type": "number", "default": 3 },
+        "tableStyle": { "type": "string", "default": "default" }, /* default, separated-cards */
+        "gap": { "type": "string", "default": "var(--spacing-md)"},
+        "align": { "type": "string", "default": "" }
+    },
+    "supports": {
+        "align": ["wide", "full"],
+        "html": false,
+        "anchor": true
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css"
+}

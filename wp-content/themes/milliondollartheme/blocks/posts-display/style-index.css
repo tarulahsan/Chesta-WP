@@ -1,13 +1,12 @@
 /* --- Posts Display Block Styles (style-index.css) --- */
 .wp-block-milliondollartheme-posts-display {
-    /* Base styles for the wrapper */
     margin-bottom: var(--spacing-lg);
 }
 
 /* Grid Layout */
 .wp-block-milliondollartheme-posts-display.layout-grid {
     display: grid;
-    gap: var(--spacing-md, 16px);
+    gap: var(--spacing-lg, 32px); /* Increased gap */
 }
 .wp-block-milliondollartheme-posts-display.layout-grid.columns-1 { grid-template-columns: 1fr; }
 .wp-block-milliondollartheme-posts-display.layout-grid.columns-2 { grid-template-columns: repeat(2, 1fr); }
@@ -17,86 +16,136 @@
 /* List Layout */
 .wp-block-milliondollartheme-posts-display.layout-list .post-item {
     display: flex;
-    gap: var(--spacing-md, 16px);
-    margin-bottom: var(--spacing-md, 16px);
-    align-items: flex-start; /* Align items to the top */
+    gap: var(--spacing-lg, 32px); /* Increased gap */
+    margin-bottom: var(--spacing-lg, 32px); /* Increased margin */
+    align-items: flex-start;
+}
+.wp-block-milliondollartheme-posts-display.layout-list .post-item:last-child {
+    margin-bottom: 0;
 }
 .wp-block-milliondollartheme-posts-display.layout-list .post-item-thumbnail {
-    flex-basis: 150px; /* Fixed width for thumbnail in list layout */
+    flex-basis: 200px; /* Larger fixed width for thumbnail */
     flex-shrink: 0;
 }
-.wp-block-milliondollartheme-posts-display.layout-list .post-item-content {
+.wp-block-milliondollartheme-posts-display.layout-list .post-item-content-wrapper {
     flex-grow: 1;
 }
 
 
 /* Individual Post Item Styling */
 .wp-block-milliondollartheme-posts-display .post-item {
-    /* Common styles for each post item */
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+.wp-block-milliondollartheme-posts-display .post-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(var(--primary-color-rgb, 0,82,212), 0.12);
 }
 
 /* Default Item Style */
 .wp-block-milliondollartheme-posts-display.item-style-default .post-item {
-    background-color: var(--milliondollartheme-postitem-default-bg, #f9f9f9);
-    padding: var(--spacing-sm, 8px);
-    border-radius: var(--border-radius-sm, 4px);
-    border: 1px solid var(--milliondollartheme-postitem-default-border, #eee);
+    background-color: var(--milliondollartheme-postitem-default-bg, var(--background-color-light, #fff));
+    padding: var(--spacing-md, 16px); /* More padding */
+    border-radius: var(--border-radius-md, 12px); /* Softer radius */
+    border: 1px solid var(--milliondollartheme-postitem-default-border, var(--border-color, #e0e0e0));
 }
 
 /* Card Glassy Item Style */
 .wp-block-milliondollartheme-posts-display.item-style-card-glassy .post-item {
-    background: var(--glass-bg-color, rgba(255, 255, 255, 0.1));
-    backdrop-filter: blur(var(--glass-blur-radius, 10px));
-    -webkit-backdrop-filter: blur(var(--glass-blur-radius, 10px));
-    border: 1px solid var(--glass-border-color, rgba(255, 255, 255, 0.18));
-    box-shadow: var(--glass-box-shadow, 0 8px 32px 0 rgba(31, 38, 135, 0.37));
-    padding: var(--spacing-md, 16px);
-    border-radius: var(--border-radius-md, 12px);
+    background: var(--glass-bg-color, rgba(255, 255, 255, 0.05)); /* More subtle glass */
+    backdrop-filter: blur(var(--glass-blur-radius, 12px));
+    -webkit-backdrop-filter: blur(var(--glass-blur-radius, 12px));
+    border: 1px solid var(--glass-border-color, rgba(255, 255, 255, 0.15));
+    box-shadow: var(--glass-box-shadow-light, 0 5px 20px rgba(0,0,0,0.1)); /* Lighter shadow */
+    padding: var(--spacing-lg, 32px); /* Generous padding for glassy cards */
+    border-radius: var(--border-radius-lg, 16px); /* Larger radius for glassy cards */
+    overflow: hidden; /* Ensure content respects border radius */
 }
-.wp-block-milliondollartheme-posts-display.item-style-card-glassy .post-item-title a,
+.wp-block-milliondollartheme-posts-display.item-style-card-glassy .post-item-title a {
+    color: var(--text-color-light-on-glass, var(--text-color-light, #fff));
+}
 .wp-block-milliondollartheme-posts-display.item-style-card-glassy .post-item-date,
 .wp-block-milliondollartheme-posts-display.item-style-card-glassy .post-item-excerpt {
-    color: var(--text-color-light, #fff); /* Assuming glassy on dark bg */
+    color: var(--text-color-light-on-glass-muted, rgba(255,255,255,0.8));
 }
 .wp-block-milliondollartheme-posts-display.item-style-card-glassy .post-item-title a:hover {
-    color: var(--accent-color); /* Or a lighter shade of text-color-light */
+    color: var(--accent-color-on-glass, var(--accent-color, #00C6AD));
+}
+.wp-block-milliondollartheme-posts-display.item-style-card-glassy .post-item-read-more a.cta-button {
+    /* Ensure outline button is light on dark/glassy background */
+    border-color: var(--text-color-light-on-glass, var(--text-color-light));
+    color: var(--text-color-light-on-glass, var(--text-color-light));
+}
+.wp-block-milliondollartheme-posts-display.item-style-card-glassy .post-item-read-more a.cta-button:hover {
+    background-color: var(--text-color-light-on-glass, var(--text-color-light));
+    color: var(--primary-color); /* Or another dark color */
 }
 
 
 .post-item-thumbnail {
-    margin-bottom: var(--spacing-sm, 8px);
+    margin-bottom: var(--spacing-md, 16px); /* Increased margin */
+    overflow: hidden; /* For image zoom effect */
+    position: relative; /* For potential overlay or link icon */
 }
 .post-item-thumbnail img {
     width: 100%;
-    height: auto;
+    height: auto; /* Can set fixed height for grid items later with object-fit */
+    aspect-ratio: 16/9; /* Default aspect ratio */
+    object-fit: cover;
     display: block;
-    border-radius: var(--border-radius-sm, 4px);
+    border-radius: var(--border-radius-sm, 8px); /* Consistent radius */
+    transition: transform 0.4s var(--transition-timing-smooth, cubic-bezier(0.25, 0.46, 0.45, 0.94));
+}
+.post-item-thumbnail a:hover img {
+    transform: scale(1.08); /* More prominent zoom */
+}
+
+.post-item-content-wrapper {
+    /* Wrapper for text content after image */
 }
 
 .post-item-title {
     font-family: var(--font-family-heading);
-    font-size: 1.3em; /* Example */
+    font-size: 1.4em; /* Slightly larger */
+    line-height: 1.3;
     margin-top: 0;
     margin-bottom: var(--spacing-xs, 4px);
 }
 .post-item-title a {
     text-decoration: none;
-    color: var(--primary-color);
+    color: var(--h-color, var(--primary-color)); /* Use heading color var */
 }
 .post-item-title a:hover {
     color: var(--accent-color);
 }
 
-.post-item-date {
-    font-size: 0.85em;
-    color: var(--text-color-dark);
-    opacity: 0.7;
+.post-item-meta {
     margin-bottom: var(--spacing-sm, 8px);
 }
+.post-item-date {
+    font-size: 0.85em;
+    color: var(--text-meta-color, var(--text-color-dark));
+    opacity: 0.75;
+    /* margin-bottom: var(--spacing-sm, 8px); /* Moved to meta wrapper */
+}
 
+.post-item-excerpt {
+    font-size: 0.95em;
+    line-height: 1.6;
+    margin-bottom: var(--spacing-md, 16px);
+}
 .post-item-excerpt p:last-child {
     margin-bottom: 0;
 }
+
+.post-item-read-more {
+    margin-top: var(--spacing-sm, 8px);
+}
+.post-item-read-more a.cta-button {
+    /* Inherits global button styles, ensure small variant is used if desired */
+    font-size: 0.9em; /* Make read more button slightly smaller */
+    padding: var(--spacing-xs) var(--spacing-sm);
+}
+
 
 /* Responsive adjustments for grid */
 @media (max-width: 991px) { /* Tablet */
@@ -107,15 +156,18 @@
 }
 @media (max-width: 767px) { /* Mobile */
     .wp-block-milliondollartheme-posts-display.layout-grid {
-        grid-template-columns: 1fr; /* Stack grid items on mobile */
+        grid-template-columns: 1fr;
     }
     .wp-block-milliondollartheme-posts-display.layout-list .post-item {
-        flex-direction: column; /* Stack thumbnail and content */
+        flex-direction: column;
+        gap: var(--spacing-md); /* Consistent gap when stacked */
     }
     .wp-block-milliondollartheme-posts-display.layout-list .post-item-thumbnail {
-        flex-basis: auto; /* Allow thumbnail to take full width when stacked */
+        flex-basis: auto;
         width: 100%;
-        max-width: 200px; /* Optional max width for stacked image */
-        margin-left: auto; margin-right: auto; /* Center if max-width is used */
+        max-width: 100%; /* Allow full width image in stacked list */
+        margin-left: 0; margin-right: 0;
     }
+    .post-item-title { font-size: 1.2em; }
+    .post-item-excerpt { font-size: 0.9em; }
 }

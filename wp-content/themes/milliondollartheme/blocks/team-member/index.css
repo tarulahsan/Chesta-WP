@@ -1,0 +1,38 @@
+/* --- Team Member Block Editor Styles (index.css) --- */
+.wp-block-milliondollartheme-team-member {
+    /* border: 1px dashed #ccc; */
+    /* text-align from class applied by blockProps */
+}
+.wp-block-milliondollartheme-team-member .team-member-image-wrapper {
+    /* Basic styles for editor */
+}
+.wp-block-milliondollartheme-team-member .team-member-image-wrapper img {
+    display: block; background-color: #eee; /* Placeholder bg if no image */
+    /* width, height, object-fit from front-end styles */
+}
+
+.wp-block-milliondollartheme-team-member.layout-image-left {
+    /* display: flex; align-items: flex-start; gap: 16px; /* From front-end for preview consistency */
+}
+.wp-block-milliondollartheme-team-member.layout-image-left .team-member-image-wrapper {
+    /* width: 100px; flex-shrink: 0; */
+}
+.wp-block-milliondollartheme-team-member.layout-image-left .team-member-content {
+    /* flex-grow: 1; */
+}
+
+.social-link-repeater-item {
+    border: 1px solid #e0e0e0;
+    padding: var(--spacing-sm, 8px);
+    margin-bottom: var(--spacing-sm, 8px);
+    border-radius: var(--border-radius-sm, 4px);
+    background-color: #fdfdfd;
+}
+.social-link-repeater-item .components-base-control { margin-bottom: var(--spacing-xs, 4px); }
+.social-link-repeater-item .components-button.is-destructive { margin-top: 0; float: right; }
+
+/* Editor preview for card styles if needed */
+.wp-block-milliondollartheme-team-member.is-style-glassy {
+    /* background: rgba(50,50,150,0.1); */ /* JS applies this */
+    /* color: #f0f0f0; */ /* JS applies this */
+}

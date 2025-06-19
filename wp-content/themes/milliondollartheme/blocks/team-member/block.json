@@ -1,0 +1,48 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/team-member",
+    "title": "Team Member",
+    "category": "milliondollartheme-blocks",
+    "description": "Displays a team member's profile with image, name, role, bio, and social links.",
+    "icon": "admin-users",
+    "keywords": ["team", "member", "profile", "person", "staff", "author", "user"],
+    "attributes": {
+        "name": { "type": "string", "source": "html", "selector": ".team-member-name", "default": "Alex Chen" },
+        "role": { "type": "string", "source": "html", "selector": ".team-member-role", "default": "Lead Designer" },
+        "bio": { "type": "string", "source": "html", "selector": ".team-member-bio", "default": "Alex brings over 10 years of design experience to the team, specializing in user-centric interfaces." },
+        "imageUrl": { "type": "string" },
+        "imageId": { "type": "number" },
+        "imageShape": { "type": "string", "default": "circle" }, /* circle, rounded, square */
+        "layout": { "type": "string", "default": "image-top" }, /* image-top, image-left */
+        "alignment": { "type": "string", "default": "center" }, /* Text alignment within block: left, center, right */
+        "cardStyle": { "type": "string", "default": "default" }, /* default, glassy, outline */
+        "backgroundColor": { "type": "string" },
+        "borderColor": { "type": "string" },
+        "borderRadius": { "type": "string", "default": "var(--border-radius-md)" },
+        "padding": { "type": "string", "default": "var(--spacing-lg)" }, /* Increased default padding */
+        "socialLinks": {
+            "type": "array",
+            "default": [
+                { "id": "s1", "icon": "twitter", "url": "#" },
+                { "id": "s2", "icon": "linkedin", "url": "#" }
+            ]
+            // No source for array directly, handled by JS save/edit.
+            // If source query was used, it would be more complex for repeater.
+        },
+        "nameColor": { "type": "string" },
+        "roleColor": { "type": "string" },
+        "bioColor": { "type": "string" },
+        "socialIconColor": { "type": "string" },
+        "align": { "type": "string", "default": "" } /* For block alignment */
+    },
+    "supports": {
+        "html": false,
+        "anchor": true,
+        "align": ["wide"]
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css"
+}

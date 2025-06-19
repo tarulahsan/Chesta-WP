@@ -1,0 +1,38 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/alert-notification",
+    "title": "Alert / Notification",
+    "category": "milliondollartheme-blocks",
+    "description": "Displays contextual alert messages (info, success, warning, error).",
+    "icon": "info-outline",
+    "keywords": ["alert", "notification", "message", "notice", "info", "warning", "error", "success"],
+    "attributes": {
+        "message": { "type": "string", "source": "html", "selector": ".alert-message", "default": "This is an important notification!" },
+        "alertType": { "type": "string", "default": "info" }, /* info, success, warning, error */
+        "isDismissible": { "type": "boolean", "default": true },
+        "showIcon": { "type": "boolean", "default": true },
+        "customIcon": { "type": "string" }, // For user to provide an icon slug if overriding default
+        "alertStyle": { "type": "string", "default": "default" }, /* default, glassy, outlined */
+        "borderRadius": { "type": "string", "default": "var(--border-radius-sm)"},
+        "padding": { "type": "string", "default": "var(--spacing-md)"},
+        "align": { "type": "string", "default": "" }
+    },
+    "supports": {
+        "align": ["wide", "full"],
+        "html": false,
+        "anchor": true,
+        "color": {
+            "background": true,
+            "text": true,
+            "gradients": false,
+            "link": false
+        },
+        "spacing": { "margin": true }
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css",
+    "viewScript": "file:./view.js"
+}

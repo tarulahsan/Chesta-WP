@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/masonry-portfolio-gallery",
+    "title": "Masonry Portfolio Gallery",
+    "category": "milliondollartheme-blocks",
+    "description": "Displays portfolio items in a Pinterest-style masonry layout.",
+    "icon": "images-alt",
+    "keywords": ["portfolio", "gallery", "grid", "masonry", "projects", "images"],
+    "attributes": {
+        "selectedCategories": { "type": "string", "default": "" },
+        "numberOfItems": { "type": "number", "default": 9 },
+        "orderBy": { "type": "string", "default": "date" },
+        "order": { "type": "string", "default": "DESC" },
+        "columnMinWidth": { "type": "number", "default": 250 },
+        "imageSize": { "type": "string", "default": "medium_large" },
+        "showPostTitleOnHover": { "type": "boolean", "default": true },
+        "gap": { "type": "number", "default": 16 }, /* Gap in pixels */
+        "align": { "type": "string", "default": "" },
+        "itemStyle": { "type": "string", "default": "default" } /* default, glassy-item */
+        // No complex hover effects or filtering in this iteration
+    },
+    "supports": {
+        "align": ["wide", "full"],
+        "html": false,
+        "anchor": true
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "style": "file:./style-index.css",
+    "viewScript": "file:./view.js",
+    "render": "file:./render.php"
+}

@@ -297,82 +297,107 @@ add_action( 'init', 'milliondollartheme_register_blocks' );
  * @return string HTML content for the block.
  */
 function milliondollartheme_render_posts_display_block( $attributes ) {
+    $default_attrs = array(
+        'numberOfPosts' => 3,
+        'layout' => 'grid',
+        'columns' => 3,
+        'displayFeaturedImage' => true,
+        'featuredImageSize' => 'medium_large', // New attribute
+        'displayPostTitle' => true,
+        'titleTag' => 'h3', // New attribute
+        'displayPostDate' => true,
+        'displayPostExcerpt' => true,
+        'excerptLength' => 25,
+        'displayReadMoreLink' => false, // New attribute
+        'readMoreText' => __('Read More', 'milliondollartheme'), // New attribute
+        'categories' => '',
+        'orderBy' => 'date',
+        'order' => 'DESC',
+        'postsDisplayStyle' => 'default',
+        'align' => '',
+    );
+    $attr = array_merge( $default_attrs, $attributes );
+
     $args = array(
         'post_type'      => 'post',
-        'posts_per_page' => isset( $attributes['numberOfPosts'] ) ? intval( $attributes['numberOfPosts'] ) : 3,
-        'orderby'        => isset( $attributes['orderBy'] ) ? sanitize_text_field( $attributes['orderBy'] ) : 'date',
-        'order'          => isset( $attributes['order'] ) ? sanitize_text_field( $attributes['order'] ) : 'DESC',
+        'posts_per_page' => intval( $attr['numberOfPosts'] ),
+        'orderby'        => sanitize_text_field( $attr['orderBy'] ),
+        'order'          => sanitize_text_field( $attr['order'] ),
         'post_status'    => 'publish',
     );
 
-    if ( ! empty( $attributes['categories'] ) ) {
-        $args['category_name'] = sanitize_text_field( $attributes['categories'] ); // Accepts comma-separated slugs
+    if ( ! empty( $attr['categories'] ) ) {
+        // Assuming categories are slugs. For IDs, tax_query would be better.
+        $args['category_name'] = sanitize_text_field( $attr['categories'] );
     }
 
     $query = new WP_Query( $args );
 
     if ( ! $query->have_posts() ) {
-        return '<p>' . esc_html__( 'No posts found.', 'milliondollartheme' ) . '</p>';
+        return '<p class="no-posts-found">' . esc_html__( 'No posts found matching your criteria.', 'milliondollartheme' ) . '</p>';
     }
 
-    $layout = isset( $attributes['layout'] ) ? $attributes['layout'] : 'grid';
-    $columns = isset( $attributes['columns'] ) ? intval( $attributes['columns'] ) : 3;
-    $display_image = isset( $attributes['displayFeaturedImage'] ) ? $attributes['displayFeaturedImage'] : true;
-    $display_title = isset( $attributes['displayPostTitle'] ) ? $attributes['displayPostTitle'] : true;
-    $display_date = isset( $attributes['displayPostDate'] ) ? $attributes['displayPostDate'] : true;
-    $display_excerpt = isset( $attributes['displayPostExcerpt'] ) ? $attributes['displayPostExcerpt'] : true;
-    $excerpt_length = isset( $attributes['excerptLength'] ) ? intval( $attributes['excerptLength'] ) : 25;
-    $item_style = isset( $attributes['postsDisplayStyle'] ) ? $attributes['postsDisplayStyle'] : 'default';
-
-
-    $classes = array(
+    $wrapper_classes = array(
         'wp-block-milliondollartheme-posts-display',
-        'layout-' . esc_attr( $layout ),
-        'item-style-' . esc_attr( $item_style )
+        'layout-' . esc_attr( $attr['layout'] ),
+        'item-style-' . esc_attr( $attr['postsDisplayStyle'] )
     );
-    if ( $layout === 'grid' ) {
-        $classes[] = 'columns-' . esc_attr( $columns );
+    if ( $attr['layout'] === 'grid' ) {
+        $wrapper_classes[] = 'columns-' . esc_attr( $attr['columns'] );
     }
-    if ( isset($attributes['align']) && $attributes['align']){
-      $classes[] = 'align' . esc_attr($attributes['align']);
+    if ( !empty($attr['align']) ){
+      $wrapper_classes[] = 'align' . esc_attr($attr['align']);
     }
 
+    $title_tag = tag_escape( $attr['titleTag'] ); // Sanitize the tag
 
-    $output = '<div class="' . esc_attr( implode( ' ', $classes ) ) . '">';
+    ob_start();
+    ?>
+    <div class="<?php echo esc_attr( implode( ' ', $wrapper_classes ) ); ?>">
+        <?php while ( $query->have_posts() ) : $query->the_post(); ?>
+            <article <?php post_class( 'post-item' ); ?>>
+                <?php if ( $attr['displayFeaturedImage'] && has_post_thumbnail() ) : ?>
+                    <div class="post-item-thumbnail">
+                        <a href="<?php the_permalink(); ?>" aria-hidden="true" tabindex="-1">
+                            <?php the_post_thumbnail( get_the_ID(), esc_attr($attr['featuredImageSize']) ); ?>
+                        </a>
+                    </div>
+                <?php endif; ?>
 
-    while ( $query->have_posts() ) {
-        $query->the_post();
-        $output .= '<article class="post-item">'; // Individual post item
+                <div class="post-item-content-wrapper">
+                    <?php if ( $attr['displayPostTitle'] ) : ?>
+                        <<?php echo $title_tag; ?> class="post-item-title">
+                            <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+                        </<?php echo $title_tag; ?>>
+                    <?php endif; ?>
 
-        if ( $display_image && has_post_thumbnail() ) {
-            $output .= '<div class="post-item-thumbnail">';
-            $output .= '<a href="' . esc_url( get_permalink() ) . '">' . get_the_post_thumbnail( get_the_ID(), 'medium_large' ) . '</a>'; // Use appropriate image size
-            $output .= '</div>';
-        }
+                    <div class="post-item-meta">
+                       <?php if ( $attr['displayPostDate'] ) : ?>
+                           <span class="post-item-date"><?php echo get_the_date(); ?></span>
+                       <?php endif; ?>
+                       <?php // TODO: Add author, categories display options here ?>
+                    </div>
 
-        $output .= '<div class="post-item-content">';
-        if ( $display_title ) {
-            $output .= '<h3 class="post-item-title"><a href="' . esc_url( get_permalink() ) . '">' . get_the_title() . '</a></h3>';
-        }
+                    <?php if ( $attr['displayPostExcerpt'] ) : ?>
+                        <div class="post-item-excerpt">
+                            <?php echo wpautop( wp_trim_words( get_the_excerpt(), intval( $attr['excerptLength'] ), ' &hellip;' ) ); ?>
+                        </div>
+                    <?php endif; ?>
 
-        if ( $display_date ) {
-            $output .= '<p class="post-item-date">' . get_the_date() . '</p>';
-        }
-
-        if ( $display_excerpt ) {
-            $excerpt = get_the_excerpt();
-            $trimmed_excerpt = wp_trim_words( $excerpt, $excerpt_length, ' &hellip;' );
-            $output .= '<div class="post-item-excerpt">' . wpautop( $trimmed_excerpt ) . '</div>';
-        }
-        $output .= '</div>'; // .post-item-content
-
-        $output .= '</article>';
-    }
+                    <?php if ( $attr['displayReadMoreLink'] ) : ?>
+                        <p class="post-item-read-more">
+                            <a href="<?php the_permalink(); ?>" class="cta-button is-style-outline is-size-small">
+                                <?php echo esc_html( $attr['readMoreText'] ); ?>
+                            </a>
+                        </p>
+                    <?php endif; ?>
+                </div>
+            </article>
+        <?php endwhile; ?>
+    </div>
+    <?php
     wp_reset_postdata();
-
-    $output .= '</div>'; // .wp-block-milliondollartheme-posts-display
-
-    return $output;
+    return ob_get_clean();
 }
 
 /**

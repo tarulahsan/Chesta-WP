@@ -1,0 +1,35 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/progress-bar",
+    "title": "Progress Bar / Skill Bar",
+    "category": "milliondollartheme-blocks",
+    "description": "Visually represents a percentage or skill level with an animated bar.",
+    "icon": "editor-contract",
+    "keywords": ["progress", "bar", "skill", "percentage", "stats", "level", "meter"],
+    "attributes": {
+        "title": { "type": "string", "source": "html", "selector": ".progress-bar-title", "default": "Web Development" },
+        "percentage": { "type": "number", "default": 75 },
+        "barColor": { "type": "string" },
+        "barGradient": { "type": "string" },
+        "barBackgroundColor": { "type": "string", "default": "rgba(0,0,0,0.1)" },
+        "barHeight": { "type": "string", "default": "20px" },
+        "borderRadius": { "type": "string", "default": "var(--border-radius-sm)" },
+        "showLabel": { "type": "boolean", "default": true },
+        "labelPosition": { "type": "string", "default": "inside" },
+        "labelColor": { "type": "string" },
+        "titleColor": { "type": "string" },
+        "animateOnScroll": { "type": "boolean", "default": true },
+        "barStyle": { "type": "string", "default": "default" }
+    },
+    "supports": {
+        "html": false,
+        "anchor": true,
+        "align": ["wide", "full"]
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css",
+    "viewScript": "file:./view.js"
+}

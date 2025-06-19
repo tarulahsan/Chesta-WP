@@ -1,0 +1,92 @@
+/* Pricing Plan Item Styles */
+.wp-block-milliondollartheme-pricing-plan-item {
+    border: 1px solid var(--border-color, #ddd);
+    padding: var(--spacing-md, 16px);
+    border-radius: var(--border-radius-md, 12px);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* For equal height columns in flex/grid parent */
+}
+.wp-block-milliondollartheme-pricing-plan-item.is-style-glassy {
+    background: var(--glass-bg-color);
+    backdrop-filter: blur(var(--glass-blur-radius));
+    -webkit-backdrop-filter: blur(var(--glass-blur-radius));
+    border: 1px solid var(--glass-border-color);
+    box-shadow: var(--glass-box-shadow);
+    color: var(--text-color-light);
+}
+.wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-name,
+.wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-price,
+.wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-features {
+    color: var(--text-color-light);
+}
+.wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-features ul li {
+    border-color: rgba(255,255,255,0.2);
+}
+
+
+.wp-block-milliondollartheme-pricing-plan-item.is-featured-plan {
+    border-width: 2px;
+    border-color: var(--primary-color, #0052D4);
+    box-shadow: 0 5px 20px rgba(var(--primary-color-rgb,0,82,212),0.2);
+    transform: scale(1.02); /* Slightly larger featured plan */
+}
+
+.plan-name {
+    font-family: var(--font-family-heading);
+    font-size: 1.5em;
+    font-weight: 700;
+    margin-bottom: var(--spacing-sm, 8px);
+}
+.plan-price {
+    font-family: var(--font-family-heading);
+    font-size: 2.5em;
+    font-weight: 900;
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-sm, 8px);
+}
+.wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-price {
+    color: var(--accent-color); /* Brighter accent for price on glass */
+}
+
+.plan-price-amount {}
+.plan-price-interval {
+    font-size: 0.4em;
+    font-weight: 400;
+    opacity: 0.7;
+    margin-left: 2px;
+}
+.plan-features {
+    list-style: none;
+    padding: 0;
+    margin: var(--spacing-md, 16px) 0;
+    flex-grow: 1; /* Push button to bottom */
+}
+.plan-features li {
+    padding: var(--spacing-xs, 4px) 0;
+    border-bottom: 1px dotted #eee;
+}
+.plan-features li:last-child {
+    border-bottom: none;
+}
+.plan-button-wrapper {
+    margin-top: auto; /* Push button to bottom */
+}
+.plan-button { /* Mimic .cta-button or .adv-button-link */
+    display: inline-block; text-decoration: none; font-family: var(--font-family-heading);
+    font-weight: 700; transition: all var(--transition-speed) ease; cursor: pointer;
+    border: 2px solid transparent; padding: var(--spacing-sm) var(--spacing-lg);
+    font-size: 1em; border-radius: var(--border-radius-sm); text-align: center;
+}
+.plan-button.is-button-style-primary { background: var(--gradient-primary); color: var(--text-color-light); }
+.plan-button.is-button-style-secondary { background: var(--gradient-secondary); color: var(--text-color-light); }
+.plan-button.is-button-style-outline { border-color: var(--primary-color); color: var(--primary-color); }
+.plan-button.is-button-style-outline:hover { background-color: var(--primary-color); color: var(--text-color-light); }
+
+.wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-button.is-button-style-outline {
+    border-color: var(--text-color-light); color: var(--text-color-light);
+}
+.wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-button.is-button-style-outline:hover {
+    background-color: var(--text-color-light); color: var(--primary-color);
+}
