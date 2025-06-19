@@ -9,7 +9,6 @@ import {
 } from '@wordpress/block-editor';
 import {
     PanelBody, TextControl, TextareaControl, SelectControl, Button, Icon, Tooltip
-    // __experimentalRepeater as Repeater // For more complex repeaters
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { v4 as uuidv4 } from 'uuid';
@@ -26,8 +25,12 @@ const { name, title, attributes } = metadata;
 
 // Simple Social Icon component (using Dashicons for placeholders for now)
 const SocialIcon = ({ icon, color }) => {
+    // In a real implementation, this would render an SVG from a library like Feather Icons.
+    // For styling, we will use a generic class and data-icon attribute.
+    const iconClass = `social-icon-svg icon-${icon ? icon.toLowerCase().replace('-f', '').replace('-in', '') : 'default'}`;
+    // Fallback to Dashicon if no SVG logic yet, but CSS will target generic class primarily.
     const dashiconClass = `dashicons dashicons-${icon ? icon.toLowerCase().replace('facebook-f', 'facebook').replace('linkedin-in', 'linkedin') : 'admin-site'}`;
-    return <span className={dashiconClass} style={{ fontSize: '20px', color: color || 'inherit' }}></span>;
+    return <span className={`${iconClass} ${dashiconClass}`} style={{ color: color || 'inherit', fontSize: '20px' }} data-icon-slug={icon}></span>;
 };
 
 
@@ -37,7 +40,7 @@ registerBlockType(name, {
 
     edit: ({ attributes, setAttributes }) => {
         const {
-            name: memberName, role, bio, imageUrl, imageShape, layout, alignment,
+            name: memberName, role, bio, imageUrl, imageId, imageShape, layout, alignment,
             cardStyle, socialLinks, padding, borderRadius, backgroundColor, borderColor,
             nameColor, roleColor, bioColor, socialIconColor
         } = attributes;
@@ -54,10 +57,10 @@ registerBlockType(name, {
             }
         });
 
-        const nameStyles = { color: nameColor };
-        const roleStyles = { color: roleColor };
-        const bioStyles = { color: bioColor };
-
+        const namePreviewStyles = { color: nameColor };
+        const rolePreviewStyles = { color: roleColor };
+        const bioPreviewStyles = { color: bioColor };
+        // socialIconColor will be passed to SocialIcon component
 
         const updateSocialLink = (index, key, value) => {
             const newLinks = socialLinks.map((link, i) =>
@@ -98,7 +101,16 @@ registerBlockType(name, {
                     <PanelBody title={__('Social Links', 'milliondollartheme')}>
                         {socialLinks.map((link, index) => (
                             <div key={link.id || index} className="social-link-repeater-item">
-                                <TextControl label={__('Icon Slug (e.g., twitter, linkedin)', 'milliondollartheme')} value={link.icon} onChange={val => updateSocialLink(index, 'icon', val)} />
+                                <SelectControl /* TODO: Proper IconPicker or more robust select */
+                                    label={__('Icon', 'milliondollartheme')}
+                                    value={link.icon}
+                                    options={[ /* Common social icons */
+                                        {label: 'Twitter', value: 'twitter'}, {label: 'Facebook', value: 'facebook-f'}, {label: 'LinkedIn', value: 'linkedin-in'},
+                                        {label: 'Instagram', value: 'instagram'}, {label: 'YouTube', value: 'youtube'}, {label: 'GitHub', value: 'github'},
+                                        {label: 'Email', value: 'email-alt'}, {label: 'Website', value: 'admin-site'}, {label: 'WordPress', value: 'wordpress'}
+                                    ]}
+                                    onChange={val => updateSocialLink(index, 'icon', val)}
+                                />
                                 <TextControl label={__('URL', 'milliondollartheme')} value={link.url} onChange={val => updateSocialLink(index, 'url', val)} />
                                 <Button isDestructive isSmall onClick={() => removeSocialLink(index)} style={{marginTop:'5px'}}>{__('Remove Link', 'milliondollartheme')}</Button>
                             </div>
@@ -107,17 +119,17 @@ registerBlockType(name, {
                     </PanelBody>
                     <PanelBody title={__('Card Appearance', 'milliondollartheme')}>
                         <SelectControl label={__('Layout', 'milliondollartheme')} value={layout} options={[{label:'Image Top',value:'image-top'},{label:'Image Left',value:'image-left'}]} onChange={val => setAttributes({layout: val})} />
-                        <SelectControl label={__('Card Style', 'milliondollartheme')} value={cardStyle} options={[{label:'Default',value:'default'},{label:'Glassy',value:'glassy'},{label:'Outline',value:'outline'}]} onChange={val => setAttributes({cardStyle: val})} />
-                        <TextControl label={__('Padding', 'milliondollartheme')} value={padding} onChange={val => setAttributes({padding: val})} />
-                        <TextControl label={__('Border Radius', 'milliondollartheme')} value={borderRadius} onChange={val => setAttributes({borderRadius: val})} />
+                        <SelectControl label={__('Card Style', 'milliondollartheme')} value={cardStyle} options={[{label:'Default',value:'default'},{label:'Glassy',value:'glassy'},{label:'Outline',value:'outline'}, {label:'Custom', value:'custom'}]} onChange={val => setAttributes({cardStyle: val})} />
+                        <TextControl label={__('Padding (e.g., var(--spacing-md))', 'milliondollartheme')} value={padding} onChange={val => setAttributes({padding: val})} />
+                        <TextControl label={__('Border Radius (e.g., var(--border-radius-md))', 'milliondollartheme')} value={borderRadius} onChange={val => setAttributes({borderRadius: val})} />
                     </PanelBody>
-                    <PanelBody title={__('Colors (Initial)', 'milliondollartheme')} initialOpen={false}>
-                        <TextControl /* TODO: ColorPalette */ label={__('Name Color', 'milliondollartheme')} value={nameColor || ''} onChange={val => setAttributes({nameColor: val})} />
-                        <TextControl /* TODO: ColorPalette */ label={__('Role Color', 'milliondollartheme')} value={roleColor || ''} onChange={val => setAttributes({roleColor: val})} />
-                        <TextControl /* TODO: ColorPalette */ label={__('Bio Color', 'milliondollartheme')} value={bioColor || ''} onChange={val => setAttributes({bioColor: val})} />
-                        <TextControl /* TODO: ColorPalette */ label={__('Social Icon Color', 'milliondollartheme')} value={socialIconColor || ''} onChange={val => setAttributes({socialIconColor: val})} />
-                        {(cardStyle === 'default' || cardStyle === 'custom') && <TextControl /* TODO: ColorPalette */ label={__('Background Color', 'milliondollartheme')} value={backgroundColor || ''} onChange={val => setAttributes({backgroundColor: val})} />}
-                        {(cardStyle === 'outline' || cardStyle === 'custom') && <TextControl /* TODO: ColorPalette */ label={__('Border Color', 'milliondollartheme')} value={borderColor || ''} onChange={val => setAttributes({borderColor: val})} />}
+                    <PanelBody title={__('Color Customization', 'milliondollartheme')} initialOpen={false}>
+                        <TextControl /* TODO: ColorPalette for nameColor */ label={__('Name Color', 'milliondollartheme')} value={nameColor || ''} onChange={val => setAttributes({nameColor: val})} />
+                        <TextControl /* TODO: ColorPalette for roleColor */ label={__('Role Color', 'milliondollartheme')} value={roleColor || ''} onChange={val => setAttributes({roleColor: val})} />
+                        <TextControl /* TODO: ColorPalette for bioColor */ label={__('Bio Color', 'milliondollartheme')} value={bioColor || ''} onChange={val => setAttributes({bioColor: val})} />
+                        <TextControl /* TODO: ColorPalette for socialIconColor */ label={__('Social Icon Default Color', 'milliondollartheme')} value={socialIconColor || ''} onChange={val => setAttributes({socialIconColor: val})} />
+                        {(cardStyle === 'default' || cardStyle === 'custom') && <TextControl /* TODO: ColorPalette for backgroundColor */ label={__('Card Background Color', 'milliondollartheme')} value={backgroundColor || ''} onChange={val => setAttributes({backgroundColor: val})} />}
+                        {(cardStyle === 'outline' || cardStyle === 'custom') && <TextControl /* TODO: ColorPalette for borderColor */ label={__('Card Border Color', 'milliondollartheme')} value={borderColor || ''} onChange={val => setAttributes({borderColor: val})} />}
                     </PanelBody>
                 </InspectorControls>
 
@@ -128,13 +140,13 @@ registerBlockType(name, {
                         </div>
                     )}
                     <div className="team-member-content">
-                        <RichText tagName="h4" className="team-member-name" value={memberName} onChange={(val) => setAttributes({ name: val })} placeholder={__('Name...','milliondollartheme')} style={nameStyles} />
-                        <RichText tagName="p" className="team-member-role" value={role} onChange={(val) => setAttributes({ role: val })} placeholder={__('Role...','milliondollartheme')} style={roleStyles} />
-                        <RichText tagName="p" className="team-member-bio" value={bio} onChange={(val) => setAttributes({ bio: val })} placeholder={__('Short bio...','milliondollartheme')} style={bioStyles} />
+                        <RichText tagName="h4" className="team-member-name" value={memberName} onChange={(val) => setAttributes({ name: val })} placeholder={__('Name...','milliondollartheme')} style={namePreviewStyles} />
+                        <RichText tagName="p" className="team-member-role" value={role} onChange={(val) => setAttributes({ role: val })} placeholder={__('Role...','milliondollartheme')} style={rolePreviewStyles} />
+                        <RichText tagName="p" className="team-member-bio" value={bio} onChange={(val) => setAttributes({ bio: val })} placeholder={__('Short bio...','milliondollartheme')} style={bioPreviewStyles} />
                         {socialLinks && socialLinks.length > 0 && (
                             <div className="team-member-social-links">
                                 {socialLinks.map((link, index) => (
-                                    <a href={link.url || '#'} key={link.id || index} className="team-member-social-link" target="_blank" rel="noopener noreferrer" data-icon={link.icon} style={{color: socialIconColor}}>
+                                    <a href={link.url || '#'} key={link.id || index} className="team-member-social-link" target="_blank" rel="noopener noreferrer" data-icon={link.icon} onClick={(e) => e.preventDefault()} style={{color: socialIconColor}}>
                                         <SocialIcon icon={link.icon} />
                                     </a>
                                 ))}

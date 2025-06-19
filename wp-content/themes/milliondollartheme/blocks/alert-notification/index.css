@@ -2,8 +2,30 @@
 .wp-block-milliondollartheme-alert-notification {
     /* border: 1px dashed #ccc; */ /* Optional visual guide in editor */
     /* Preview of colors and styles primarily comes from style-index.css and core color support */
+    /* Inline styles from JS for padding, borderRadius will apply */
 }
 .wp-block-milliondollartheme-alert-notification .alert-dismiss-button {
     /* Ensure dismiss button is visible in editor but not functional without JS */
     /* opacity: 0.5; */ /* Example to differentiate from front-end */
+    /* color applied inline from JS */
+}
+
+/* Editor preview for icon color */
+.wp-block-milliondollartheme-alert-notification .alert-icon {
+    /* color applied inline from JS */
+}
+
+/* Mimic type colors for editor if core support is not active */
+/* These are fallbacks and should ideally not be needed if style-index.css is enqueued for editor */
+.wp-block-milliondollartheme-alert-notification.alert-type-info:not(.has-background) {
+    /* background-color: #e7f3fe; border-left-color: #21759b; */
+}
+/* ... and so on for other types if needed ... */
+
+.wp-block-milliondollartheme-alert-notification.is-style-glassy:not(.has-background) {
+    /* background: rgba(50,50,150,0.1); */
+    /* border: 1px solid rgba(255,255,255,0.1); */
+}
+.wp-block-milliondollartheme-alert-notification.is-style-glassy:not(.has-text-color) {
+    /* color: #f0f0f0; */
 }

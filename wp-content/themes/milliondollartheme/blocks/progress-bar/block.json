@@ -10,22 +10,27 @@
     "attributes": {
         "title": { "type": "string", "source": "html", "selector": ".progress-bar-title", "default": "Web Development" },
         "percentage": { "type": "number", "default": 75 },
-        "barColor": { "type": "string" },
+        "barColor": { "type": "string", "default": "var(--primary-color)" },
         "barGradient": { "type": "string" },
-        "barBackgroundColor": { "type": "string", "default": "rgba(0,0,0,0.1)" },
-        "barHeight": { "type": "string", "default": "20px" },
-        "borderRadius": { "type": "string", "default": "var(--border-radius-sm)" },
+        "barBackgroundColor": { "type": "string", "default": "rgba(0,0,0,0.07)" }, /* Slightly darker track */
+        "barHeight": { "type": "string", "default": "24px" }, /* Increased default height */
+        "borderRadius": { "type": "string", "default": "var(--border-radius-pill, 50px)" }, /* Default to pill shape */
         "showLabel": { "type": "boolean", "default": true },
         "labelPosition": { "type": "string", "default": "inside" },
-        "labelColor": { "type": "string" },
-        "titleColor": { "type": "string" },
+        "labelColor": { "type": "string", "default": "var(--text-color-light)" }, /* Default light for dark bars */
+        "titleColor": { "type": "string" }, /* Defaults to block text color via CSS */
         "animateOnScroll": { "type": "boolean", "default": true },
         "barStyle": { "type": "string", "default": "default" }
     },
     "supports": {
         "html": false,
         "anchor": true,
-        "align": ["wide", "full"]
+        "align": ["wide", "full"],
+        "color": {
+            "text": true,
+            "background": false,
+            "link": false, "gradients": false
+        }
     },
     "textdomain": "milliondollartheme",
     "editorScript": "file:./index.js",

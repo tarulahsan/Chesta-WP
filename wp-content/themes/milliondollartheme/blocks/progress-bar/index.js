@@ -26,26 +26,27 @@ registerBlockType(name, {
         } = attributes;
 
         const blockProps = useBlockProps({
-            className: `is-style-${barStyle}`
+            className: `is-style-${barStyle} label-pos-${labelPosition}` // Added label-pos class to wrapper
         });
 
-        const barWrapperStyles = {
+        const titlePreviewStyles = { color: titleColor };
+        const barWrapperPreviewStyles = {
             height: barHeight,
             backgroundColor: barBackgroundColor,
             borderRadius: borderRadius,
-            position: 'relative', // For label positioning
-            overflow: 'hidden' // Ensure fill stays within bounds
+            position: 'relative',
+            overflow: 'hidden'
         };
-        const barFillStyles = {
+        const barFillPreviewStyles = {
             width: `${percentage}%`,
             height: '100%',
             backgroundColor: barColor && !barGradient ? barColor : undefined,
             backgroundImage: barGradient || undefined,
-            borderRadius: borderRadius, // Or slightly less if there's an inner padding
-            transition: 'width 0.5s ease-out' // For editor preview if percentage changes
+            borderRadius: borderRadius,
+            transition: 'width 0.3s ease-out', // For live update in editor
+            display: 'flex', alignItems: 'center', justifyContent: labelPosition === 'inside' ? 'flex-end' : 'flex-start' // For label
         };
-        const labelStyles = { color: labelColor };
-        const titleStyles = { color: titleColor };
+        const labelPreviewStyles = { color: labelColor };
 
         return (
             <>
@@ -53,8 +54,8 @@ registerBlockType(name, {
                     <PanelBody title={__('Bar Settings', 'milliondollartheme')}>
                         <TextControl label={__('Title/Skill Name', 'milliondollartheme')} value={barTitle} onChange={(val) => setAttributes({ title: val })} />
                         <RangeControl label={__('Percentage', 'milliondollartheme')} value={percentage} onChange={(val) => setAttributes({ percentage: val })} min={0} max={100} />
-                        <TextControl label={__('Bar Height (e.g., 20px, 1.5em)', 'milliondollartheme')} value={barHeight} onChange={(val) => setAttributes({ barHeight: val })} />
-                        <TextControl label={__('Border Radius', 'milliondollartheme')} value={borderRadius} onChange={(val) => setAttributes({ borderRadius: val })} />
+                        <TextControl label={__('Bar Height (e.g., 24px, 1.5em)', 'milliondollartheme')} value={barHeight} onChange={(val) => setAttributes({ barHeight: val })} />
+                        <TextControl label={__('Border Radius (e.g., 4px, 50px)', 'milliondollartheme')} value={borderRadius} onChange={(val) => setAttributes({ borderRadius: val })} />
                     </PanelBody>
                     <PanelBody title={__('Colors & Style', 'milliondollartheme')}>
                         <SelectControl
@@ -63,10 +64,27 @@ registerBlockType(name, {
                             options={[ {label:'Default', value:'default'}, {label:'Striped', value:'striped'}, {label:'Glassy Fill', value:'glassy-fill'} ]}
                             onChange={val => setAttributes({barStyle: val})}
                         />
-                        <TextControl /* TODO: ColorPalette */ label={__('Bar Color (Solid)', 'milliondollartheme')} value={barColor || ''} onChange={(val) => setAttributes({ barColor: val })} />
-                        <TextareaControl /* TODO: GradientPicker */ label={__('Bar Gradient (CSS)', 'milliondollartheme')} value={barGradient || ''} onChange={(val) => setAttributes({ barGradient: val })} help={__('Overrides solid color.', 'milliondollartheme')} />
-                        <TextControl /* TODO: ColorPalette */ label={__('Bar Background Color (Track)', 'milliondollartheme')} value={barBackgroundColor} onChange={(val) => setAttributes({ barBackgroundColor: val })} />
-                        <TextControl /* TODO: ColorPalette */ label={__('Title Color', 'milliondollartheme')} value={titleColor || ''} onChange={(val) => setAttributes({ titleColor: val })} />
+                        <TextControl /* TODO: ColorPalette for barColor */
+                            label={__('Bar Color (Solid)', 'milliondollartheme')}
+                            value={barColor || ''}
+                            onChange={(val) => setAttributes({ barColor: val })}
+                        />
+                        <TextareaControl /* TODO: GradientPicker for barGradient */
+                            label={__('Bar Gradient (CSS)', 'milliondollartheme')}
+                            value={barGradient || ''}
+                            onChange={(val) => setAttributes({ barGradient: val })}
+                            help={__('Overrides solid color if set.', 'milliondollartheme')}
+                        />
+                        <TextControl /* TODO: ColorPalette for barBackgroundColor */
+                            label={__('Bar Background Color (Track)', 'milliondollartheme')}
+                            value={barBackgroundColor}
+                            onChange={(val) => setAttributes({ barBackgroundColor: val })}
+                        />
+                        <TextControl /* TODO: ColorPalette for titleColor */
+                            label={__('Title Color', 'milliondollartheme')}
+                            value={titleColor || ''}
+                            onChange={(val) => setAttributes({ titleColor: val })}
+                        />
                     </PanelBody>
                     <PanelBody title={__('Label', 'milliondollartheme')}>
                         <ToggleControl label={__('Show Percentage Label', 'milliondollartheme')} checked={!!showLabel} onChange={() => setAttributes({ showLabel: !showLabel })} />
@@ -75,10 +93,14 @@ registerBlockType(name, {
                                 <SelectControl
                                     label={__('Label Position', 'milliondollartheme')}
                                     value={labelPosition}
-                                    options={[ {label:'Inside Bar', value:'inside'}, {label:'Right of Bar', value:'outside-right'}, {label:'Above Bar', value:'outside-above'} ]}
+                                    options={[ {label:'Inside Bar (End)', value:'inside'}, {label:'Right of Bar', value:'outside-right'}, {label:'Above Bar', value:'outside-above'} ]}
                                     onChange={(val) => setAttributes({ labelPosition: val })}
                                 />
-                                <TextControl /* TODO: ColorPalette */ label={__('Label Color', 'milliondollartheme')} value={labelColor || ''} onChange={(val) => setAttributes({ labelColor: val })} />
+                                <TextControl /* TODO: ColorPalette for labelColor */
+                                    label={__('Label Color', 'milliondollartheme')}
+                                    value={labelColor || ''}
+                                    onChange={(val) => setAttributes({ labelColor: val })}
+                                />
                             </>
                         )}
                     </PanelBody>
@@ -88,23 +110,23 @@ registerBlockType(name, {
                 </InspectorControls>
 
                 <div {...blockProps}>
-                    {barTitle && (labelPosition === 'outside-above' || !showLabel) && ( /* Show title above if label is not there or also above */
-                        <RichText tagName="p" className="progress-bar-title is-position-above" value={barTitle} onChange={(val) => setAttributes({ title: val })} style={titleStyles} />
+                    {barTitle && (labelPosition === 'outside-above' || !showLabel) && (
+                        <RichText tagName="p" className="progress-bar-title is-position-above" value={barTitle} onChange={(val) => setAttributes({ title: val })} style={titlePreviewStyles} />
                     )}
                     <div className={`progress-bar-wrapper label-pos-${labelPosition}`}>
-                        <div className="progress-bar-track" style={barWrapperStyles}>
-                            <div className="progress-bar-fill" style={barFillStyles}>
+                        <div className="progress-bar-track" style={barWrapperPreviewStyles}>
+                            <div className="progress-bar-fill" style={barFillPreviewStyles}>
                                 {showLabel && labelPosition === 'inside' && (
-                                    <span className="progress-bar-label is-inside" style={labelStyles}>{percentage}%</span>
+                                    <span className="progress-bar-label is-inside" style={labelPreviewStyles}>{percentage}%</span>
                                 )}
                             </div>
                         </div>
                         {showLabel && labelPosition === 'outside-right' && (
-                            <span className="progress-bar-label is-outside-right" style={labelStyles}>{percentage}%</span>
+                            <span className="progress-bar-label is-outside-right" style={labelPreviewStyles}>{percentage}%</span>
                         )}
                     </div>
-                     {barTitle && labelPosition !== 'outside-above' && showLabel && ( /* Show title below if label is inside/right */
-                        <RichText tagName="p" className="progress-bar-title is-position-below" value={barTitle} onChange={(val) => setAttributes({ title: val })} style={titleStyles} />
+                     {barTitle && labelPosition !== 'outside-above' && showLabel && (
+                        <RichText tagName="p" className="progress-bar-title is-position-below" value={barTitle} onChange={(val) => setAttributes({ title: val })} style={titlePreviewStyles} />
                     )}
 
                 </div>

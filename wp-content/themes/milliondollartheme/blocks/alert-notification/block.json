@@ -9,14 +9,16 @@
     "keywords": ["alert", "notification", "message", "notice", "info", "warning", "error", "success"],
     "attributes": {
         "message": { "type": "string", "source": "html", "selector": ".alert-message", "default": "This is an important notification!" },
-        "alertType": { "type": "string", "default": "info" }, /* info, success, warning, error */
+        "alertType": { "type": "string", "default": "info" },
         "isDismissible": { "type": "boolean", "default": true },
         "showIcon": { "type": "boolean", "default": true },
-        "customIcon": { "type": "string" }, // For user to provide an icon slug if overriding default
-        "alertStyle": { "type": "string", "default": "default" }, /* default, glassy, outlined */
+        "icon": { "type": "string" },
+        "alertStyle": { "type": "string", "default": "default" },
         "borderRadius": { "type": "string", "default": "var(--border-radius-sm)"},
         "padding": { "type": "string", "default": "var(--spacing-md)"},
-        "align": { "type": "string", "default": "" }
+        "align": { "type": "string", "default": "" },
+        "iconColor": { "type": "string" },
+        "dismissButtonColor": { "type": "string" }
     },
     "supports": {
         "align": ["wide", "full"],

@@ -1,91 +1,177 @@
 /* Pricing Plan Item Styles */
 .wp-block-milliondollartheme-pricing-plan-item {
-    border: 1px solid var(--border-color, #ddd);
-    padding: var(--spacing-md, 16px);
-    border-radius: var(--border-radius-md, 12px);
+    /* border, padding, borderRadius, backgroundColor applied inline by save() from attributes */
     text-align: center;
     display: flex;
     flex-direction: column;
-    height: 100%; /* For equal height columns in flex/grid parent */
+    height: 100%; /* For equal height columns when used in parent grid/flex */
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    position: relative; /* For featured badge or other pseudo-elements */
+    overflow: hidden; /* To contain border-radius on children if needed */
 }
+
+/* Default Style (if itemStyle is 'default') */
+.wp-block-milliondollartheme-pricing-plan-item.is-style-default {
+    /* background-color: var(--pricing-item-default-bg, #fff); /* Default if not set by attr */
+    /* border: 1px solid var(--pricing-item-default-border, var(--border-color, #ddd)); */
+    box-shadow: var(--shadow-sm, 0 2px 8px rgba(0,0,0,0.05)); /* Subtle default shadow */
+}
+.wp-block-milliondollartheme-pricing-plan-item.is-style-default:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md, 0 6px 15px rgba(0,0,0,0.1));
+}
+
+
+/* Glassy Style */
 .wp-block-milliondollartheme-pricing-plan-item.is-style-glassy {
-    background: var(--glass-bg-color);
+    background: var(--glass-bg-color); /* From global theme variables */
     backdrop-filter: blur(var(--glass-blur-radius));
     -webkit-backdrop-filter: blur(var(--glass-blur-radius));
     border: 1px solid var(--glass-border-color);
     box-shadow: var(--glass-box-shadow);
-    color: var(--text-color-light);
+    color: var(--text-color-light); /* Default text on glass */
+}
+.wp-block-milliondollartheme-pricing-plan-item.is-style-glassy:hover {
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0 10px 30px rgba(var(--primary-color-rgb, 0,82,212),0.25);
 }
 .wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-name,
-.wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-price,
+.wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-price-amount,
+.wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-price-interval,
 .wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-features {
-    color: var(--text-color-light);
+    /* color: inherit; /* Inherits light color from wrapper, or overridden by attributes */
 }
-.wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-features ul li {
-    border-color: rgba(255,255,255,0.2);
+.wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-price-amount {
+    color: var(--accent-color-on-glass, var(--accent-color)); /* Price stands out */
+}
+.wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-features li {
+    border-color: var(--glass-border-color-muted, rgba(255,255,255,0.2));
+}
+
+/* Outline Style (New) */
+.wp-block-milliondollartheme-pricing-plan-item.is-style-outline {
+    background-color: transparent;
+    border-width: 2px !important; /* Ensure outline is visible */
+    border-style: solid !important;
+    /* border-color applied inline by attribute */
+}
+.wp-block-milliondollartheme-pricing-plan-item.is-style-outline:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 15px rgba(var(--accent-color-rgb, 0,198,173),0.2);
 }
 
 
+/* Featured Plan Styling */
 .wp-block-milliondollartheme-pricing-plan-item.is-featured-plan {
-    border-width: 2px;
-    border-color: var(--primary-color, #0052D4);
-    box-shadow: 0 5px 20px rgba(var(--primary-color-rgb,0,82,212),0.2);
-    transform: scale(1.02); /* Slightly larger featured plan */
+    /* border-width: 3px; */ /* Handled by inline style potentially */
+    /* border-color: var(--primary-color); /* Handled by inline style potentially */
+    /* box-shadow: 0 8px 25px rgba(var(--primary-color-rgb,0,82,212),0.25); */
+    transform: scale(1.03); /* Slightly larger featured plan by default */
+    z-index: 1; /* Bring featured plan above others if they overlap due to transform */
 }
+.wp-block-milliondollartheme-pricing-plan-item.is-featured-plan:hover {
+    transform: scale(1.05) translateY(-5px); /* More pronounced hover for featured */
+}
+/* Optional "Featured" badge/ribbon for .is-featured-plan */
+.wp-block-milliondollartheme-pricing-plan-item.is-featured-plan::before {
+    content: "Featured"; /* Or "Most Popular" etc. */
+    position: absolute;
+    top: 0; right: 0;
+    background-color: var(--primary-color);
+    color: var(--text-color-light);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.75em;
+    font-weight: bold;
+    border-radius: 0 var(--border-radius-md) 0 var(--border-radius-sm); /* Match parent top-right */
+    z-index: 2;
+}
+.wp-block-milliondollartheme-pricing-plan-item.is-style-glassy.is-featured-plan::before {
+    background-color: var(--accent-color);
+    color: var(--text-color-dark); /* Text on accent might need to be dark */
+}
+
 
 .plan-name {
     font-family: var(--font-family-heading);
-    font-size: 1.5em;
+    font-size: 1.6em; /* Larger plan name */
     font-weight: 700;
     margin-bottom: var(--spacing-sm, 8px);
+    /* color applied inline from attribute */
 }
 .plan-price {
     font-family: var(--font-family-heading);
-    font-size: 2.5em;
+    font-size: 2.8em; /* Larger price */
     font-weight: 900;
-    color: var(--primary-color);
-    margin-bottom: var(--spacing-sm, 8px);
+    color: var(--primary-color); /* Default, can be overridden by attr */
+    margin-bottom: var(--spacing-xs, 4px); /* Tighter to interval */
+    line-height: 1;
+    /* color applied inline from attribute */
 }
-.wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-price {
-    color: var(--accent-color); /* Brighter accent for price on glass */
-}
-
 .plan-price-amount {}
 .plan-price-interval {
-    font-size: 0.4em;
-    font-weight: 400;
+    font-size: 0.4em; /* Relative to price font size */
+    font-weight: 500; /* Slightly bolder interval */
     opacity: 0.7;
-    margin-left: 2px;
+    margin-left: 4px; /* Space from amount */
+    /* color applied inline from attribute */
 }
 .plan-features {
     list-style: none;
     padding: 0;
-    margin: var(--spacing-md, 16px) 0;
-    flex-grow: 1; /* Push button to bottom */
+    margin: var(--spacing-lg, 32px) 0; /* More space around features */
+    flex-grow: 1;
+    font-size: 0.95em;
+    /* color applied inline from attribute */
 }
 .plan-features li {
-    padding: var(--spacing-xs, 4px) 0;
-    border-bottom: 1px dotted #eee;
+    padding: var(--spacing-sm, 8px) 0; /* More padding for feature items */
+    border-bottom: 1px dotted var(--border-color-light, #eee);
 }
 .plan-features li:last-child {
     border-bottom: none;
 }
+/* Optional: Add checkmark icons to features */
+.plan-features li::before {
+    /* content: '\2713'; /* Checkmark */
+    /* color: var(--accent-color); */
+    /* margin-right: var(--spacing-sm); */
+    /* font-weight: bold; */
+}
+
 .plan-button-wrapper {
     margin-top: auto; /* Push button to bottom */
+    padding-top: var(--spacing-md, 16px); /* Space above button */
 }
-.plan-button { /* Mimic .cta-button or .adv-button-link */
-    display: inline-block; text-decoration: none; font-family: var(--font-family-heading);
-    font-weight: 700; transition: all var(--transition-speed) ease; cursor: pointer;
-    border: 2px solid transparent; padding: var(--spacing-sm) var(--spacing-lg);
-    font-size: 1em; border-radius: var(--border-radius-sm); text-align: center;
+.plan-button {
+    display: block; /* Full width button within plan item */
+    width: 100%;
+    max-width: 280px; /* Max width for button */
+    margin-left: auto;
+    margin-right: auto;
+    text-decoration: none;
+    font-family: var(--font-family-heading);
+    font-weight: 700;
+    transition: all var(--transition-speed) ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+    padding: var(--spacing-md) var(--spacing-lg); /* Larger button padding */
+    font-size: 1.05em; /* Slightly larger button text */
+    border-radius: var(--border-radius-sm);
+    text-align: center;
+    line-height: 1.5; /* Ensure text vertical center */
 }
-.plan-button.is-button-style-primary { background: var(--gradient-primary); color: var(--text-color-light); }
-.plan-button.is-button-style-secondary { background: var(--gradient-secondary); color: var(--text-color-light); }
-.plan-button.is-button-style-outline { border-color: var(--primary-color); color: var(--primary-color); }
-.plan-button.is-button-style-outline:hover { background-color: var(--primary-color); color: var(--text-color-light); }
+.plan-button:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Apply button styles based on class (fallbacks if inline styles from JS are not fully set) */
+.plan-button.is-button-style-primary { background: var(--buttonBgColor, var(--gradient-primary)); color: var(--buttonTextColor, var(--text-color-light)); border-color: var(--buttonBorderColor, transparent); background-image: var(--buttonGradient); }
+.plan-button.is-button-style-secondary { background: var(--buttonBgColor, var(--gradient-secondary)); color: var(--buttonTextColor, var(--text-color-light)); border-color: var(--buttonBorderColor, transparent); background-image: var(--buttonGradient); }
+.plan-button.is-button-style-outline { background: var(--buttonBgColor, transparent); color: var(--buttonTextColor, var(--primary-color)); border-color: var(--buttonBorderColor, var(--primary-color)); }
 
 .wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-button.is-button-style-outline {
-    border-color: var(--text-color-light); color: var(--text-color-light);
+    border-color: var(--buttonBorderColor, var(--text-color-light)); color: var(--buttonTextColor, var(--text-color-light));
 }
 .wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-button.is-button-style-outline:hover {
     background-color: var(--text-color-light); color: var(--primary-color);

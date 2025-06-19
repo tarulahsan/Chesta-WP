@@ -1,115 +1,129 @@
 /* --- Masonry Portfolio Gallery Block Styles (style-index.css) --- */
 .wp-block-milliondollartheme-masonry-portfolio-gallery {
-    /* display: grid; or flex, depending on Masonry JS library needs */
-    /* The Masonry JS will typically handle item positioning. */
-    /* We use CSS vars for gap and column-min-width passed from PHP. */
     margin-bottom: var(--spacing-lg);
-    /* Clearfix if items are floated by Masonry (older versions) */
 }
 /* Basic grid setup that Masonry JS can work with */
 .portfolio-gallery-masonry {
-    display: flex;
+    display: flex; /* Fallback if Masonry JS fails or is disabled */
     flex-wrap: wrap;
-    margin: calc(-1 * var(--masonry-gap, 16px) / 2); /* Negative margin trick for gap */
+    /* Negative margin trick for gap, if not using CSS Grid for fallback */
+    /* margin: calc(-1 * var(--masonry-gap, 16px) / 2); */
+    /* If using CSS Grid as a fallback or base for Masonry: */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--masonry-column-min-width, 250px), 1fr));
+    gap: var(--masonry-gap, 16px);
 }
 
-.masonry-grid-sizer, /* For columnWidth calculation by Masonry.js */
+.masonry-grid-sizer { /* For Masonry JS: columnWidth sizer, typically empty */
+    /* width: var(--masonry-column-min-width, 250px); /* Or a percentage if using percentPosition */
+}
 .portfolio-item.masonry-item {
-    width: calc(100% / var(--masonry-columns, 3) - var(--masonry-gap, 16px)); /* Fallback, JS sets width */
-    /* Actual width calculation for responsive columns based on min-width:
-       Example: if container is 1000px, min-width 250px -> 4 columns. item width ~250px.
-       Masonry JS usually calculates this. For CSS-only masonry (grid), it's different.
-       For JS-based, we might set item width to something like:
-       width: var(--masonry-column-min-width, 250px);
-       Or use percentage based on how many columns fit.
-    */
-    margin: calc(var(--masonry-gap, 16px) / 2); /* Gutter for items */
+    /* Masonry JS will set width and positioning. */
+    /* margin: calc(var(--masonry-gap, 16px) / 2); /* Gutter if using negative margin trick */
+    /* For CSS Grid fallback, margin is not needed as gap handles it. */
     box-sizing: border-box;
+    margin-bottom: var(--masonry-gap, 16px); /* If Masonry is just stacking vertically (e.g. single column) */
 }
 
-.portfolio-item {
-    position: relative; /* For overlay */
-    overflow: hidden; /* For image hover effects & border-radius */
-    border-radius: var(--border-radius-sm);
+.portfolio-item-inner-wrapper { /* New wrapper for card styles */
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--item-border-radius, var(--border-radius-md)); /* Default, overridden by itemStyle */
+    height: 100%; /* Ensure wrapper takes full height of masonry item if needed */
     transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
 }
-.wp-block-milliondollartheme-masonry-portfolio-gallery.item-style-default .portfolio-item {
+.wp-block-milliondollartheme-masonry-portfolio-gallery.item-style-default .portfolio-item-inner-wrapper {
     background-color: var(--background-color-light, #f0f0f0);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
-.wp-block-milliondollartheme-masonry-portfolio-gallery.item-style-default .portfolio-item:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.07);
+.wp-block-milliondollartheme-masonry-portfolio-gallery.item-style-default .portfolio-item-inner-wrapper:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
 }
-
 
 .portfolio-item-thumbnail {
     display: block;
     position: relative;
-    overflow: hidden; /* Ensure overlay and image effects are contained */
+    overflow: hidden;
+    line-height: 0; /* Remove space below image */
+    /* aspect-ratio is applied inline by PHP */
 }
 .portfolio-item-thumbnail img {
     display: block;
     width: 100%;
-    height: auto; /* Masonry relies on image actual height */
-    transition: transform 0.4s ease-out;
-}
-.portfolio-item-thumbnail a:hover img {
-    transform: scale(1.1);
+    height: 100%; /* Fill the aspect ratio container */
+    object-fit: cover; /* Cover ensures aspect ratio is maintained without distortion */
+    transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smoother zoom */
 }
 
-.portfolio-item-thumbnail.is-placeholder {
-    background-color: #e9ecef;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 150px; /* Placeholder height */
-    aspect-ratio: var(--image-aspect-ratio, 16/9); /* Use variable if aspect ratio attr added */
-}
-.portfolio-item-thumbnail.is-placeholder .placeholder-icon {
-    font-size: 48px;
-    color: #adb5bd;
+/* Hover Effect: Zoom */
+.wp-block-milliondollartheme-masonry-portfolio-gallery.hover-effect-zoom .portfolio-item-thumbnail a:hover img {
+    transform: scale(1.12); /* Slightly more zoom */
 }
 
-
+/* Hover Effect: Overlay Title (Common base for overlay effects) */
 .portfolio-item-overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(var(--primary-color-rgb, 0,82,212), 0.75); /* Theme color overlay */
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(var(--primary-color-rgb, 0,82,212), 0.8);
     color: var(--text-color-light, #fff);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    padding: var(--spacing-sm);
+    padding: var(--spacing-md);
     opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-    border-radius: inherit; /* Match item's border radius */
+    transition: opacity 0.35s ease-in-out;
+    border-radius: inherit;
+    z-index: 1; /* Ensure overlay is above image */
 }
-.portfolio-item-thumbnail a:hover .portfolio-item-overlay {
+.wp-block-milliondollartheme-masonry-portfolio-gallery.hover-effect-overlay-title .portfolio-item-thumbnail a:hover .portfolio-item-overlay {
     opacity: 1;
+}
+.portfolio-item-overlay-content { /* Inner wrapper for content within overlay */
+    /* Can add transform effects here for text appearing */
 }
 .portfolio-item-title {
     font-family: var(--font-family-heading);
-    font-size: 1.2em;
+    font-size: 1.3em;
+    font-weight: 600;
     margin: 0;
-    color: inherit; /* Inherits from overlay */
+    color: inherit;
+    line-height: 1.3;
 }
 
-/* Glassy Item Style */
-.wp-block-milliondollartheme-masonry-portfolio-gallery.item-style-glassy-card .portfolio-item {
+/* Fallback Placeholder Styling */
+.portfolio-item-thumbnail.is-placeholder {
+    background-color: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px; /* Default min height for placeholders */
+    /* aspect-ratio applied inline by PHP */
+}
+.portfolio-item-thumbnail.is-placeholder .placeholder-icon {
+    font-size: 56px; /* Larger icon */
+    color: #adb5bd;
+}
+.portfolio-item-thumbnail.is-placeholder .portfolio-item-overlay {
+    /* Ensure overlay works on placeholder too */
+    background: rgba(var(--text-color-dark-rgb, 26,26,26), 0.6);
+}
+
+
+/* Item Style: Glassy Card */
+.wp-block-milliondollartheme-masonry-portfolio-gallery.item-style-glassy-card .portfolio-item-inner-wrapper {
     background: var(--glass-bg-color);
     backdrop-filter: blur(var(--glass-blur-radius));
     -webkit-backdrop-filter: blur(var(--glass-blur-radius));
     border: 1px solid var(--glass-border-color);
-    box-shadow: var(--glass-box-shadow-light);
-    border-radius: var(--border-radius-md); /* Glassy items have larger radius */
+    box-shadow: var(--glass-box-shadow);
+    border-radius: var(--border-radius-lg); /* Larger radius for glassy cards */
 }
 .wp-block-milliondollartheme-masonry-portfolio-gallery.item-style-glassy-card .portfolio-item-thumbnail img {
-    /* border-radius: var(--border-radius-md) var(--border-radius-md) 0 0; /* If title is shown below */
+    /* Potentially remove individual image radius if inner-wrapper has overflow:hidden and radius */
+    border-radius: 0;
 }
 .wp-block-milliondollartheme-masonry-portfolio-gallery.item-style-glassy-card .portfolio-item-overlay {
     background: rgba(var(--glass-bg-color-rgb, 50,50,80), 0.5); /* Darker glass for overlay on glass */
@@ -117,17 +131,26 @@
 .wp-block-milliondollartheme-masonry-portfolio-gallery.item-style-glassy-card .portfolio-item-title {
     color: var(--text-color-light);
 }
-
-
-/* Responsive: Masonry JS usually handles column recalculation.
-   CSS below is for fallback or if CSS-driven masonry is used. */
-@media (max-width: 767px) {
-    /* .masonry-grid-sizer, .portfolio-item.masonry-item {
-        width: calc(100% / var(--masonry-columns-mobile, 1) - var(--masonry-gap));
-    } */
+.wp-block-milliondollartheme-masonry-portfolio-gallery.item-style-glassy-card .portfolio-item-inner-wrapper:hover {
+     box-shadow: 0 12px 40px rgba(var(--primary-color-rgb, 0,82,212), 0.3);
 }
-@media (max-width: 1023px) and (min-width: 768px) {
-    /* .masonry-grid-sizer, .portfolio-item.masonry-item {
-        width: calc(100% / var(--masonry-columns-tablet, 2) - var(--masonry-gap));
+
+
+/* Responsive: CSS Grid handles column changes based on minmax.
+   Masonry JS will also recalculate. Specific item style adjustments might be needed. */
+@media (max-width: 767px) { /* Mobile */
+    .portfolio-gallery-masonry {
+        /* If using CSS grid and want single column on mobile explicitly: */
+        /* grid-template-columns: 1fr; */
+        /* Masonry JS should adapt based on container width and columnMinWidth. */
+        /* Reduce gap for mobile if desired */
+        /* gap: calc(var(--masonry-gap, 16px) / 2); */
+        /* margin: calc(-1 * var(--masonry-gap, 16px) / 4); */
+    }
+    /* .portfolio-item.masonry-item {
+        margin: calc(var(--masonry-gap, 16px) / 4);
     } */
+    .portfolio-item-title {
+        font-size: 1.1em;
+    }
 }

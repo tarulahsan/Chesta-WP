@@ -1,24 +1,28 @@
 /* --- Alert/Notification Block Styles (style-index.css) --- */
 .wp-block-milliondollartheme-alert-notification {
     display: flex;
-    align-items: flex-start; /* Align icon and content top */
-    gap: var(--spacing-sm, 8px);
+    align-items: flex-start;
+    gap: var(--spacing-md, 16px); /* Increased gap for better icon spacing */
     /* padding and borderRadius applied inline from attributes */
-    /* Default colors based on alertType, can be overridden by core color support */
-    border-left-width: 5px; /* Prominent left border for type indication */
+    /* Default colors based on alertType, can be overridden by core color support (WP adds .has-text-color, .has-background-color) */
+    border-left-width: 5px;
     border-left-style: solid;
-    position: relative; /* For dismiss button */
+    position: relative;
+    transition: opacity 0.3s ease, transform 0.3s ease; /* For Alpine x-transition */
 }
 
+/* Base styling for icon, content, dismiss button */
 .alert-icon {
     flex-shrink: 0;
-    font-size: 1.5em; /* Default icon size */
-    line-height: 1.3; /* Align with first line of text better */
-    margin-top: 2px; /* Fine-tune alignment */
+    font-size: 1.6em; /* Slightly larger icon */
+    line-height: 1.4; /* Align with first line of text better */
+    margin-top: 1px; /* Fine-tune vertical alignment */
+    /* color applied inline by JS from iconColor attribute OR from .alert-type-* CSS */
 }
 
 .alert-content-wrapper {
     flex-grow: 1;
+    padding: var(--spacing-xs) 0; /* Add slight vertical padding for text alignment */
 }
 .alert-message {
     margin: 0;
@@ -31,97 +35,146 @@
 .alert-dismiss-button {
     background: transparent;
     border: none;
-    color: inherit; /* Inherit color from parent, can be styled for contrast */
-    opacity: 0.7;
-    font-size: 1.5em;
+    /* color applied inline by JS from dismissButtonColor attribute OR from .alert-type-* CSS */
+    opacity: 0.6; /* Slightly less opaque by default */
+    font-size: 1.6em; /* Consistent with icon size */
+    font-weight: bold;
     line-height: 1;
     padding: 0 var(--spacing-xs, 4px);
     cursor: pointer;
-    margin-left: var(--spacing-sm, 8px);
-    align-self: flex-start; /* Align with top of text */
-    transition: opacity var(--transition-speed) ease;
+    margin-left: var(--spacing-md, 16px); /* More space for dismiss button */
+    align-self: center; /* Vertically center dismiss button with content */
+    transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
 }
 .alert-dismiss-button:hover {
     opacity: 1;
+    transform: scale(1.1);
 }
 
-/* Alert Types - Default Colors (can be overridden by core color support or custom attributes later) */
-/* Using CSS variables for easy theming of these default type colors */
+/* Alert Types - Default Colors (These are fallbacks if core color support is not used, or base for icon/border) */
+/* CSS variables for easy theming of these default type colors */
+:root { /* Define these in global style.css if not already there */
+    --alert-info-bg-default: rgba(var(--primary-color-rgb,0,82,212), 0.08);
+    --alert-info-border-default: var(--primary-color, #0052D4);
+    --alert-info-text-default: var(--primary-color-darker, #003f9e); /* Darker shade of primary for text */
+    --alert-info-icon-default: var(--primary-color, #0052D4);
+
+    --alert-success-bg-default: #d1e7dd; /* Softer success */
+    --alert-success-border-default: #198754; /* Bootstrap 5 success green */
+    --alert-success-text-default: #0a3622;
+    --alert-success-icon-default: #198754;
+
+    --alert-warning-bg-default: #fff8e1; /* Softer warning */
+    --alert-warning-border-default: #ffc107; /* Bootstrap 5 warning yellow */
+    --alert-warning-text-default: #664d03;
+    --alert-warning-icon-default: #ffc107;
+
+    --alert-error-bg-default: #f8d7da;
+    --alert-error-border-default: #dc3545; /* Bootstrap 5 danger red */
+    --alert-error-text-default: #58151c;
+    --alert-error-icon-default: #dc3545;
+}
+
+/* Applying default type colors */
 .wp-block-milliondollartheme-alert-notification.alert-type-info {
-    background-color: var(--alert-info-bg, rgba(var(--primary-color-rgb,0,82,212), 0.1));
-    border-left-color: var(--alert-info-border, var(--primary-color, #0052D4));
-    color: var(--alert-info-text, var(--primary-color, #0052D4));
+    background-color: var(--alert-info-bg, var(--alert-info-bg-default));
+    border-left-color: var(--alert-info-border, var(--alert-info-border-default));
+    color: var(--alert-info-text, var(--alert-info-text-default));
 }
 .wp-block-milliondollartheme-alert-notification.alert-type-info .alert-icon {
-    color: var(--alert-info-icon, var(--primary-color, #0052D4));
+    color: var(--iconColor, var(--alert-info-icon, var(--alert-info-icon-default))); /* Attribute first */
+}
+.wp-block-milliondollartheme-alert-notification.alert-type-info .alert-dismiss-button {
+    color: var(--dismissButtonColor, var(--alert-info-text, var(--alert-info-text-default)));
 }
 
+
 .wp-block-milliondollartheme-alert-notification.alert-type-success {
-    background-color: var(--alert-success-bg, #d4edda);
-    border-left-color: var(--alert-success-border, #28a745);
-    color: var(--alert-success-text, #155724);
+    background-color: var(--alert-success-bg, var(--alert-success-bg-default));
+    border-left-color: var(--alert-success-border, var(--alert-success-border-default));
+    color: var(--alert-success-text, var(--alert-success-text-default));
 }
 .wp-block-milliondollartheme-alert-notification.alert-type-success .alert-icon {
-    color: var(--alert-success-icon, #28a745);
+    color: var(--iconColor, var(--alert-success-icon, var(--alert-success-icon-default)));
+}
+.wp-block-milliondollartheme-alert-notification.alert-type-success .alert-dismiss-button {
+    color: var(--dismissButtonColor, var(--alert-success-text, var(--alert-success-text-default)));
 }
 
 .wp-block-milliondollartheme-alert-notification.alert-type-warning {
-    background-color: var(--alert-warning-bg, #fff3cd);
-    border-left-color: var(--alert-warning-border, #ffc107);
-    color: var(--alert-warning-text, #856404);
+    background-color: var(--alert-warning-bg, var(--alert-warning-bg-default));
+    border-left-color: var(--alert-warning-border, var(--alert-warning-border-default));
+    color: var(--alert-warning-text, var(--alert-warning-text-default));
 }
 .wp-block-milliondollartheme-alert-notification.alert-type-warning .alert-icon {
-    color: var(--alert-warning-icon, #ffc107);
+    color: var(--iconColor, var(--alert-warning-icon, var(--alert-warning-icon-default)));
+}
+.wp-block-milliondollartheme-alert-notification.alert-type-warning .alert-dismiss-button {
+    color: var(--dismissButtonColor, var(--alert-warning-text, var(--alert-warning-text-default)));
 }
 
 .wp-block-milliondollartheme-alert-notification.alert-type-error {
-    background-color: var(--alert-error-bg, #f8d7da);
-    border-left-color: var(--alert-error-border, #dc3545);
-    color: var(--alert-error-text, #721c24);
+    background-color: var(--alert-error-bg, var(--alert-error-bg-default));
+    border-left-color: var(--alert-error-border, var(--alert-error-border-default));
+    color: var(--alert-error-text, var(--alert-error-text-default));
 }
 .wp-block-milliondollartheme-alert-notification.alert-type-error .alert-icon {
-    color: var(--alert-error-icon, #dc3545);
+    color: var(--iconColor, var(--alert-error-icon, var(--alert-error-icon-default)));
+}
+.wp-block-milliondollartheme-alert-notification.alert-type-error .alert-dismiss-button {
+    color: var(--dismissButtonColor, var(--alert-error-text, var(--alert-error-text-default)));
+}
+
+/* Core color support overrides (WP adds .has-text-color and .has-background-color) */
+.wp-block-milliondollartheme-alert-notification.has-background {
+    /* If user sets a background, the type-based background is overridden. */
+    /* We might need to adjust icon/dismiss button color based on perceived lightness of this custom bg. */
+    /* For now, rely on user setting text color for contrast if they set a custom BG. */
+}
+.wp-block-milliondollartheme-alert-notification.has-text-color {
+    /* This will override the type-based text color. */
+    /* Icon and dismiss button will also inherit this if not specifically set by their attributes. */
+}
+.wp-block-milliondollartheme-alert-notification.has-text-color .alert-icon,
+.wp-block-milliondollartheme-alert-notification.has-text-color .alert-dismiss-button {
+    /* color: inherit; /* Let them inherit the user-set text color by default */
 }
 
 
 /* Alert Styles */
 .wp-block-milliondollartheme-alert-notification.is-style-default {
-    /* Colors are primarily from .alert-type-* classes */
-    /* box-shadow: 0 2px 5px rgba(0,0,0,0.05); */
+    box-shadow: var(--shadow-sm, 0 3px 10px rgba(0,0,0,0.07)); /* Softer shadow for default */
 }
 
 .wp-block-milliondollartheme-alert-notification.is-style-outlined {
-    background-color: transparent !important; /* Override type bg */
-    border-width: 1px; /* Full border */
+    background-color: transparent !important; /* Override type bg AND core bg if set */
+    border-width: 2px; /* Full border for outlined */
     border-style: solid;
     /* border-color from .alert-type-* will apply to left, others will be this color */
-    border-right-color: var(--alert-border-color, currentColor); /* Match text color or type border */
+    /* Or, all borders take the type color */
+    border-right-color: var(--alert-border-color, currentColor);
     border-top-color: var(--alert-border-color, currentColor);
     border-bottom-color: var(--alert-border-color, currentColor);
-    /* Text color from .alert-type-* */
+    /* Text color from .alert-type-* (or core text color) */
+}
+.wp-block-milliondollartheme-alert-notification.is-style-outlined:hover {
+    box-shadow: 0 0 15px rgba(var(--primary-color-rgb,0,82,212),0.1); /* Subtle shadow on hover */
 }
 
+
 .wp-block-milliondollartheme-alert-notification.is-style-glassy {
-    background: var(--glass-bg-color);
+    background: var(--glass-bg-color) !important; /* Override type bg AND core bg */
     backdrop-filter: blur(var(--glass-blur-radius));
     -webkit-backdrop-filter: blur(var(--glass-blur-radius));
     border: 1px solid var(--glass-border-color) !important; /* Override type border */
     box-shadow: var(--glass-box-shadow);
-    /* Text color should be light for glassy, potentially overriding .alert-type-* text color */
-    /* color: var(--text-color-light); /* This might need !important or more specificity */
-}
-.wp-block-milliondollartheme-alert-notification.is-style-glassy.alert-type-info,
-.wp-block-milliondollartheme-alert-notification.is-style-glassy.alert-type-success,
-.wp-block-milliondollartheme-alert-notification.is-style-glassy.alert-type-warning,
-.wp-block-milliondollartheme-alert-notification.is-style-glassy.alert-type-error {
-    color: var(--text-color-light); /* Ensure text is light on glassy bg */
+    color: var(--text-color-light) !important; /* Force light text on glassy, overrides type and core text color */
 }
 .wp-block-milliondollartheme-alert-notification.is-style-glassy .alert-icon {
-    /* Icon color might also need to be light, or use its type color for accent */
-    /* color: var(--text-color-light); */
+    color: var(--iconColor, var(--text-color-light)); /* Icon light, or use attribute */
 }
 .wp-block-milliondollartheme-alert-notification.is-style-glassy .alert-dismiss-button {
-    color: var(--text-color-light);
+    color: var(--dismissButtonColor, var(--text-color-light));
     opacity: 0.8;
 }
 .wp-block-milliondollartheme-alert-notification.is-style-glassy .alert-dismiss-button:hover {
@@ -130,12 +183,17 @@
 
 
 /* Responsive */
-@media (max-width: 767px) {
+@media (max-width: 767px) { /* Mobile */
     .wp-block-milliondollartheme-alert-notification {
         /* padding might be adjusted via attribute, or here for smaller screens */
-        /* font-size: 0.9em; */ /* Scale down text if needed */
+        /* font-size: 0.9em; /* Scale down text if needed */
+        gap: var(--spacing-sm, 8px); /* Slightly reduce gap */
     }
     .alert-icon {
-        font-size: 1.3em; /* Slightly smaller icon on mobile */
+        font-size: 1.4em;
+        margin-top: 0; /* Adjust for potentially smaller line height */
+    }
+    .alert-dismiss-button {
+        font-size: 1.4em;
     }
 }

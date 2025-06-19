@@ -16,9 +16,11 @@ import './index.css';
 const { name, title, attributes } = metadata;
 
 // Helper for default icons based on type
-const AlertIcon = ({ type, customIcon }) => {
-    let iconSlug = customIcon || '';
-    if (!customIcon) {
+const AlertIcon = ({ type, icon: selectedIcon, iconColor }) => { // Use new `icon` prop, add iconColor
+    // In a real implementation, this would render an SVG from a library like Feather Icons.
+    // For styling, we will use a generic class and data-icon attribute.
+    let iconSlug = selectedIcon || '';
+    if (!selectedIcon) { // Use selectedIcon
         switch (type) {
             case 'success': iconSlug = 'yes-alt'; break;
             case 'warning': iconSlug = 'warning'; break;
@@ -27,8 +29,10 @@ const AlertIcon = ({ type, customIcon }) => {
         }
     }
     if (!iconSlug) return null;
-    // In a real block, this would render an SVG or a proper icon font class.
-    return <span className={`dashicons dashicons-${iconSlug} alert-icon alert-icon-${type}`}></span>;
+    const iconClass = `social-icon-svg icon-${iconSlug ? iconSlug.toLowerCase().replace('-f', '').replace('-in', '') : 'default'}`; // Generic class for potential SVG styling
+    // Fallback to Dashicon if no SVG logic yet, but CSS will target generic class primarily.
+    const dashiconClass = `dashicons dashicons-${iconSlug}`;
+    return <span className={`${iconClass} ${dashiconClass}`} style={{color: iconColor, fontSize: '20px'}} data-icon-slug={iconSlug}></span>;
 };
 
 registerBlockType(name, {
@@ -36,13 +40,15 @@ registerBlockType(name, {
     attributes: attributes,
 
     edit: ({ attributes, setAttributes }) => {
-        const { message, alertType, isDismissible, showIcon, customIcon, alertStyle, borderRadius, padding } = attributes;
+        const { message, alertType, isDismissible, showIcon, icon, alertStyle, borderRadius, padding, iconColor, dismissButtonColor } = attributes;
+        // Core color support (backgroundColor, textColor) is handled by useBlockProps and WordPress
+
         const blockProps = useBlockProps({
             className: `is-style-${alertStyle} alert-type-${alertType}`,
             style: {
                 borderRadius: borderRadius,
                 padding: padding,
-                // backgroundColor and color from core block supports if enabled & used
+                // backgroundColor and color are applied by WP if set in Inspector via core controls
             }
         });
 
@@ -72,32 +78,45 @@ registerBlockType(name, {
                             onChange={() => setAttributes({ showIcon: !showIcon })}
                         />
                         {showIcon && (
-                            <TextControl /* TODO: IconPicker */
-                                label={__('Custom Icon Slug (Dashicon)', 'milliondollartheme')}
-                                value={customIcon || ''}
-                                onChange={(val) => setAttributes({ customIcon: val })}
-                                help={__('Overrides default type icon.', 'milliondollartheme')}
+                            <SelectControl /* Better than TextControl for predefined icons */
+                                label={__('Icon', 'milliondollartheme')}
+                                value={icon || ''} /* Use icon attribute */
+                                options={[
+                                    {label: 'Default for Type', value: ''},
+                                    {label: 'Info (Alternative)', value: 'info'},
+                                    {label: 'Success (Alternative)', value: 'yes'},
+                                    {label: 'Warning (Alternative)', value: 'flag'},
+                                    {label: 'Error (Alternative)', value: 'no'},
+                                    {label: 'Lightbulb', value: 'lightbulb'},
+                                    {label: 'Bell', value: 'bell'},
+                                    {label: 'Megaphone', value: 'megaphone'}
+                                    /* TODO: Add more common/useful Dashicons or plan for true IconPicker */
+                                ]}
+                                onChange={(val) => setAttributes({ icon: val })}
+                                help={__('Select an icon or leave empty for type default.', 'milliondollartheme')}
                             />
                         )}
                     </PanelBody>
-                    <PanelBody title={__('Appearance', 'milliondollartheme')}>
+                    <PanelBody title={__('Appearance & Styling', 'milliondollartheme')}>
                         <SelectControl
                             label={__('Alert Style', 'milliondollartheme')}
                             value={alertStyle}
                             options={[ {label:'Default', value:'default'}, {label:'Glassy', value:'glassy'}, {label:'Outlined', value:'outlined'} ]}
                             onChange={val => setAttributes({alertStyle: val})}
                         />
-                        <TextControl label={__('Padding', 'milliondollartheme')} value={padding} onChange={val => setAttributes({padding: val})} />
-                        <TextControl label={__('Border Radius', 'milliondollartheme')} value={borderRadius} onChange={val => setAttributes({borderRadius: val})} />
-                        {/* Color controls can use core color support (text, background) */}
+                        <TextControl label={__('Padding (e.g., var(--spacing-md))', 'milliondollartheme')} value={padding} onChange={val => setAttributes({padding: val})} />
+                        <TextControl label={__('Border Radius (e.g., var(--border-radius-sm))', 'milliondollartheme')} value={borderRadius} onChange={val => setAttributes({borderRadius: val})} />
+                        {showIcon && <TextControl /* TODO: ColorPalette for iconColor */ label={__('Icon Color', 'milliondollartheme')} value={iconColor || ''} onChange={val => setAttributes({iconColor: val})} />}
+                        {isDismissible && <TextControl /* TODO: ColorPalette for dismissButtonColor */ label={__('Dismiss Button Color', 'milliondollartheme')} value={dismissButtonColor || ''} onChange={val => setAttributes({dismissButtonColor: val})} />}
+                        <p>{__('Use Global Styles (Block Settings > Color) for overall text and background colors.', 'milliondollartheme')}</p>
                     </PanelBody>
                 </InspectorControls>
 
                 <div {...blockProps}>
-                    {showIcon && <AlertIcon type={alertType} customIcon={customIcon} />}
+                    {showIcon && <AlertIcon type={alertType} icon={icon} iconColor={iconColor} />}
                     <div className="alert-content-wrapper">
                         <RichText
-                            tagName="div" // Using div for message to allow multiple paragraphs if needed
+                            tagName="div"
                             multiline="p"
                             className="alert-message"
                             value={message}
@@ -106,7 +125,7 @@ registerBlockType(name, {
                         />
                     </div>
                     {isDismissible && (
-                        <button type="button" className="alert-dismiss-button" aria-label={__('Dismiss alert', 'milliondollartheme')}>
+                        <button type="button" className="alert-dismiss-button" aria-label={__('Dismiss alert', 'milliondollartheme')} style={{color: dismissButtonColor}}>
                             &times;
                         </button>
                     )}
@@ -116,17 +135,14 @@ registerBlockType(name, {
     },
 
     save: ({ attributes }) => {
-        const { message, alertType, isDismissible, showIcon, customIcon, alertStyle, borderRadius, padding } = attributes;
+        const { message, alertType, isDismissible, showIcon, icon, alertStyle, borderRadius, padding, iconColor, dismissButtonColor } = attributes;
 
-        // Core color support classes (like .has-text-color, .has-background) are added by useBlockProps.save()
-        // if colors are set via the editor's color palettes.
         const blockProps = useBlockProps.save({
             className: `is-style-${alertStyle} alert-type-${alertType}`,
             style: {
                 borderRadius: borderRadius,
                 padding: padding,
             },
-            // Alpine.js for dismissible functionality
             'x-data': isDismissible ? '{ open: true }' : undefined,
             'x-show': isDismissible ? 'open' : undefined,
             'x-transition:leave': isDismissible ? 'transition ease-in duration-200' : undefined,
@@ -136,7 +152,7 @@ registerBlockType(name, {
 
         return (
             <div {...blockProps}>
-                {showIcon && <AlertIcon type={alertType} customIcon={customIcon} />}
+                {showIcon && <AlertIcon type={alertType} icon={icon} iconColor={iconColor} />}
                 <div className="alert-content-wrapper">
                     <RichText.Content tagName="div" className="alert-message" value={message} />
                 </div>
@@ -145,7 +161,8 @@ registerBlockType(name, {
                         type="button"
                         className="alert-dismiss-button"
                         aria-label={__('Dismiss alert', 'milliondollartheme')}
-                        {'x-on:click'}="open = false"
+                        x-on:click="open = false"
+                        style={{color: dismissButtonColor}}
                     >
                         &times;
                     </button>

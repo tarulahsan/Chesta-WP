@@ -2,15 +2,53 @@
 .wp-block-milliondollartheme-progress-bar {
     /* border: 1px dashed #ccc; */ /* Optional visual guide */
 }
-.progress-bar-title.rich-text { /* Targeting the RichText component wrapper */
-    margin-bottom: 4px; /* Ensure some space in editor */
+.progress-bar-title.rich-text {
+    margin-bottom: 4px;
+    /* Inline styles from JS for color */
 }
-.progress-bar-track {
-    /* Preview of track in editor */
+.wp-block-milliondollartheme-progress-bar .progress-bar-wrapper {
+    display: flex; /* From front-end styles */
+    align-items: center; /* From front-end styles */
+    gap: var(--spacing-md, 16px); /* From front-end styles */
 }
-.progress-bar-fill {
-    /* Preview of fill in editor, width is dynamic */
+.wp-block-milliondollartheme-progress-bar .progress-bar-track {
+    flex-grow: 1;
+    /* Inline styles from JS for height, bg, radius, overflow */
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.08); /* Simpler editor shadow */
 }
-.progress-bar-label {
-    /* Preview of label */
+.wp-block-milliondollartheme-progress-bar .progress-bar-fill {
+    /* Inline styles from JS for width, height, bg, radius, transition, display, align, justify */
+}
+.wp-block-milliondollartheme-progress-bar .progress-bar-label {
+    /* Inline styles from JS for color */
+    font-size: 0.8em; /* Match front-end approx */
+    font-weight: bold;
+}
+
+/* Editor preview for label positions */
+.wp-block-milliondollartheme-progress-bar.label-pos-outside-above .progress-bar-title.is-position-above {
+    /* JS handles conditional rendering of title */
+}
+.wp-block-milliondollartheme-progress-bar.label-pos-outside-above .progress-bar-wrapper {
+    flex-direction: column; /* Stack label and bar if label is above */
+    align-items: stretch; /* Full width for items */
+    gap: var(--spacing-xs, 4px);
+}
+.wp-block-milliondollartheme-progress-bar.label-pos-outside-above .progress-bar-label.is-outside-above {
+    display: block; /* Takes full width */
+    text-align: right; /* Align label text to where bar ends */
+    /* margin-bottom: var(--spacing-xs, 4px); /* Space before bar track */
+}
+
+
+/* Preview for striped style */
+.wp-block-milliondollartheme-progress-bar.is-style-striped .progress-bar-fill::before {
+    content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background-image: linear-gradient(-45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);
+    background-size: 30px 30px; /* Smaller stripes for editor */
+    border-radius: inherit;
+}
+/* Preview for glassy fill - relies on inline styles from JS for bg */
+.wp-block-milliondollartheme-progress-bar.is-style-glassy-fill .progress-bar-fill {
+    /* border: 1px solid rgba(255,255,255,0.1); /* Example border for glassy preview */
 }

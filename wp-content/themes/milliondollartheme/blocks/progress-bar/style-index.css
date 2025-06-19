@@ -1,106 +1,163 @@
 /* --- Progress Bar Block Styles (style-index.css) --- */
 .wp-block-milliondollartheme-progress-bar {
-    margin-bottom: var(--spacing-md, 16px);
+    margin-bottom: var(--spacing-lg, 32px); /* More space below each bar */
+    /* Block text color (from core support) can act as default for title if titleColor attr is not set */
 }
+
 .progress-bar-title {
     display: block;
     font-weight: 600;
-    font-family: var(--font-family-body); /* Or heading if preferred */
-    /* color from attribute */
+    font-family: var(--font-family-heading); /* Use heading font for title */
+    font-size: 1.1em; /* Slightly larger title */
+    line-height: 1.4;
+    /* color applied inline by JS from titleColor attribute or inherits from block wrapper */
 }
 .progress-bar-title.is-position-above {
-    margin-bottom: var(--spacing-xs, 4px);
+    margin-bottom: var(--spacing-sm, 8px); /* More space if title above */
 }
 .progress-bar-title.is-position-below {
-    margin-top: var(--spacing-xs, 4px);
-    font-size: 0.9em; /* Smaller if below */
-    opacity: 0.8;
+    margin-top: var(--spacing-sm, 8px);
+    font-size: 1em; /* Slightly smaller if below */
+    opacity: 0.85;
 }
 
 .progress-bar-wrapper {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm, 8px);
+    gap: var(--spacing-md, 16px); /* Increased gap for outside label */
 }
+/* Specific wrapper styles based on label position */
+.progress-bar-wrapper.label-pos-outside-above {
+    /* Title is already above, this class might not be needed on wrapper if title handles it */
+    /* If label is also outside-above, the title might be above label or vice-versa */
+}
+
+
 .progress-bar-track {
     flex-grow: 1;
-    /* height, backgroundColor, borderRadius applied inline */
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); /* Subtle inner shadow for track */
+    /* height, backgroundColor, borderRadius applied inline by JS from attributes */
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.12); /* More defined inner shadow */
+    position: relative; /* For pseudo elements or absolute positioned fill if needed */
+    overflow: hidden; /* Important for border-radius on fill */
 }
 .progress-bar-fill {
-    /* width (animated), height, backgroundColor/Image, borderRadius applied inline */
-    text-align: right; /* For label inside right */
-    display: flex; /* For label vertical centering */
+    /* width (animated), height, backgroundColor/Image, borderRadius applied inline by JS */
+    text-align: right;
+    display: flex;
     align-items: center;
     justify-content: flex-end; /* Default for label inside */
+    position: relative; /* For striped animation pseudo or glassy content */
+    /* transition: width 1s cubic-bezier(0.23, 1, 0.32, 1); /* Smoother transition, can be set by JS or here */
 }
 
 .progress-bar-label {
-    font-size: 0.8em;
-    font-weight: bold;
+    font-size: 0.85em; /* Slightly larger label */
+    font-weight: 700; /* Bolder label */
     line-height: 1;
-    /* color from attribute */
+    white-space: nowrap; /* Prevent label from wrapping */
+    /* color applied inline by JS from labelColor attribute */
 }
 .progress-bar-label.is-inside {
-    padding: 0 var(--spacing-xs, 4px);
-    color: var(--text-color-light); /* Default for label on dark bar */
+    padding: 0 var(--spacing-sm, 8px); /* More padding for inside label */
+    color: var(--progress-label-inside-color, var(--text-color-light)); /* Default light for dark bars */
+    /* Contrast for label inside bar needs to be handled carefully, potentially by JS adding a class to fill if bg is light */
 }
-.progress-bar-wrapper.label-pos-inside .progress-bar-fill.has-light-bg .progress-bar-label.is-inside {
-    /* TODO: Add class 'has-light-bg' if barColor/gradient is light, then set label to dark */
-    /* color: var(--text-color-dark); */
+.wp-block-milliondollartheme-progress-bar.is-style-default .progress-bar-fill[style*="background: var(--primary-color)"] + .progress-bar-label.is-inside,
+.wp-block-milliondollartheme-progress-bar.is-style-default .progress-bar-fill[style*="background-image: var(--gradient-primary)"] + .progress-bar-label.is-inside {
+    /* Example if barColor/gradient is primary and text-color-light is default for label */
 }
 
+
 .progress-bar-label.is-outside-right {
-    flex-shrink: 0; /* Prevent label from shrinking */
+    flex-shrink: 0;
+    font-family: var(--font-family-monospace, monospace); /* Monospace for numbers */
+}
+.progress-bar-wrapper.label-pos-outside-above .progress-bar-label { /* If label is above bar but below title */
+    display: block;
+    text-align: right; /* Align percentage to the end of the bar */
+    margin-bottom: var(--spacing-xs, 4px);
+    width: 100%; /* Make it full width to align with bar end */
 }
 
 
 /* Bar Styles */
-.wp-block-milliondollartheme-progress-bar.is-style-striped .progress-bar-fill {
-    background-image: repeating-linear-gradient(
-        -45deg,
-        rgba(255,255,255,0.15),
-        rgba(255,255,255,0.15) 10px,
-        transparent 10px,
-        transparent 20px
-    ), var(--bar-gradient, linear-gradient(to right, var(--primary-color), var(--accent-color))); /* Fallback to gradient/color */
-    background-color: var(--bar-color, var(--primary-color)); /* Fallback if gradient not set */
-}
-.wp-block-milliondollartheme-progress-bar.is-style-striped.animate-on-scroll .progress-bar-fill {
-    /* animation: progress-bar-stripes 1s linear infinite; /* If always animated stripes */
+.wp-block-milliondollartheme-progress-bar.is-style-default .progress-bar-fill {
+    /* Default fill, color/gradient from attributes */
 }
 
+.wp-block-milliondollartheme-progress-bar.is-style-striped .progress-bar-fill {
+    /* background-image combines stripes with actual barColor/barGradient */
+    /* The actual barColor/barGradient is applied inline by JS */
+    /* This creates a semi-transparent stripe overlay */
+}
+.wp-block-milliondollartheme-progress-bar.is-style-striped .progress-bar-fill::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: linear-gradient(
+        -45deg,
+        rgba(255,255,255,0.2) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255,255,255,0.2) 50%,
+        rgba(255,255,255,0.2) 75%,
+        transparent 75%,
+        transparent
+    );
+    background-size: 40px 40px; /* Size of stripes */
+    z-index: 0; /* Behind label */
+    border-radius: inherit; /* Match fill's border radius */
+}
+.wp-block-milliondollartheme-progress-bar.is-style-striped.animate-on-scroll.in-view .progress-bar-fill::before {
+    animation: progress-bar-stripes 1s linear infinite;
+}
+
+@keyframes progress-bar-stripes {
+    from { background-position: 40px 0; }
+    to { background-position: 0 0; }
+}
+
+
 .wp-block-milliondollartheme-progress-bar.is-style-glassy-fill .progress-bar-fill {
-    /* Apply glassy effect to the fill itself */
     background: var(--glass-bg-color); /* Fallback if barColor/gradient not set for glassy */
     backdrop-filter: blur(var(--glass-blur-radius));
     -webkit-backdrop-filter: blur(var(--glass-blur-radius));
     border: 1px solid var(--glass-border-color);
     box-shadow: var(--glass-box-shadow-light);
-    /* Note: barColor/barGradient attributes would override this background */
+    /* Note: barColor/barGradient attributes from JS will override this background */
+    /* If barColor/barGradient are used, they should ideally be semi-transparent for glassy effect */
 }
 .wp-block-milliondollartheme-progress-bar.is-style-glassy-fill .progress-bar-label.is-inside {
-    color: var(--text-color-dark); /* Label on glassy might need to be dark */
+    color: var(--progress-label-on-glass-color, var(--text-color-dark)); /* Label on glassy might need to be dark */
+    text-shadow: 0 0 5px var(--background-color-light); /* Help readability on complex glass */
 }
 
 
-/* Animation class (view.js will add .in-view to trigger this) */
-.wp-block-milliondollartheme-progress-bar.animate-on-scroll .progress-bar-fill {
-    /* Initial width is 0%, set by inline style from save() */
-    /* Transition is set inline by save() */
-}
-.wp-block-milliondollartheme-progress-bar.animate-on-scroll.in-view .progress-bar-fill {
-    /* Target width is set by data-percentage, applied by view.js */
-}
+/* Animation class (view.js will add .in-view to trigger this if needed, but JS handles width directly) */
+/* .wp-block-milliondollartheme-progress-bar.animate-on-scroll.in-view .progress-bar-fill { */
+    /* Target width is set by data-percentage, applied by view.js to inline style */
+/* } */
 
 
 /* Responsive */
-@media (max-width: 767px) {
-    .progress-bar-title { font-size: 0.9em; }
-    .progress-bar-label { font-size: 0.75em; }
-    /* If label is outside-right, might need to stack or reduce text */
+@media (max-width: 767px) { /* Mobile */
+    .progress-bar-title { font-size: 1em; }
+    .progress-bar-label { font-size: 0.8em; }
+
     .progress-bar-wrapper.label-pos-outside-right {
         /* flex-direction: column; */ /* Example: stack bar and label */
         /* align-items: flex-start; */
+    }
+    /* .progress-bar-wrapper.label-pos-outside-right .progress-bar-label.is-outside-right {
+        margin-top: var(--spacing-xs);
+        margin-left: 0;
+    } */
+}
+
+@media (max-width: 480px) { /* Smaller Mobile */
+    .progress-bar-title { font-size: 0.9em; }
+    .progress-bar-label { font-size: 0.7em; }
+    .wp-block-milliondollartheme-progress-bar.is-style-striped .progress-bar-fill::before {
+        background-size: 30px 30px; /* Smaller stripes on small screens */
     }
 }

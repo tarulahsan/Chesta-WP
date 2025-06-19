@@ -9,8 +9,10 @@
     "keywords": ["pricing", "table", "plans", "comparison"],
     "attributes": {
         "columns": { "type": "number", "default": 3 },
-        "tableStyle": { "type": "string", "default": "default" }, /* default, separated-cards */
-        "gap": { "type": "string", "default": "var(--spacing-md)"},
+        "tableStyle": { "type": "string", "default": "default" },
+        "gap": { "type": "string", "default": "var(--spacing-md)" },
+        "tableBackgroundColor": { "type": "string" },
+        "tableBorderColor": { "type": "string" },
         "align": { "type": "string", "default": "" }
     },
     "supports": {

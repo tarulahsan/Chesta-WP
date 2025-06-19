@@ -9,16 +9,24 @@
     "keywords": ["portfolio", "gallery", "grid", "masonry", "projects", "images"],
     "attributes": {
         "selectedCategories": { "type": "string", "default": "" },
+        "selectedTags": { "type": "string", "default": "" },
         "numberOfItems": { "type": "number", "default": 9 },
         "orderBy": { "type": "string", "default": "date" },
         "order": { "type": "string", "default": "DESC" },
         "columnMinWidth": { "type": "number", "default": 250 },
+        "columnsTablet": { "type": "number" },
+        "columnsMobile": { "type": "number" },
         "imageSize": { "type": "string", "default": "medium_large" },
+        "imageAspectRatio": { "type": "string", "default": "auto" },
         "showPostTitleOnHover": { "type": "boolean", "default": true },
-        "gap": { "type": "number", "default": 16 }, /* Gap in pixels */
-        "align": { "type": "string", "default": "" },
-        "itemStyle": { "type": "string", "default": "default" } /* default, glassy-item */
-        // No complex hover effects or filtering in this iteration
+        "hoverEffect": { "type": "string", "default": "zoom" },
+        "itemStyle": { "type": "string", "default": "default" },
+        "gap": { "type": "number", "default": 16 },
+        "showFilterBar": { "type": "boolean", "default": false },
+        "filterBy": { "type": "string", "default": "category" },
+        "paginationType": { "type": "string", "default": "none" },
+        "loadMoreButtonText": { "type": "string", "default": "Load More" },
+        "align": { "type": "string", "default": "" }
     },
     "supports": {
         "align": ["wide", "full"],
