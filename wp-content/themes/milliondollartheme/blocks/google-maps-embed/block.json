@@ -1,0 +1,31 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/google-maps-embed",
+    "title": "Google Maps Embed (Enhanced)",
+    "category": "milliondollartheme-blocks",
+    "description": "Easily embed customizable Google Maps.",
+    "icon": "location-alt",
+    "keywords": ["map", "google maps", "location", "embed", "address"],
+    "attributes": {
+        "query": { "type": "string", "default": "Googleplex, Mountain View, CA" },
+        "zoom": { "type": "number", "default": 14 },
+        "mapType": { "type": "string", "default": "roadmap" },
+        "height": { "type": "string", "default": "450px" },
+        "preventScroll": { "type": "boolean", "default": true },
+        "showMarker": { "type": "boolean", "default": true },
+        "mapStyle": { "type": "string", "default": "default" },
+        "customMapStyleJSON": { "type": "string" },
+        "borderRadius": { "type": "string", "default": "var(--border-radius-md, 8px)" },
+        "align": { "type": "string", "default": "" }
+    },
+    "supports": {
+        "align": ["wide", "full"],
+        "html": false
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "style": "file:./style-index.css",
+    "editorStyle": "file:./index.css",
+    "render": "file:./render.php"
+}

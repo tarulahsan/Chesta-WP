@@ -1,0 +1,76 @@
+/* index.css - Editor-only styles for Icon List */
+
+/* Selected Item Styling */
+.wp-block-milliondollartheme-icon-list .icon-list-item.is-selected {
+    background-color: rgba(0, 120, 212, 0.05); /* Subtle background for selection */
+    border: 1px dashed rgba(0, 120, 212, 0.3);
+    border-radius: 2px;
+    /* box-shadow: 0 0 0 1px var(--wp-admin-theme-color, #007cba) inset; */
+}
+
+/* Item Actions Toolbar (Remove button) */
+.wp-block-milliondollartheme-icon-list .icon-list-item .item-actions-toolbar {
+    margin-left: auto; /* Pushes it to the right */
+    padding-left: 8px; /* Space from the text content */
+    display: inline-flex; /* Keep it on the same line */
+    align-items: center; /* Vertically align with text/icon */
+}
+.wp-block-milliondollartheme-icon-list .icon-list-item .item-actions-toolbar .components-toolbar-button {
+    min-width: 24px;
+    height: 24px;
+    padding: 0;
+}
+.wp-block-milliondollartheme-icon-list .icon-list-item .item-actions-toolbar .components-icon-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+
+/* Link Preview Styling in Editor */
+.wp-block-milliondollartheme-icon-list .icon-list-item .icon-list-item-link-preview .icon-list-item-text {
+    color: var(--wp-admin-theme-color, #007cba); /* Make it look like a link */
+    text-decoration: underline;
+    cursor: default; /* It's not a real link in the editor text area */
+}
+
+/* Placeholder and Hint Styling */
+.wp-block-milliondollartheme-icon-list .icon-list-placeholder,
+.wp-block-milliondollartheme-icon-list .icon-list-editor-hint {
+    font-style: italic;
+    color: #555;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    text-align: center;
+    margin: 10px 0; /* Give it some space */
+}
+
+/* Ensure RichText input area is sufficiently wide */
+.wp-block-milliondollartheme-icon-list .icon-list-item .icon-list-item-content-wrapper {
+    flex-grow: 1;
+}
+.wp-block-milliondollartheme-icon-list .icon-list-item .icon-list-item-text {
+    display: block; /* Make RichText take full width of its wrapper */
+    width: 100%;
+}
+
+/* Adjustments for alignment in editor if needed (front-end styles might cover this) */
+.wp-block-milliondollartheme-icon-list.has-text-align-center .icon-list-item {
+    /* justify-content: center; /* This centers the whole li content */
+}
+.wp-block-milliondollartheme-icon-list.has-text-align-right .icon-list-item .icon-list-item-content-wrapper {
+     /* order: 0; /* Ensure text wrapper is before icon if icon is ordered to 1 */
+}
+.wp-block-milliondollartheme-icon-list.has-text-align-right .icon-list-item .dashicons {
+    /* order: 1; */
+}
+
+/* Style for the clickable area of the list item to select it */
+.wp-block-milliondollartheme-icon-list .icon-list-item {
+    cursor: pointer; /* Indicate items are clickable for selection */
+    position: relative; /* For potential absolute positioned elements like toolbars */
+}
+.wp-block-milliondollartheme-icon-list .icon-list-item .components-rich-text__editable {
+    cursor: text; /* Text cursor for RichText areas */
+}

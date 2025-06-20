@@ -20,6 +20,15 @@ registerBlockType(name, {
         const priceIntervalStyles = { color: priceIntervalColor };
         const featuresStyles = { color: featuresColor };
         const buttonPreviewStyles = { backgroundColor: buttonBgColor, color: buttonTextColor, borderColor: buttonBorderColor, backgroundImage: buttonGradient, borderStyle: buttonBorderColor ? 'solid' : (buttonStyle === 'outline' ? 'solid' : 'none') };
+
+        // Define button style options including 'Glassy'
+        const buttonStyleOptions = [
+            {label: __('Primary', 'milliondollartheme'), value: 'primary'},
+            {label: __('Secondary', 'milliondollartheme'), value: 'secondary'},
+            {label: __('Outline', 'milliondollartheme'), value: 'outline'},
+            {label: __('Glassy', 'milliondollartheme'), value: 'glassy'} // Added Glassy
+        ];
+
         return (
             <div {...blockProps}>
                 <InspectorControls>
@@ -32,7 +41,12 @@ registerBlockType(name, {
                     <PanelBody title={__('Button', 'milliondollartheme')}>
                         <TextControl label={__('Button Text', 'milliondollartheme')} value={buttonText} onChange={val => setAttributes({buttonText: val})} />
                         <TextControl label={__('Button URL', 'milliondollartheme')} value={buttonUrl} onChange={val => setAttributes({buttonUrl: val})} />
-                        <SelectControl label={__('Button Style', 'milliondollartheme')} value={buttonStyle} options={[{label: 'Primary', value: 'primary'},{label: 'Secondary', value: 'secondary'},{label: 'Outline', value: 'outline'}]} onChange={val => setAttributes({buttonStyle: val})} />
+                        <SelectControl
+                            label={__('Button Style', 'milliondollartheme')}
+                            value={buttonStyle}
+                            options={buttonStyleOptions} // Use the defined options array
+                            onChange={val => setAttributes({buttonStyle: val})}
+                        />
                         <TextControl /* TODO: ColorPalette */ label={__('Button Text Color', 'milliondollartheme')} value={buttonTextColor || ''} onChange={val => setAttributes({buttonTextColor: val})} />
                         <TextControl /* TODO: ColorPalette for custom button style */ label={__('Button Background Color', 'milliondollartheme')} value={buttonBgColor || ''} onChange={val => setAttributes({buttonBgColor: val})} />
                         <TextControl /* TODO: ColorPalette for custom button style */ label={__('Button Border Color', 'milliondollartheme')} value={buttonBorderColor || ''} onChange={val => setAttributes({buttonBorderColor: val})} />
@@ -71,6 +85,18 @@ registerBlockType(name, {
         const priceIntervalStyles = { color: priceIntervalColor };
         const featuresStyles = { color: featuresColor };
         const buttonSavedStyles = { backgroundColor: buttonBgColor, color: buttonTextColor, borderColor: buttonBorderColor, backgroundImage: buttonGradient, borderStyle: buttonBorderColor ? 'solid' : (buttonStyle === 'outline' ? 'solid' : 'none') };
+        // Ensure buttonSavedStyles doesn't include undefined properties if buttonStyle is not 'custom'
+        if (buttonStyle !== 'custom' && buttonStyle !== 'outline') { // Basic styles like primary, secondary, glassy might not use these direct inline styles
+            delete buttonSavedStyles.backgroundColor; // Rely on CSS classes for these styles mostly
+            delete buttonSavedStyles.borderColor;
+            delete buttonSavedStyles.borderStyle;
+            if (buttonStyle !== 'glassy' && buttonStyle !== 'primary' && buttonStyle !== 'secondary') { // If not a style that might use gradient via class
+                 delete buttonSavedStyles.backgroundImage;
+            }
+             // Text color can be kept for overrides or also removed if classes handle it fully
+        }
+
+
         return (
             <div {...blockProps}>
                 <RichText.Content tagName="h4" className="plan-name" value={planName} style={planNameStyles} />
@@ -81,7 +107,7 @@ registerBlockType(name, {
                 <RichText.Content tagName="ul" multiline="li" className="plan-features" value={features} style={featuresStyles} />
                 {buttonText && buttonUrl && (
                     <div className="plan-button-wrapper">
-                        <a href={buttonUrl} className={`plan-button is-button-style-${buttonStyle}`} style={buttonSavedStyles}>
+                        <a href={buttonUrl} className={`plan-button is-button-style-${buttonStyle}`} style={Object.keys(buttonSavedStyles).length > 0 ? buttonSavedStyles : undefined}>
                             {buttonText}
                         </a>
                     </div>

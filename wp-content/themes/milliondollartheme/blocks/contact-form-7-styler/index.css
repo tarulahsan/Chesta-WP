@@ -1,0 +1,16 @@
+/* --- Contact Form 7 Styler Editor Styles (index.css) --- */
+.wp-block-milliondollartheme-contact-form-7-styler {
+    border: 1px dashed #ccc;
+    padding: 16px;
+    min-height: 150px; /* Increased min-height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* Styling for messages shown in SSR preview in editor */
+.wp-block-milliondollartheme-contact-form-7-styler .cf7-editor-message,
+.wp-block-milliondollartheme-contact-form-7-styler .cf7-error-message { /* If error shows in editor */
+    text-align: center;
+    width: 100%;
+}
+/* The SSR form selector was removed from render.php to simplify, rely on Inspector. */

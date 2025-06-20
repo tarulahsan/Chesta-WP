@@ -27,8 +27,20 @@ registerBlockType(name, {
         const {
             numberOfPosts, layout, columns, displayFeaturedImage, displayPostTitle,
             displayPostDate, displayPostExcerpt, excerptLength, categories, orderBy, order,
-            postsDisplayStyle
+            postsDisplayStyle,
+            // Added for this tweak:
+            featuredImageSize, titleTag, displayReadMoreLink, readMoreText
         } = attributes;
+
+        // TODO: Fetch available image sizes to populate featuredImageSize options dynamically
+        const imageSizeOptions = [
+            {label:'Thumbnail',value:'thumbnail'},
+            {label:'Medium',value:'medium'},
+            {label:'Medium Large',value:'medium_large'},
+            {label:'Large',value:'large'},
+            {label:'Full',value:'full'}
+        ];
+
 
         return (
             <>
@@ -85,11 +97,40 @@ registerBlockType(name, {
                     </PanelBody>
                     <PanelBody title={__('Post Elements', 'milliondollartheme')}>
                         <ToggleControl label={__('Display Featured Image', 'milliondollartheme')} checked={!!displayFeaturedImage} onChange={() => setAttributes({displayFeaturedImage: !displayFeaturedImage})} />
+                        {displayFeaturedImage && (
+                            <SelectControl
+                                label={__('Featured Image Size', 'milliondollartheme')}
+                                value={featuredImageSize || 'medium_large'}
+                                options={imageSizeOptions}
+                                onChange={val => setAttributes({featuredImageSize: val})}
+                                help={__('Select the size for the featured images.', 'milliondollartheme')}
+                            />
+                        )}
                         <ToggleControl label={__('Display Post Title', 'milliondollartheme')} checked={!!displayPostTitle} onChange={() => setAttributes({displayPostTitle: !displayPostTitle})} />
+                        {displayPostTitle && (
+                             <SelectControl
+                                label={__('Title HTML Tag', 'milliondollartheme')}
+                                value={titleTag || 'h3'}
+                                options={[{label:'H2',value:'h2'},{label:'H3',value:'h3'},{label:'H4',value:'h4'},{label:'H5',value:'h5'},{label:'P',value:'p'}]}
+                                onChange={val => setAttributes({titleTag: val})}
+                            />
+                        )}
                         <ToggleControl label={__('Display Post Date', 'milliondollartheme')} checked={!!displayPostDate} onChange={() => setAttributes({displayPostDate: !displayPostDate})} />
                         <ToggleControl label={__('Display Post Excerpt', 'milliondollartheme')} checked={!!displayPostExcerpt} onChange={() => setAttributes({displayPostExcerpt: !displayPostExcerpt})} />
                         {displayPostExcerpt && (
                             <RangeControl label={__('Excerpt Length (words)', 'milliondollartheme')} value={excerptLength} onChange={(val) => setAttributes({excerptLength: val})} min={10} max={100} />
+                        )}
+                        <ToggleControl
+                            label={__('Display Read More Link', 'milliondollartheme')}
+                            checked={!!displayReadMoreLink}
+                            onChange={() => setAttributes({displayReadMoreLink: !displayReadMoreLink})}
+                        />
+                        {displayReadMoreLink && (
+                            <TextControl
+                                label={__('Read More Text', 'milliondollartheme')}
+                                value={readMoreText || __('Read More', 'milliondollartheme')}
+                                onChange={val => setAttributes({readMoreText: val})}
+                            />
                         )}
                     </PanelBody>
                 </InspectorControls>

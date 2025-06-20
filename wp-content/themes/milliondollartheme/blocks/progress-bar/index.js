@@ -171,7 +171,15 @@ registerBlockType(name, {
                      <RichText.Content tagName="p" className="progress-bar-title is-position-above" value={barTitle} style={titleStyles} />
                 )}
                 <div className={`progress-bar-wrapper label-pos-${labelPosition}`}>
-                    <div className="progress-bar-track" style={barWrapperStyles}>
+                    <div
+                        className="progress-bar-track"
+                        style={barWrapperStyles}
+                        role="progressbar"
+                        aria-valuenow={percentage}
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        aria-label={barTitle ? `${barTitle} ${__('progress', 'milliondollartheme')}` : __('Progress bar', 'milliondollartheme')}
+                    >
                         <div className="progress-bar-fill" style={barFillStyles}>
                             {showLabel && labelPosition === 'inside' && (
                                 <span className="progress-bar-label is-inside" style={labelStyles}>{percentage}%</span>

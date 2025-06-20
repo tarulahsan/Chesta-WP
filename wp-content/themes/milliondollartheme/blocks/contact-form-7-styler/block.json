@@ -1,0 +1,34 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/contact-form-7-styler",
+    "title": "Contact Form 7 Styler",
+    "category": "milliondollartheme-blocks",
+    "description": "Select and apply theme styling to an existing Contact Form 7 form.",
+    "icon": "email-alt",
+    "keywords": ["contact form 7", "form", "styler", "contact", "cf7"],
+    "attributes": {
+        "formId": { "type": "number", "default": 0 },
+        "formStyle": { "type": "string", "default": "default" },
+        "hideLabels": { "type": "boolean", "default": false },
+        "usePlaceholders": { "type": "boolean", "default": true },
+        "fieldTextColor": { "type": "string" },
+        "fieldBgColor": { "type": "string" },
+        "fieldBorderColor": { "type": "string" },
+        "fieldFocusBorderColor": { "type": "string" },
+        "fieldBorderRadius": { "type": "string", "default": "var(--border-radius-sm)" },
+        "fieldPadding": { "type": "string", "default": "var(--spacing-sm)" },
+        "buttonStyle": { "type": "string", "default": "primary" },
+        "buttonFullWidth": { "type": "boolean", "default": false},
+        "buttonAlignment": { "type": "string", "default": "left"},
+        "align": { "type": "string", "default": "" }
+    },
+    "supports": {
+        "align": ["wide", "full"],
+        "html": false
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "style": "file:./style-index.css",
+    "render": "file:./render.php"
+}

@@ -128,6 +128,15 @@
     filter: brightness(1.1);
 }
 
+.wp-block-milliondollartheme-call-to-action.is-style-glassy .cta-button.is-style-secondary,
+.wp-block-milliondollartheme-call-to-action.is-style-gradient-bg .cta-button.is-style-secondary,
+.wp-block-milliondollartheme-call-to-action.is-style-image-bg .cta-button.is-style-secondary {
+    /* Adjust if secondary button needs different look on dark bg */
+    /* Example: background: var(--gradient-secondary-on-dark, var(--secondary-color)); */
+    /* color: var(--button-secondary-text-on-dark, var(--text-color-light)); */
+    /* No specific overrides by default, but provides a hook */
+}
+
 
 .cta-button.is-style-outline {
     background-color: transparent;

@@ -1,0 +1,56 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/image-carousel",
+    "title": "Image Carousel",
+    "category": "milliondollartheme-blocks",
+    "description": "A customizable carousel for displaying a series of images with various effects.",
+    "icon": "images-alt2",
+    "keywords": ["image", "carousel", "slider", "gallery", "slideshow"],
+    "attributes": {
+        "images": {
+            "type": "array",
+            "default": [],
+            "source": "query",
+            "selector": ".swiper-slide",
+            "query": {
+                "id": { "type": "string", "source": "attribute", "selector": "img", "attribute": "data-id"},
+                "url": { "type": "string", "source": "attribute", "selector": "img", "attribute": "src"},
+                "alt": { "type": "string", "source": "attribute", "selector": "img", "attribute": "alt"},
+                "caption": { "type": "string", "source": "html", "selector": ".swiper-caption"}
+            }
+        },
+        "slidesPerView": { "type": "number", "default": 1 },
+        "slidesPerViewTablet": { "type": "number", "default": 1 },
+        "slidesPerViewMobile": { "type": "number", "default": 1 },
+        "spaceBetween": { "type": "number", "default": 30 },
+        "loop": { "type": "boolean", "default": true },
+        "autoplay": { "type": "boolean", "default": false },
+        "delay": { "type": "number", "default": 3000 },
+        "showArrows": { "type": "boolean", "default": true },
+        "arrowStyle": { "type": "string", "default": "default" },
+        "arrowColor": { "type": "string" },
+        "arrowBgColor": { "type": "string" },
+        "showDots": { "type": "boolean", "default": true },
+        "dotStyle": { "type": "string", "default": "dots" },
+        "dotColor": { "type": "string" },
+        "activeDotColor": { "type": "string" },
+        "effect": { "type": "string", "default": "slide" },
+        "carouselStyle": { "type": "string", "default": "default" },
+        "imageFit": { "type": "string", "default": "cover" },
+        "imageHeight": { "type": "string", "default": "400px" },
+        "borderRadius": { "type": "string", "default": "var(--border-radius-md)"},
+        "imageLinkTarget": { "type": "string", "default": "none"},
+        "align": { "type": "string", "default": "" }
+    },
+    "supports": {
+        "align": ["wide", "full"],
+        "html": false,
+        "anchor": true
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css",
+    "viewScript": "file:./view.js"
+}

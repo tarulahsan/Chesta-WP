@@ -1,0 +1,192 @@
+/* --- Contact Form 7 Styler Block Styles (style-index.css) --- */
+.wp-block-milliondollartheme-contact-form-7-styler {
+    margin-bottom: var(--spacing-lg);
+    /* CSS Variables for field styling (set by render.php from attributes) */
+    --cf7-field-text-color-effective: var(--cf7-field-text-color, var(--text-color-dark));
+    --cf7-field-bg-color-effective: var(--cf7-field-bg-color, var(--background-color-light));
+    --cf7-field-border-color-effective: var(--cf7-field-border-color, var(--border-color, #ccc));
+    --cf7-field-focus-border-color-effective: var(--cf7-field-focus-border-color, var(--primary-color));
+    --cf7-field-border-radius-effective: var(--cf7-field-border-radius, var(--border-radius-sm));
+    --cf7-field-padding-effective: var(--cf7-field-padding, var(--spacing-sm));
+}
+
+/* Hide Labels */
+.wp-block-milliondollartheme-contact-form-7-styler.cf7-labels-hidden .theme-styled-cf7 label {
+    display: none !important; /* Important to override CF7 defaults if any */
+}
+.wp-block-milliondollartheme-contact-form-7-styler.cf7-labels-hidden.cf7-use-placeholders .theme-styled-cf7 .wpcf7-form-control-wrap {
+    /* margin-top: var(--spacing-sm); /* If labels had margin-bottom */
+}
+
+
+.wp-block-milliondollartheme-contact-form-7-styler .theme-styled-cf7 p {
+    margin-bottom: var(--spacing-md, 16px);
+}
+
+.wp-block-milliondollartheme-contact-form-7-styler .theme-styled-cf7 label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs, 4px);
+    font-family: var(--font-family-body);
+    color: var(--cf7-field-text-color-effective); /* Labels match field text color by default */
+}
+
+.wp-block-milliondollartheme-contact-form-7-styler .theme-styled-cf7 .wpcf7-form-control:not(.wpcf7-submit) { /* Exclude submit button */
+    width: 100%;
+    padding: var(--cf7-field-padding-effective);
+    font-family: var(--font-family-body);
+    font-size: 1em;
+    border: 1px solid var(--cf7-field-border-color-effective);
+    border-radius: var(--cf7-field-border-radius-effective);
+    background-color: var(--cf7-field-bg-color-effective);
+    color: var(--cf7-field-text-color-effective);
+    transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    box-sizing: border-box;
+}
+.wp-block-milliondollartheme-contact-form-7-styler .theme-styled-cf7 textarea.wpcf7-form-control {
+    min-height: 120px;
+    resize: vertical;
+}
+.wp-block-milliondollartheme-contact-form-7-styler .theme-styled-cf7 .wpcf7-form-control:not(.wpcf7-submit):focus {
+    border-color: var(--cf7-field-focus-border-color-effective);
+    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb, 0,82,212), 0.2);
+    outline: none;
+}
+
+/* Submit Button Styling */
+.wp-block-milliondollartheme-contact-form-7-styler .wpcf7-form p:last-of-type { /* Often where submit button is */
+    text-align: var(--cf7-button-align, left); /* Default to left from attr */
+}
+.wp-block-milliondollartheme-contact-form-7-styler.cf7-button-align-center .wpcf7-form p:last-of-type { text-align: center; }
+.wp-block-milliondollartheme-contact-form-7-styler.cf7-button-align-right .wpcf7-form p:last-of-type { text-align: right; }
+
+
+.wp-block-milliondollartheme-contact-form-7-styler .theme-styled-cf7 .wpcf7-submit {
+    display: inline-block;
+    text-decoration: none;
+    font-family: var(--font-family-heading);
+    font-weight: 700;
+    transition: all var(--transition-speed) ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+    padding: var(--button-padding-vertical, var(--spacing-sm)) var(--button-padding-horizontal, var(--spacing-lg));
+    font-size: var(--button-font-size, 1em);
+    border-radius: var(--button-border-radius, var(--border-radius-sm));
+    text-align: center;
+    line-height: 1.5;
+    width: auto;
+}
+.wp-block-milliondollartheme-contact-form-7-styler.cf7-button-full-width .theme-styled-cf7 .wpcf7-submit {
+    width: 100%;
+    display: block;
+}
+.wp-block-milliondollartheme-contact-form-7-styler .theme-styled-cf7 .wpcf7-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+/* Button Style Variations */
+.wp-block-milliondollartheme-contact-form-7-styler.cf7-button-style-primary .wpcf7-submit {
+    background: var(--gradient-primary, var(--primary-color));
+    color: var(--button-primary-text-color, var(--text-color-light));
+}
+.wp-block-milliondollartheme-contact-form-7-styler.cf7-button-style-secondary .wpcf7-submit {
+    background: var(--gradient-secondary, var(--secondary-color));
+    color: var(--button-secondary-text-color, var(--text-color-light));
+}
+.wp-block-milliondollartheme-contact-form-7-styler.cf7-button-style-outline .wpcf7-submit {
+    background-color: transparent;
+    border-color: var(--button-outline-border-color, var(--primary-color));
+    color: var(--button-outline-text-color, var(--primary-color));
+}
+.wp-block-milliondollartheme-contact-form-7-styler.cf7-button-style-outline .wpcf7-submit:hover {
+    background-color: var(--button-outline-hover-bg-color, var(--primary-color));
+    color: var(--button-outline-hover-text-color, var(--text-color-light));
+    border-color: var(--button-outline-hover-bg-color, var(--primary-color));
+}
+.wp-block-milliondollartheme-contact-form-7-styler.cf7-button-style-glassy .wpcf7-submit {
+    background: var(--glass-bg-color);
+    backdrop-filter: blur(var(--glass-blur-radius));
+    -webkit-backdrop-filter: blur(var(--glass-blur-radius));
+    border: 1px solid var(--glass-border-color);
+    color: var(--button-glassy-text-color, var(--text-color-light));
+    box-shadow: var(--glass-box-shadow-light);
+}
+.wp-block-milliondollartheme-contact-form-7-styler.cf7-button-style-glassy .wpcf7-submit:hover {
+    background: rgba(255,255,255,0.25);
+    border-color: rgba(255,255,255,0.35);
+}
+
+
+/* Overall Form Style Variations */
+/* Glassy Fields Style */
+.wp-block-milliondollartheme-contact-form-7-styler.cf7-style-glassy-fields {
+}
+.wp-block-milliondollartheme-contact-form-7-styler.cf7-style-glassy-fields .theme-styled-cf7 .wpcf7-form-control:not(.wpcf7-submit) {
+    background: var(--cf7-field-bg-color-effective, var(--glass-bg-color-input, rgba(255,255,255,0.15)));
+    backdrop-filter: blur(var(--glass-blur-radius-input, 5px));
+    -webkit-backdrop-filter: blur(var(--glass-blur-radius-input, 5px));
+    border: 1px solid var(--cf7-field-border-color-effective, var(--glass-border-color-input, rgba(255,255,255,0.25)));
+    color: var(--cf7-field-text-color-effective, var(--text-color-on-glass-input, var(--text-color-light)));
+    box-shadow: none;
+}
+.wp-block-milliondollartheme-contact-form-7-styler.cf7-style-glassy-fields .theme-styled-cf7 .wpcf7-form-control:not(.wpcf7-submit):focus {
+    border-color: var(--cf7-field-focus-border-color-effective, var(--glass-border-color-focus, rgba(255,255,255,0.5)));
+    box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb,0,82,212),0.15);
+}
+.wp-block-milliondollartheme-contact-form-7-styler.cf7-style-glassy-fields .theme-styled-cf7 label {
+    color: var(--cf7-field-text-color-effective, var(--text-color-on-glass-label, var(--text-color-light)));
+}
+
+
+/* Minimal Style */
+.wp-block-milliondollartheme-contact-form-7-styler.cf7-style-minimal .theme-styled-cf7 .wpcf7-form-control:not(.wpcf7-submit) {
+    background-color: transparent;
+    border-style: none none solid none;
+    border-bottom-width: 2px;
+    border-bottom-color: var(--cf7-field-border-color-effective);
+    border-radius: 0;
+    padding-left: 0; padding-right: 0;
+}
+.wp-block-milliondollartheme-contact-form-7-styler.cf7-style-minimal .theme-styled-cf7 .wpcf7-form-control:not(.wpcf7-submit):focus {
+    border-bottom-color: var(--cf7-field-focus-border-color-effective);
+    box-shadow: none;
+}
+
+
+/* CF7 Response Output Styling */
+.wp-block-milliondollartheme-contact-form-7-styler .wpcf7-response-output {
+    margin: var(--spacing-md, 16px) 0;
+    padding: var(--spacing-md, 16px);
+    border-radius: var(--border-radius-md);
+    border-width: 1px;
+    border-style: solid;
+    line-height: 1.6;
+}
+.wp-block-milliondollartheme-contact-form-7-styler .wpcf7-mail-sent-ok {
+    background-color: var(--alert-success-bg, var(--alert-success-bg-default));
+    border-color: var(--alert-success-border, var(--alert-success-border-default));
+    color: var(--alert-success-text, var(--alert-success-text-default));
+}
+.wp-block-milliondollartheme-contact-form-7-styler .wpcf7-mail-sent-ng,
+.wp-block-milliondollartheme-contact-form-7-styler .wpcf7-spam-blocked,
+.wp-block-milliondollartheme-contact-form-7-styler .wpcf7-validation-errors {
+    background-color: var(--alert-error-bg, var(--alert-error-bg-default));
+    border-color: var(--alert-error-border, var(--alert-error-border-default));
+    color: var(--alert-error-text, var(--alert-error-text-default));
+}
+.wp-block-milliondollartheme-contact-form-7-styler span.wpcf7-not-valid-tip {
+    color: var(--alert-error-text, var(--alert-error-text-default));
+    font-size: 0.9em;
+    margin-top: var(--spacing-xs);
+    display: block;
+}
+
+.cf7-error-message, .cf7-editor-message {
+    padding: var(--spacing-md);
+    background-color: var(--alert-warning-bg-default);
+    border: 1px solid var(--alert-warning-border-default);
+    color: var(--alert-warning-text-default);
+    border-radius: var(--border-radius-sm);
+    text-align: center;
+}

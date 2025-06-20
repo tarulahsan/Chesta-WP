@@ -1,0 +1,105 @@
+/* style-index.css - Shared front-end and editor styles for Icon List */
+
+.million-dollar-icon-list {
+    padding-left: 0; /* Reset browser default for ul/ol */
+    margin-bottom: var(--wp--preset--spacing--md, 1.5em); /* Consistent bottom margin */
+}
+
+/* Handle list style type based on the tag used (ul, ol, or div) */
+.million-dollar-icon-list.icon-list-items-container:not(.div-list) {
+    /* Default padding for ul/ol if not a div list (browser default is usually around 40px) */
+    /* Depending on design, might want custom padding-left if using actual list markers */
+}
+
+.million-dollar-icon-list.div-list {
+    list-style: none; /* Explicitly remove list styling for div based lists */
+    padding-left: 0;
+}
+.million-dollar-icon-list ul,
+.million-dollar-icon-list ol {
+    padding-left: 1.2em; /* Default indentation for actual lists, adjust as needed */
+    list-style-position: inside; /* Or outside, depending on design preference */
+}
+
+
+.million-dollar-icon-list .icon-list-item {
+    display: flex;
+    align-items: flex-start; /* Align icon with the start of the text block */
+    margin-bottom: var(--list-item-spacing, 0.5em); /* Vertical spacing between items */
+}
+
+.million-dollar-icon-list .icon-list-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Icon Styling */
+.million-dollar-icon-list .icon-list-item .dashicons {
+    margin-right: var(--list-icon-text-gap, 0.5em); /* Gap between icon and text */
+    /* font-size is set inline by ListItemIcon component via globalIconSize attribute */
+    /* color is set inline by ListItemIcon component via item.iconColor or globalIconColor */
+    flex-shrink: 0; /* Prevent icon from shrinking if text is long */
+    line-height: 1.2; /* Adjust if specific icon set needs vertical alignment tuning */
+}
+
+/* Text Styling */
+.million-dollar-icon-list .icon-list-item .icon-list-item-text {
+    /* color is set inline by RichText via item.textColor or globalTextColor */
+    flex-grow: 1; /* Allow text to take available space */
+    line-height: 1.5; /* Standard line height for readability */
+}
+
+/* Link Styling */
+.million-dollar-icon-list .icon-list-item a {
+    text-decoration: none; /* Default, can be overridden by theme styles */
+    color: inherit; /* Inherit color from text or global settings */
+    display: inline-flex; /* To align with icon if link wraps text */
+    align-items: flex-start;
+}
+.million-dollar-icon-list .icon-list-item a .icon-list-item-text {
+     width: 100%; /* Ensure text within link takes full available width */
+}
+
+
+.million-dollar-icon-list .icon-list-item a:hover {
+    text-decoration: underline; /* Common hover effect */
+}
+
+/* Alignment - WordPress core classes usually handle this via .has-text-align-* on the wrapper */
+/* These are fallbacks or can be more specific if needed */
+.million-dollar-icon-list.align-left .icon-list-item,
+.million-dollar-icon-list.has-text-align-left .icon-list-item {
+    justify-content: flex-start; /* Align item content (icon + text) to the left */
+    text-align: left;
+}
+
+.million-dollar-icon-list.align-center .icon-list-item,
+.million-dollar-icon-list.has-text-align-center .icon-list-item {
+    justify-content: center; /* Center item content */
+    text-align: center; /* Center text within its container */
+}
+.million-dollar-icon-list.align-center .icon-list-item .dashicons {
+    /* If centered, the icon + text block is centered. Icon is still usually left of text. */
+}
+
+
+.million-dollar-icon-list.align-right .icon-list-item,
+.million-dollar-icon-list.has-text-align-right .icon-list-item {
+    justify-content: flex-end; /* Align item content to the right */
+    text-align: right;
+}
+/* If text align right, might want icon on the other side */
+.million-dollar-icon-list.has-text-align-right .icon-list-item .dashicons {
+    order: 1; /* Place icon after text */
+    margin-left: var(--list-icon-text-gap, 0.5em);
+    margin-right: 0;
+}
+.million-dollar-icon-list.has-text-align-right .icon-list-item .icon-list-item-content-wrapper {
+    order: 0;
+}
+
+/* Placeholder for empty list in front-end (if needed, usually handled by not rendering) */
+.million-dollar-icon-list:empty::before {
+    /* content: "Icon list is empty."; */
+    /* display: block; */
+    /* color: #777; */
+}

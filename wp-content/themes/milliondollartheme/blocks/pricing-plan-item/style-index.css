@@ -166,13 +166,42 @@
 }
 
 /* Apply button styles based on class (fallbacks if inline styles from JS are not fully set) */
-.plan-button.is-button-style-primary { background: var(--buttonBgColor, var(--gradient-primary)); color: var(--buttonTextColor, var(--text-color-light)); border-color: var(--buttonBorderColor, transparent); background-image: var(--buttonGradient); }
-.plan-button.is-button-style-secondary { background: var(--buttonBgColor, var(--gradient-secondary)); color: var(--buttonTextColor, var(--text-color-light)); border-color: var(--buttonBorderColor, transparent); background-image: var(--buttonGradient); }
-.plan-button.is-button-style-outline { background: var(--buttonBgColor, transparent); color: var(--buttonTextColor, var(--primary-color)); border-color: var(--buttonBorderColor, var(--primary-color)); }
+.plan-button.is-button-style-primary {
+    background: var(--buttonBgColor, var(--gradient-primary, var(--primary-color)));
+    color: var(--buttonTextColor, var(--text-color-light));
+    border-color: var(--buttonBorderColor, transparent);
+    background-image: var(--buttonGradient); /* Will be undefined if not set */
+}
+.plan-button.is-button-style-secondary {
+    background: var(--buttonBgColor, var(--gradient-secondary, var(--secondary-color)));
+    color: var(--buttonTextColor, var(--text-color-light));
+    border-color: var(--buttonBorderColor, transparent);
+    background-image: var(--buttonGradient); /* Will be undefined if not set */
+}
+.plan-button.is-button-style-outline {
+    background: var(--buttonBgColor, transparent);
+    color: var(--buttonTextColor, var(--primary-color));
+    border-color: var(--buttonBorderColor, var(--primary-color));
+}
+
+.plan-button.is-button-style-glassy {
+    background: var(--buttonBgColor, var(--glass-bg-color, rgba(255, 255, 255, 0.1)));
+    backdrop-filter: blur(var(--glass-blur-radius, 10px));
+    -webkit-backdrop-filter: blur(var(--glass-blur-radius, 10px));
+    border: 1px solid var(--buttonBorderColor, var(--glass-border-color, rgba(255, 255, 255, 0.2)));
+    color: var(--buttonTextColor, var(--text-color-light, #ffffff));
+    box-shadow: var(--glass-box-shadow-light, 0 2px 5px rgba(0,0,0,0.1));
+}
+.plan-button.is-button-style-glassy:hover {
+    background: rgba(255,255,255,0.25);
+    border-color: rgba(255,255,255,0.35);
+}
 
 .wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-button.is-button-style-outline {
-    border-color: var(--buttonBorderColor, var(--text-color-light)); color: var(--buttonTextColor, var(--text-color-light));
+    border-color: var(--buttonBorderColor, var(--text-color-light));
+    color: var(--buttonTextColor, var(--text-color-light));
 }
 .wp-block-milliondollartheme-pricing-plan-item.is-style-glassy .plan-button.is-button-style-outline:hover {
-    background-color: var(--text-color-light); color: var(--primary-color);
+    background-color: var(--text-color-light);
+    color: var(--primary-color);
 }

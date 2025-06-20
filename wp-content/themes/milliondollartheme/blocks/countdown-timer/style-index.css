@@ -1,0 +1,159 @@
+/* --- Countdown Timer Block Styles (style-index.css) --- */
+.wp-block-milliondollartheme-countdown-timer {
+    /* text-align from has-text-align-* class is applied to this wrapper by WP */
+    /* --countdown-gap is applied inline by save() to this wrapper for the flex/grid gap */
+    /* Core background/text colors apply here if set by user */
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Alignment helpers if not using direct flex on wrapper */
+.wp-block-milliondollartheme-countdown-timer.has-text-align-left .countdown-timer-dynamic-wrapper,
+.wp-block-milliondollartheme-countdown-timer.has-text-align-left .countdown-timer-preview {
+    justify-content: flex-start;
+}
+.wp-block-milliondollartheme-countdown-timer.has-text-align-center .countdown-timer-dynamic-wrapper,
+.wp-block-milliondollartheme-countdown-timer.has-text-align-center .countdown-timer-preview {
+    justify-content: center;
+}
+.wp-block-milliondollartheme-countdown-timer.has-text-align-right .countdown-timer-dynamic-wrapper,
+.wp-block-milliondollartheme-countdown-timer.has-text-align-right .countdown-timer-preview {
+    justify-content: flex-end;
+}
+
+.countdown-timer-dynamic-wrapper,
+.countdown-timer-preview { /* Editor preview also uses this structure */
+    display: flex;
+    flex-wrap: wrap;
+    /* justify-content is inherited from parent's text-align helper classes */
+    gap: var(--countdown-gap, var(--spacing-md)); /* Use CSS var from save() or fallback */
+}
+
+.countdown-digit-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Default alignment within a digit block */
+    min-width: 70px; /* Slightly wider min-width */
+    /* padding, borderRadius, backgroundColor, borderColor applied inline by JS from attributes */
+    /* Default values if attributes are not set for custom/boxed styles */
+    padding: var(--digit-block-padding, var(--spacing-sm)); /* Default padding */
+    border-radius: var(--digit-block-border-radius, var(--border-radius-sm)); /* Default radius */
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+.countdown-digit-block:hover {
+    /* transform: translateY(-2px); /* Subtle hover for digit blocks */
+    /* box-shadow: 0 4px 10px rgba(0,0,0,0.05); */
+}
+
+
+.countdown-digit-block .countdown-number {
+    font-family: var(--font-family-heading);
+    font-weight: 900; /* Bolder numbers */
+    line-height: 1; /* Ensure tight line height for numbers */
+    display: block;
+    /* font-size and color from CSS vars set by save() or attributes */
+    font-size: var(--countdown-number-fs, 2.5em);
+    color: var(--countdown-number-color, var(--text-color-dark));
+    margin-bottom: var(--spacing-xs); /* Space between number and label */
+}
+.countdown-digit-block .countdown-label {
+    font-family: var(--font-family-body);
+    font-size: var(--countdown-label-fs, 0.8em);
+    color: var(--countdown-label-color, var(--text-color-dark));
+    opacity: 0.75; /* Slightly more visible label */
+    text-transform: uppercase;
+    letter-spacing: 0.8px; /* Wider letter spacing */
+    display: block;
+    line-height: 1.2;
+}
+
+.countdown-expired-message-placeholder,
+.countdown-expired-message-content { /* Class on the RichText.Content wrapper */
+    font-size: 1.3em; /* Larger expired message */
+    font-weight: 600;
+    font-family: var(--font-family-heading);
+    text-align: center;
+    padding: var(--spacing-lg); /* More padding for expired message */
+    color: var(--primary-color); /* Themed color */
+}
+
+/* Style Variations for Digit Blocks (applied to .wp-block-milliondollartheme-countdown-timer) */
+/* Default style digit blocks (transparent background, no border unless set by attributes) */
+.wp-block-milliondollartheme-countdown-timer.is-style-default .countdown-digit-block {
+    /* background-color: transparent; */ /* Default from no style */
+    /* border: none; */
+    /* padding: var(--spacing-xs) 0; /* Minimal padding for default style */
+}
+
+/* Boxed Style */
+.wp-block-milliondollartheme-countdown-timer.is-style-boxed .countdown-digit-block {
+    /* background-color, border-color, padding, border-radius applied inline by JS from attributes */
+    /* Fallback if attributes are not set: */
+    background-color: var(--digit-block-bg-boxed, rgba(var(--primary-color-rgb,0,82,212),0.08));
+    border: 1px solid var(--digit-block-border-boxed, rgba(var(--primary-color-rgb,0,82,212),0.15));
+    box-shadow: var(--shadow-xs, 0 1px 3px rgba(0,0,0,0.03));
+}
+.wp-block-milliondollartheme-countdown-timer.is-style-boxed .countdown-digit-block:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+
+/* Glassy Box Style */
+.wp-block-milliondollartheme-countdown-timer.is-style-glassy-box .countdown-digit-block {
+    /* background, backdrop-filter, border, box-shadow applied by inline JS if digitBlockBackgroundColor is set to glassy vars */
+    /* Or, apply glassy effect directly if specific attributes are not set by user */
+    background: var(--digit-block-bg-glassy, var(--glass-bg-color));
+    backdrop-filter: blur(var(--glass-blur-radius));
+    -webkit-backdrop-filter: blur(var(--glass-blur-radius));
+    border: 1px solid var(--digit-block-border-glassy, var(--glass-border-color));
+    box-shadow: var(--glass-box-shadow-light);
+}
+.wp-block-milliondollartheme-countdown-timer.is-style-glassy-box .countdown-number,
+.wp-block-milliondollartheme-countdown-timer.is-style-glassy-box .countdown-label {
+    /* color: var(--text-color-light); /* Inline styles from attributes should take precedence */
+}
+.wp-block-milliondollartheme-countdown-timer.is-style-glassy-box .countdown-digit-block:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: var(--glass-box-shadow); /* Slightly stronger shadow on hover */
+}
+
+
+/* Custom Style (relies entirely on inline styles from attributes) */
+.wp-block-milliondollartheme-countdown-timer.is-style-custom .countdown-digit-block {
+    /* All styling (bg, border, padding, radius) comes from inline styles */
+}
+
+
+/* Responsive */
+@media (max-width: 767px) { /* Mobile */
+    .countdown-timer-dynamic-wrapper, .countdown-timer-preview {
+        gap: var(--spacing-sm, 8px); /* Reduced gap */
+        justify-content: center !important; /* Force center for all alignments on mobile */
+    }
+    .countdown-digit-block {
+        min-width: 55px; /* Slightly smaller min-width */
+        padding: var(--spacing-xs); /* Reduce padding */
+    }
+    /* Number and Label font sizes are controlled by attributes which can include responsive units like vw,
+       or use clamp(). For direct CSS override example: */
+    .countdown-digit-block .countdown-number {
+        /* font-size: calc(var(--countdown-number-fs, 2.5em) * 0.65); */
+    }
+    .countdown-digit-block .countdown-label {
+        /* font-size: calc(var(--countdown-label-fs, 0.8em) * 0.8); */
+    }
+    .countdown-expired-message-placeholder, .countdown-expired-message-content {
+        font-size: 1.1em;
+        padding: var(--spacing-md);
+    }
+}
+@media (max-width: 400px) { /* Very small mobile */
+    .countdown-timer-dynamic-wrapper, .countdown-timer-preview {
+        gap: var(--spacing-xs, 4px);
+    }
+     .countdown-digit-block {
+        min-width: 45px;
+        padding: var(--spacing-xs) calc(var(--spacing-xs)/2);
+    }
+    /* Further scale down fonts if necessary */
+}

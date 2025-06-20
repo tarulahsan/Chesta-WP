@@ -1,0 +1,37 @@
+/* --- Image Carousel Block Editor Styles (index.css) --- */
+.wp-block-milliondollartheme-image-carousel {
+    border: 1px dashed #ccc;
+    padding: 16px;
+    min-height: 150px;
+}
+.image-carousel-editor-preview {
+    /* Styling for the static list of images in editor */
+}
+.editor-image-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+.editor-image-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid #eee;
+    padding: 8px; /* More padding */
+    background: #f9f9f9;
+    border-radius: var(--border-radius-sm); /* Use theme var */
+    max-width: 120px; /* Control item width */
+}
+.editor-image-item img {
+    max-width: 100px;
+    height: 75px; /* Fixed height for preview thumbs */
+    object-fit: cover; /* Ensure image covers */
+    display: block;
+    margin-bottom: 5px;
+    border-radius: var(--border-radius-xs);
+}
+.editor-image-item .components-button.is-destructive.is-small {
+    width: 100%; /* Make remove button full width of item */
+}

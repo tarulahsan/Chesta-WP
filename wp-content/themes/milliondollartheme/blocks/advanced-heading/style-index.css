@@ -76,18 +76,22 @@
 
 /* --- Responsiveness for Advanced Heading --- */
 @media (max-width: 767px) { /* Mobile */
-    .adv-heading-main {
-        /* Example: Fluid typography or smaller fixed sizes */
-        /* font-size: clamp(1.8rem, 5vw, 2.5rem); /* Adjust as needed */
-        /* Or rely on theme's responsive H tag styles */
+    .wp-block-milliondollartheme-advanced-heading .adv-heading-main,
+    .adv-heading-main { /* If used outside editor preview */
+        font-size: var(--responsive-h-font-size, 2em); /* Example, adjust based on desktop H level. Use CSS var for easier override. */
+        /* Consider clamp() if used elsewhere: font-size: clamp(1.8rem, 5vw, 2.5rem); */
+        line-height: 1.3;
     }
+    .wp-block-milliondollartheme-advanced-heading .adv-heading-sub,
     .adv-heading-sub {
-        /* font-size: clamp(0.8rem, 2vw, 1rem); /* Adjust, or ensure inline style is responsive if using em */
+        font-size: var(--responsive-sub-font-size, 0.85em); /* Example */
+        line-height: 1.4;
     }
+    .wp-block-milliondollartheme-advanced-heading .adv-heading-decorator,
     .adv-heading-decorator {
-        /* Potentially adjust width/thickness if set in px */
-        /* e.g. if width is 50px, it might be too large on small mobile.
-           This would ideally be handled by responsive attributes or % width.
-        */
+        /* Adjust width/thickness if set in px and looks too large */
+        /* Example: width: 40px; height: 2px; */
+        margin-top: var(--responsive-decorator-margin-top, 0.3em);
+        margin-bottom: var(--responsive-decorator-margin-bottom, 0.3em);
     }
 }

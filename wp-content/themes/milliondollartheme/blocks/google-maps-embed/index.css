@@ -1,0 +1,22 @@
+/* --- Google Maps Embed Editor Styles (index.css) --- */
+.wp-block-milliondollartheme-google-maps-embed {
+    border: 1px dashed #ccc;
+    min-height: 250px; /* Increased min-height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa; /* Light BG for editor placeholder area */
+}
+/* Styling for the API key error message specifically in the editor */
+.wp-block-milliondollartheme-google-maps-embed p.map-api-key-error-message {
+    padding: 1em;
+    background-color: #fff3cd; /* Warning color */
+    border: 1px solid #ffeeba;
+    color: #856404;
+    margin: 1em; /* Space around message */
+    text-align: center;
+    font-size: 0.9em;
+}
+.wp-block-milliondollartheme-google-maps-embed p.map-api-key-error-message a {
+    color: #664d03; /* Darker link for accessibility */
+}

@@ -1,0 +1,43 @@
+/* --- Countdown Timer Block Editor Styles (index.css) --- */
+.wp-block-milliondollartheme-countdown-timer .countdown-timer-preview {
+    padding: var(--spacing-sm, 8px);
+    /* border: 1px dashed #ccc; */ /* Optional guide */
+    /* Inline styles from JS for gap will apply */
+    /* justify-content based on has-text-align-* class */
+}
+.wp-block-milliondollartheme-countdown-timer.has-text-align-left .countdown-timer-preview { justify-content: flex-start; }
+.wp-block-milliondollartheme-countdown-timer.has-text-align-center .countdown-timer-preview { justify-content: center; }
+.wp-block-milliondollartheme-countdown-timer.has-text-align-right .countdown-timer-preview { justify-content: flex-end; }
+
+
+.wp-block-milliondollartheme-countdown-timer .countdown-timer-preview .countdown-digit-block {
+    /* display: inline-block; /* Flex is now on parent */
+    /* text-align: center; /* From parent alignment */
+    /* Inline styles from JS (padding, border-radius, bg, border) will apply for preview */
+}
+.wp-block-milliondollartheme-countdown-timer .countdown-timer-preview .countdown-digit-block.preview-style-boxed {
+    /* background-color: #f0f0f0; /* JS applies this */
+    /* border: 1px solid #ddd; */
+}
+.wp-block-milliondollartheme-countdown-timer .countdown-timer-preview .countdown-digit-block.preview-style-glassy-box {
+    /* background: rgba(50,50,150,0.1); /* JS applies this */
+    /* border: 1px solid rgba(255,255,255,0.1); */
+}
+
+
+.wp-block-milliondollartheme-countdown-timer .components-datetime-picker__time-field input[type="number"] {
+    width: auto;
+    min-width: 45px; /* Ensure usability */
+    padding: 4px; /* Make them smaller */
+}
+.countdown-expired-message-editor-preview {
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-sm);
+    background-color: #f5f5f5;
+    border: 1px dashed #ccc;
+    border-radius: var(--border-radius-sm);
+}
+.countdown-expired-message-editor-preview .rich-text {
+    font-style: italic;
+    opacity: 0.8;
+}

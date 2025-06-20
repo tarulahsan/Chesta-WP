@@ -1,0 +1,41 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/icon-list",
+    "title": "Icon List",
+    "category": "milliondollartheme-blocks",
+    "description": "Create lists where each item is prefixed with a customizable icon.",
+    "icon": "editor-ul",
+    "keywords": ["list", "icon", "checklist", "features", "bullet points"],
+    "attributes": {
+        "items": {
+            "type": "array",
+            "default": [
+                { "id": "item1", "text": "List Item 1 with Icon", "icon": "check-circle", "linkUrl": "", "iconColor": "", "textColor": "" },
+                { "id": "item2", "text": "Another List Item", "icon": "star", "linkUrl": "", "iconColor": "", "textColor": "" }
+            ]
+        },
+        "globalIcon": { "type": "string", "default": "check-circle" },
+        "globalIconSize": { "type": "string", "default": "1.2em" },
+        "globalIconColor": { "type": "string" },
+        "globalTextColor": { "type": "string" },
+        "itemSpacing": { "type": "string", "default": "var(--spacing-sm)" },
+        "iconTextGap": { "type": "string", "default": "var(--spacing-xs)" },
+        "listStyleType": { "type": "string", "default": "ul" },
+        "align": { "type": "string", "default": "" }
+    },
+    "supports": {
+        "align": ["wide", "full"],
+        "html": false,
+        "anchor": true,
+        "color": {
+            "text": true,
+            "background": true,
+            "link": true
+        }
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css"
+}

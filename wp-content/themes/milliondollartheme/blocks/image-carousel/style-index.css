@@ -1,0 +1,205 @@
+/* --- Image Carousel Block Styles (style-index.css) --- */
+/* Ensure Swiper CSS is loaded (either globally by theme or specifically by this block via PHP) */
+
+.wp-block-milliondollartheme-image-carousel {
+    position: relative;
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Fallback for when Swiper JS fails to load */
+.swiper-container-wrapper.swiper-not-loaded .swiper {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+.swiper-container-wrapper.swiper-not-loaded .swiper-slide {
+    flex: 0 0 auto; /* Prevent shrinking, allow auto width based on content or explicit width */
+    scroll-snap-align: start;
+    margin-right: var(--spaceBetween, 16px); /* Use variable if available */
+}
+.swiper-container-wrapper.swiper-not-loaded .swiper-slide:last-child { margin-right: 0; }
+.swiper-container-wrapper.swiper-not-loaded .swiper-button-prev,
+.swiper-container-wrapper.swiper-not-loaded .swiper-button-next,
+.swiper-container-wrapper.swiper-not-loaded .swiper-pagination {
+    display: none !important; /* Hide Swiper controls if JS failed */
+}
+
+
+.swiper-container-wrapper .swiper {
+    width: 100%;
+    height: var(--slide-height, 400px);
+    border-radius: var(--slide-border-radius, var(--border-radius-md));
+    overflow: hidden;
+    position: relative; /* For absolute positioned elements inside like captions */
+}
+
+.swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 18px; /* Default Swiper text size, can be removed */
+    background: var(--slide-bg-fallback, #e9ecef); /* Fallback slide background */
+    overflow: hidden;
+    position: relative;
+    border-radius: inherit;
+}
+
+.swiper-slide img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: var(--slide-image-fit, cover);
+}
+
+.swiper-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(var(--text-color-dark-rgb, 26,26,26), 0.75); /* Darker overlay for caption */
+    color: var(--text-color-light, #fff);
+    padding: var(--spacing-sm, 8px) var(--spacing-md, 16px);
+    font-size: 0.9em;
+    text-align: center;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0; /* Hidden by default, show on hover or if always visible */
+    transform: translateY(10px);
+}
+.swiper-slide:hover .swiper-caption { /* Show caption on slide hover */
+    opacity: 1;
+    transform: translateY(0);
+}
+.swiper-caption p { margin: 0; }
+
+
+/* Swiper Navigation Arrows - Using CSS Vars from save() */
+.swiper-button-prev,
+.swiper-button-next {
+    color: var(--swiper-nav-color, var(--primary-color));
+    background-color: var(--swiper-nav-bg, rgba(255,255,255,0.85));
+    border-radius: 50%;
+    width: 48px; /* Slightly larger */
+    height: 48px;
+    margin-top: -24px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+    background-color: var(--swiper-nav-bg-hover, var(--primary-color));
+    color: var(--swiper-nav-color-hover, var(--text-color-light));
+    transform: scale(1.1);
+}
+.swiper-button-prev::after,
+.swiper-button-next::after {
+    font-size: 20px !important;
+    font-weight: bold;
+}
+
+/* Swiper Pagination Dots - Using CSS Vars from save() */
+.swiper-pagination {
+    bottom: var(--spacing-sm, 12px) !important; /* Ensure it's above slide edge if slide has radius */
+}
+.swiper-pagination .swiper-pagination-bullet {
+    background: var(--swiper-pagination-bullet-color, var(--text-color-dark)); /* Default color for dots */
+    opacity: 0.4;
+    width: 10px; height: 10px;
+    transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+.swiper-pagination .swiper-pagination-bullet-active {
+    background: var(--swiper-pagination-bullet-active-color, var(--primary-color)); /* Active color for dots */
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+/* Block Style Variations for the wrapper */
+.wp-block-milliondollartheme-image-carousel.is-style-glassy-wrapper {
+    background: var(--glass-bg-color);
+    backdrop-filter: blur(var(--glass-blur-radius));
+    -webkit-backdrop-filter: blur(var(--glass-blur-radius));
+    border: 1px solid var(--glass-border-color);
+    box-shadow: var(--glass-box-shadow);
+    padding: var(--spacing-lg, 32px); /* More padding for glassy frame */
+    border-radius: var(--border-radius-xl, 24px); /* Larger radius for wrapper */
+}
+/* Ensure Swiper container inside glassy wrapper respects its own border-radius from attribute */
+.wp-block-milliondollartheme-image-carousel.is-style-glassy-wrapper .swiper {
+    /* border-radius: var(--slide-border-radius); /* Already set by inline style on swiper */
+}
+
+
+/* Effect Specifics (Swiper CSS usually handles most of this) */
+.swiper-fade .swiper-slide {
+    transition-property: opacity !important; /* Ensure fade transition is smooth */
+}
+/* Add styles for cube, coverflow, flip if Swiper CSS needs overrides or specific container setups */
+
+
+/* Responsive */
+@media (max-width: 767px) { /* Mobile */
+    .swiper {
+        /* height: calc(var(--slide-height, 400px) * 0.65); /* Example: reduce height significantly */
+    }
+    .swiper-button-prev, .swiper-button-next {
+        width: 40px; height: 40px; margin-top: -20px; /* Smaller arrows */
+    }
+    .swiper-button-prev::after, .swiper-button-next::after {
+        font-size: 16px !important;
+    }
+    .swiper-caption {
+        font-size: 0.8em;
+        padding: var(--spacing-xs);
+    }
+    .wp-block-milliondollartheme-image-carousel.is-style-glassy-wrapper {
+        padding: var(--spacing-md, 16px); /* Less padding for glassy frame on mobile */
+    }
+}
+
+/* Arrow Style Variations */
+/* Ensure these selectors are specific enough and do not conflict with other Swiper instances if any */
+.wp-block-milliondollartheme-image-carousel .swiper-container-wrapper[data-arrow-style="default"] .swiper-button-prev,
+.wp-block-milliondollartheme-image-carousel .swiper-container-wrapper[data-arrow-style="default"] .swiper-button-next {
+    /* Default Swiper styles + colors from CSS vars handle this. Colors are --swiper-navigation-color and --swiper-navigation-bg (if applicable) */
+    /* Ensure they are visible on various backgrounds */
+}
+.wp-block-milliondollartheme-image-carousel .swiper-container-wrapper[data-arrow-style="circle-bg"] .swiper-button-prev,
+.wp-block-milliondollartheme-image-carousel .swiper-container-wrapper[data-arrow-style="circle-bg"] .swiper-button-next {
+    border-radius: 50%;
+    background-color: var(--swiper-navigation-bg, rgba(255,255,255,0.85));
+    color: var(--swiper-navigation-color, #000); /* Ensure contrast with bg */
+}
+.wp-block-milliondollartheme-image-carousel .swiper-container-wrapper[data-arrow-style="square-bg"] .swiper-button-prev,
+.wp-block-milliondollartheme-image-carousel .swiper-container-wrapper[data-arrow-style="square-bg"] .swiper-button-next {
+    border-radius: var(--border-radius-sm, 4px);
+    background-color: var(--swiper-navigation-bg, rgba(255,255,255,0.85));
+    color: var(--swiper-navigation-color, #000); /* Ensure contrast with bg */
+}
+/* END Arrow Style Variations */
+
+/* Dot Style Variations */
+.wp-block-milliondollartheme-image-carousel .swiper-container-wrapper[data-dot-style="dots"] .swiper-pagination-bullet {
+    width: var(--swiper-pagination-bullet-width, 10px);
+    height: var(--swiper-pagination-bullet-height, 10px);
+    background-color: var(--swiper-pagination-color, #fff); /* Default to white for dark backgrounds */
+    opacity: var(--swiper-pagination-bullet-inactive-opacity, 0.4);
+}
+.wp-block-milliondollartheme-image-carousel .swiper-container-wrapper[data-dot-style="dots"] .swiper-pagination-bullet-active {
+    background-color: var(--swiper-pagination-active-color, var(--primary-color)); /* Use theme primary for active */
+    opacity: var(--swiper-pagination-bullet-active-opacity, 1);
+    transform: scale(1.2);
+}
+.wp-block-milliondollartheme-image-carousel .swiper-container-wrapper[data-dot-style="lines"] .swiper-pagination-bullet {
+    width: var(--swiper-pagination-bullet-width-lines, 25px);
+    height: var(--swiper-pagination-bullet-height-lines, 4px);
+    border-radius: var(--swiper-pagination-bullet-border-radius-lines, 2px);
+    background-color: var(--swiper-pagination-color, #fff);
+    opacity: var(--swiper-pagination-bullet-inactive-opacity, 0.4);
+}
+.wp-block-milliondollartheme-image-carousel .swiper-container-wrapper[data-dot-style="lines"] .swiper-pagination-bullet-active {
+    width: var(--swiper-pagination-bullet-active-width-lines, 35px);
+    background-color: var(--swiper-pagination-active-color, var(--primary-color));
+    opacity: var(--swiper-pagination-bullet-active-opacity, 1);
+}
+/* END Dot Style Variations */

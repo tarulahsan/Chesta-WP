@@ -1,0 +1,50 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "milliondollartheme/countdown-timer",
+    "title": "Countdown Timer",
+    "category": "milliondollartheme-blocks",
+    "description": "Displays a real-time countdown to a specified date and time.",
+    "icon": "clock",
+    "keywords": ["countdown", "timer", "event", "date", "launch", "coming soon"],
+    "attributes": {
+        "eventDateTime": { "type": "string", "default": "" },
+        "showDays": { "type": "boolean", "default": true },
+        "showHours": { "type": "boolean", "default": true },
+        "showMinutes": { "type": "boolean", "default": true },
+        "showSeconds": { "type": "boolean", "default": true },
+        "labelDays": { "type": "string", "default": "Days" },
+        "labelHours": { "type": "string", "default": "Hours" },
+        "labelMinutes": { "type": "string", "default": "Minutes" },
+        "labelSeconds": { "type": "string", "default": "Seconds" },
+        "numberFontSize": { "type": "string", "default": "2.5em" },
+        "numberColor": { "type": "string" },
+        "labelFontSize": { "type": "string", "default": "0.8em" },
+        "labelColor": { "type": "string" },
+        "digitBlockStyle": { "type": "string", "default": "default" },
+        "digitBlockBackgroundColor": { "type": "string" },
+        "digitBlockBorderColor": { "type": "string" },
+        "digitBlockBorderRadius": { "type": "string" },
+        "digitBlockPadding": { "type": "string" },
+        "expiredMessage": { "type": "string", "source": "html", "selector": ".countdown-expired-message-content", "default": "The event has started!" },
+        "hideWhenExpired": { "type": "boolean", "default": false },
+        "alignment": { "type": "string", "default": "center" },
+        "gapBetweenBlocks": { "type": "string", "default": "var(--spacing-md)"},
+        "align": { "type": "string", "default": "" }
+    },
+    "supports": {
+        "align": ["wide", "full"],
+        "html": false,
+        "anchor": true,
+        "color": {
+            "text": true,
+            "background": true,
+            "link": false, "gradients": false
+        }
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css",
+    "viewScript": "file:./view.js"
+}
