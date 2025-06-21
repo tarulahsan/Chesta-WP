@@ -205,8 +205,13 @@ add_action( 'widgets_init', 'milliondollartheme_widgets_init' );
  * Enqueue scripts and styles.
  */
 function milliondollartheme_scripts() {
-    // Enqueue Google Fonts
+    // Enqueue Google Fonts (base set, can be overridden by Customizer font choices via CSS variables)
     wp_enqueue_style( 'milliondollartheme-google-fonts', 'https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700;900&family=Inter:wght@400;700&display=swap', array(), null );
+
+    // Conditionally Enqueue Font Awesome from CDN
+    if ( get_theme_mod( 'milliondollartheme_enable_fontawesome', false ) ) {
+        wp_enqueue_style( 'fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css', array(), '5.15.4' );
+    }
 
     // Enqueue Alpine.js from CDN, defer loading
     wp_enqueue_script( 'alpinejs', 'https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js', array(), MILLIONDOLLARTHEME_VERSION, true ); // true for in_footer
@@ -248,6 +253,11 @@ if ( defined( 'JETPACK__VERSION' ) ) {
 }
 
 /**
+ * Breadcrumbs functionality.
+ */
+require get_template_directory() . '/inc/breadcrumbs.php';
+
+/**
  * Add defer attribute to the Alpine.js script tag.
  */
 function milliondollartheme_add_defer_to_alpinejs( $tag, $handle, $src ) {
@@ -267,7 +277,7 @@ function milliondollartheme_register_blocks() {
         $categories[] = array(
             'slug'  => 'milliondollartheme-blocks',
             'title' => __( 'MillionDollarTheme Blocks', 'milliondollartheme' ),
-            'icon'  => 'star-filled', // Or a custom SVG icon URL
+            'icon'  => 'star-filled',
         );
         return $categories;
     }, 10, 1 );
@@ -283,7 +293,6 @@ function milliondollartheme_register_blocks() {
             $block_json_file = $theme_blocks_dir . $block_folder . '/block.json';
             if ( file_exists( $block_json_file ) ) {
                 register_block_type( $theme_blocks_dir . $block_folder );
-                // error_log("Registered block: " . $block_folder); // For debugging
             }
         }
     }
@@ -292,67 +301,31 @@ add_action( 'init', 'milliondollartheme_register_blocks' );
 
 /**
  * Render callback for the Posts Display block.
- *
- * @param array $attributes Block attributes.
- * @return string HTML content for the block.
  */
 function milliondollartheme_render_posts_display_block( $attributes ) {
     $default_attrs = array(
-        'numberOfPosts' => 3,
-        'layout' => 'grid',
-        'columns' => 3,
-        'displayFeaturedImage' => true,
-        'featuredImageSize' => 'medium_large', // New attribute
-        'displayPostTitle' => true,
-        'titleTag' => 'h3', // New attribute
-        'displayPostDate' => true,
-        'displayPostExcerpt' => true,
-        'excerptLength' => 25,
-        'displayReadMoreLink' => false, // New attribute
-        'readMoreText' => __('Read More', 'milliondollartheme'), // New attribute
-        'categories' => '',
-        'orderBy' => 'date',
-        'order' => 'DESC',
-        'postsDisplayStyle' => 'default',
-        'align' => '',
+        'numberOfPosts' => 3, 'layout' => 'grid', 'columns' => 3,
+        'displayFeaturedImage' => true, 'featuredImageSize' => 'medium_large',
+        'displayPostTitle' => true, 'titleTag' => 'h3',
+        'displayPostDate' => true, 'displayPostExcerpt' => true, 'excerptLength' => 25,
+        'displayReadMoreLink' => false, 'readMoreText' => __('Read More', 'milliondollartheme'),
+        'categories' => '', 'orderBy' => 'date', 'order' => 'DESC',
+        'postsDisplayStyle' => 'default', 'align' => '',
     );
     $attr = array_merge( $default_attrs, $attributes );
-
     $args = array(
-        'post_type'      => 'post',
-        'posts_per_page' => intval( $attr['numberOfPosts'] ),
-        'orderby'        => sanitize_text_field( $attr['orderBy'] ),
-        'order'          => sanitize_text_field( $attr['order'] ),
+        'post_type'      => 'post', 'posts_per_page' => intval( $attr['numberOfPosts'] ),
+        'orderby'        => sanitize_text_field( $attr['orderBy'] ), 'order' => sanitize_text_field( $attr['order'] ),
         'post_status'    => 'publish',
     );
-
-    if ( ! empty( $attr['categories'] ) ) {
-        // Assuming categories are slugs. For IDs, tax_query would be better.
-        $args['category_name'] = sanitize_text_field( $attr['categories'] );
-    }
-
+    if ( ! empty( $attr['categories'] ) ) { $args['category_name'] = sanitize_text_field( $attr['categories'] ); }
     $query = new WP_Query( $args );
-
-    if ( ! $query->have_posts() ) {
-        return '<p class="no-posts-found">' . esc_html__( 'No posts found matching your criteria.', 'milliondollartheme' ) . '</p>';
-    }
-
-    $wrapper_classes = array(
-        'wp-block-milliondollartheme-posts-display',
-        'layout-' . esc_attr( $attr['layout'] ),
-        'item-style-' . esc_attr( $attr['postsDisplayStyle'] )
-    );
-    if ( $attr['layout'] === 'grid' ) {
-        $wrapper_classes[] = 'columns-' . esc_attr( $attr['columns'] );
-    }
-    if ( !empty($attr['align']) ){
-      $wrapper_classes[] = 'align' . esc_attr($attr['align']);
-    }
-
-    $title_tag = tag_escape( $attr['titleTag'] ); // Sanitize the tag
-
-    ob_start();
-    ?>
+    if ( ! $query->have_posts() ) { return '<p class="no-posts-found">' . esc_html__( 'No posts found matching your criteria.', 'milliondollartheme' ) . '</p>'; }
+    $wrapper_classes = array( 'wp-block-milliondollartheme-posts-display', 'layout-' . esc_attr( $attr['layout'] ), 'item-style-' . esc_attr( $attr['postsDisplayStyle'] ) );
+    if ( $attr['layout'] === 'grid' ) { $wrapper_classes[] = 'columns-' . esc_attr( $attr['columns'] ); }
+    if ( !empty($attr['align']) ){ $wrapper_classes[] = 'align' . esc_attr($attr['align']); }
+    $title_tag = tag_escape( $attr['titleTag'] );
+    ob_start(); ?>
     <div class="<?php echo esc_attr( implode( ' ', $wrapper_classes ) ); ?>">
         <?php while ( $query->have_posts() ) : $query->the_post(); ?>
             <article <?php post_class( 'post-item' ); ?>>
@@ -363,71 +336,170 @@ function milliondollartheme_render_posts_display_block( $attributes ) {
                         </a>
                     </div>
                 <?php endif; ?>
-
                 <div class="post-item-content-wrapper">
                     <?php if ( $attr['displayPostTitle'] ) : ?>
-                        <<?php echo $title_tag; ?> class="post-item-title">
-                            <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
-                        </<?php echo $title_tag; ?>>
+                        <<?php echo $title_tag; ?> class="post-item-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></<?php echo $title_tag; ?>>
                     <?php endif; ?>
-
                     <div class="post-item-meta">
-                       <?php if ( $attr['displayPostDate'] ) : ?>
-                           <span class="post-item-date"><?php echo get_the_date(); ?></span>
-                       <?php endif; ?>
-                       <?php // TODO: Add author, categories display options here ?>
+                       <?php if ( $attr['displayPostDate'] ) : ?><span class="post-item-date"><?php echo get_the_date(); ?></span><?php endif; ?>
                     </div>
-
                     <?php if ( $attr['displayPostExcerpt'] ) : ?>
-                        <div class="post-item-excerpt">
-                            <?php echo wpautop( wp_trim_words( get_the_excerpt(), intval( $attr['excerptLength'] ), ' &hellip;' ) ); ?>
-                        </div>
+                        <div class="post-item-excerpt"><?php echo wpautop( wp_trim_words( get_the_excerpt(), intval( $attr['excerptLength'] ), ' &hellip;' ) ); ?></div>
                     <?php endif; ?>
-
                     <?php if ( $attr['displayReadMoreLink'] ) : ?>
-                        <p class="post-item-read-more">
-                            <a href="<?php the_permalink(); ?>" class="cta-button is-style-outline is-size-small">
-                                <?php echo esc_html( $attr['readMoreText'] ); ?>
-                            </a>
-                        </p>
+                        <p class="post-item-read-more"><a href="<?php the_permalink(); ?>" class="cta-button is-style-outline is-size-small"><?php echo esc_html( $attr['readMoreText'] ); ?></a></p>
                     <?php endif; ?>
                 </div>
             </article>
         <?php endwhile; ?>
     </div>
-    <?php
-    wp_reset_postdata();
-    return ob_get_clean();
+    <?php wp_reset_postdata(); return ob_get_clean();
 }
 
 /**
  * Specific registration for dynamic blocks that require a PHP render_callback.
- * This ensures they are registered correctly if the main loop doesn't handle them.
  */
 function milliondollartheme_register_dynamic_block_callbacks() {
-    // For Posts Display Block
     if ( function_exists('milliondollartheme_render_posts_display_block') && class_exists('WP_Block_Type_Registry') && WP_Block_Type_Registry::get_instance()->is_registered('milliondollartheme/posts-display') ) {
-        // If already registered by the loop, unregister it first to re-register with callback
-        // This is to ensure our version with the callback takes precedence.
-        // Note: unregister_block_type might not be ideal if other filters/actions were tied to the first registration.
-        // A cleaner way is if the main loop could be modified to pass the callback.
-        // However, for a targeted fix:
         unregister_block_type('milliondollartheme/posts-display');
     }
-
-    // Check if function exists before trying to use it as callback
     if ( function_exists('milliondollartheme_render_posts_display_block') ) {
-        register_block_type( 'milliondollartheme/posts-display', array(
-            // Attributes should be automatically sourced from block.json in WP 5.8+
-            // For older versions or to be explicit, they would be listed here.
-            // 'attributes' => array( ... define attributes here ... ),
-            'render_callback' => 'milliondollartheme_render_posts_display_block',
-        ) );
-        // error_log("Re-registered milliondollartheme/posts-display with render_callback."); // For debugging
+        register_block_type( 'milliondollartheme/posts-display', array( 'render_callback' => 'milliondollartheme_render_posts_display_block', ) );
     }
 }
-// Hook this after the main block registration, or with same priority if it handles overrides well.
-// Using priority 11 to run after the default 10 of the main loop, ensuring it can override if needed.
 add_action( 'init', 'milliondollartheme_register_dynamic_block_callbacks', 11 );
 
-EOF
+/**
+ * [year] shortcode
+ * Returns the current year.
+ */
+if ( ! function_exists( 'milliondollartheme_year_shortcode' ) ) {
+    function milliondollartheme_year_shortcode() {
+        return date('Y');
+    }
+    add_shortcode( 'year', 'milliondollartheme_year_shortcode' );
+}
+
+/**
+ * Helper function to render social media icons from Customizer settings.
+ */
+if ( ! function_exists( 'milliondollartheme_get_social_media_icons' ) ) {
+    function milliondollartheme_get_social_media_icons( $context = 'footer' ) {
+        $social_networks = array( 'twitter', 'facebook', 'instagram', 'linkedin', 'youtube', 'github', 'pinterest', 'rss' );
+        if ($context === 'header') {
+             $social_networks = array( 'twitter', 'facebook', 'instagram', 'linkedin', 'youtube' );
+        }
+        $output = '<div class="social-media-links social-links-' . esc_attr($context) . '">';
+        $has_links = false;
+        foreach ( $social_networks as $network ) {
+            $url = get_theme_mod( 'milliondollartheme_' . $context . '_social_' . $network, '' );
+            if ( ! empty( $url ) ) {
+                $has_links = true;
+                $icon_slug = $network;
+                if ($network === 'facebook') $icon_slug = 'facebook-f';
+                $output .= sprintf(
+                    '<a href="%1$s" class="social-link social-link-%2$s" target="_blank" rel="noopener noreferrer" aria-label="%3$s"><span class="dashicons dashicons-%4$s" title="%5$s"></span></a>',
+                    esc_url( $url ),
+                    esc_attr( $network ),
+                    sprintf(esc_attr__('Follow us on %s', 'milliondollartheme'), ucfirst($network)),
+                    esc_attr($icon_slug),
+                    ucfirst(esc_attr($network))
+                );
+            }
+        }
+        $output .= '</div>';
+        return $has_links ? $output : '';
+    }
+}
+
+/**
+ * Output JSON-LD Schema for Organization and WebSite.
+ */
+if ( ! function_exists( 'milliondollartheme_output_base_schema' ) ) {
+    function milliondollartheme_output_base_schema() {
+        if ( is_admin() ) {
+            return;
+        }
+
+        $site_name = get_bloginfo( 'name' );
+        $site_url = home_url( '/' );
+        $site_description = get_bloginfo( 'description' );
+
+        $org_name = get_theme_mod( 'milliondollartheme_org_name', $site_name );
+        $org_logo_url = get_theme_mod( 'milliondollartheme_org_logo_url', '' );
+
+        if ( empty($org_logo_url) && function_exists('get_custom_logo') ) {
+            $custom_logo_id = get_theme_mod( 'custom_logo' );
+            if ( $custom_logo_id ) {
+                $image_data = wp_get_attachment_image_src( $custom_logo_id, 'full' );
+                if ($image_data && isset($image_data[0])) { // Check if $image_data is valid and has URL
+                    $org_logo_url = $image_data[0];
+                }
+            }
+        }
+
+        $schema = array(
+            '@context' => 'https://schema.org',
+            '@graph'   => array()
+        );
+
+        $website_schema = array(
+            '@type' => 'WebSite',
+            '@id'   => $site_url . '#website',
+            'url'   => $site_url,
+            'name'  => $site_name,
+            'description' => $site_description,
+        );
+        $website_alternate_name = get_theme_mod('milliondollartheme_website_alternate_name', '');
+        if (!empty($website_alternate_name)) {
+            $website_schema['alternateName'] = $website_alternate_name;
+        }
+        // Example SearchAction
+        // $website_schema['potentialAction'] = array(
+        //     '@type' => 'SearchAction',
+        //     'target' => array(
+        //          '@type' => 'EntryPoint',
+        //          'urlTemplate' => $site_url . '?s={search_term_string}'
+        //      ),
+        //     'query-input' => 'required name=search_term_string',
+        // );
+        $schema['@graph'][] = $website_schema;
+
+        $organization_schema = array(
+            '@type' => 'Organization',
+            '@id'   => $site_url . '#organization',
+            'name'  => $org_name,
+            'url'   => $site_url,
+        );
+        if ( ! empty( $org_logo_url ) ) {
+            $logo_data = array(
+                '@type' => 'ImageObject',
+                'url' => esc_url($org_logo_url),
+            );
+            $logo_id = attachment_url_to_postid($org_logo_url);
+            if ($logo_id) {
+                $logo_meta = wp_get_attachment_metadata($logo_id);
+                if (isset($logo_meta['width'])) $logo_data['width'] = $logo_meta['width'];
+                if (isset($logo_meta['height'])) $logo_data['height'] = $logo_meta['height'];
+            }
+            $organization_schema['logo'] = $logo_data;
+        }
+        // Example of adding social links to Organization schema (sameAs)
+        // $social_links_for_schema = array();
+        // $defined_socials = array('twitter', 'facebook', 'instagram', 'linkedin', 'youtube', 'github'); // Match Customizer
+        // foreach ($defined_socials as $social_network) {
+        //     $social_url = get_theme_mod('milliondollartheme_footer_social_' . $social_network, ''); // Assuming footer for main org links
+        //     if (!empty($social_url)) {
+        //         $social_links_for_schema[] = $social_url;
+        //     }
+        // }
+        // if (!empty($social_links_for_schema)) { $organization_schema['sameAs'] = array_unique($social_links_for_schema); }
+
+        $schema['@graph'][] = $organization_schema;
+
+        if ( ! empty( $schema['@graph'] ) ) {
+            echo "\n" . '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT ) . '</script>' . "\n";
+        }
+    }
+}
+add_action( 'wp_head', 'milliondollartheme_output_base_schema', 5 );

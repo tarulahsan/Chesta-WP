@@ -145,4 +145,72 @@ if ( ! function_exists( 'milliondollartheme_entry_footer' ) ) :
         );
     }
 endif;
-EOF
+
+if ( ! function_exists( 'milliondollartheme_social_share_buttons' ) ) :
+    /**
+     * Displays social share buttons for the current post.
+     */
+    function milliondollartheme_social_share_buttons() {
+        if ( ! get_theme_mod( 'milliondollartheme_show_social_share_buttons', true ) || ! is_singular('post') ) {
+            return;
+        }
+
+        $post_url = urlencode( get_permalink() );
+        $post_title = urlencode( html_entity_decode( get_the_title(), ENT_QUOTES, 'UTF-8' ) );
+        $post_thumbnail_url = get_the_post_thumbnail_url( null, 'medium_large' ); // For Pinterest
+        $post_thumbnail = $post_thumbnail_url ? urlencode($post_thumbnail_url) : '';
+
+
+        $social_sites = array(
+            'twitter' => array(
+                'label' => __('Share on Twitter', 'milliondollartheme'),
+                'url' => 'https://twitter.com/intent/tweet?text=' . $post_title . '&url=' . $post_url,
+                'icon_slug' => 'twitter'
+            ),
+            'facebook' => array(
+                'label' => __('Share on Facebook', 'milliondollartheme'),
+                'url' => 'https://www.facebook.com/sharer/sharer.php?u=' . $post_url,
+                'icon_slug' => 'facebook-alt' // Dashicon for Facebook is 'facebook-alt' or 'facebook'
+            ),
+            'linkedin' => array(
+                'label' => __('Share on LinkedIn', 'milliondollartheme'),
+                'url' => 'https://www.linkedin.com/shareArticle?mini=true&url=' . $post_url . '&title=' . $post_title,
+                'icon_slug' => 'linkedin'
+            ),
+            'pinterest' => array(
+                'label' => __('Pin it on Pinterest', 'milliondollartheme'),
+                'url' => 'https://pinterest.com/pin/create/button/?url=' . $post_url . '&media=' . $post_thumbnail . '&description=' . $post_title,
+                'icon_slug' => 'pinterest'
+            ),
+            'email' => array(
+                'label' => __('Share via Email', 'milliondollartheme'),
+                'url' => 'mailto:?subject=' . $post_title . '&body=' . sprintf(esc_html__('Check out this article: %s', 'milliondollartheme'), urldecode($post_url)), // urldecode for email body
+                'icon_slug' => 'email-alt2'
+            ),
+            // 'whatsapp' => array(
+            // 'label' => __('Share on WhatsApp', 'milliondollartheme'),
+            // 'url' => 'https://api.whatsapp.com/send?text=' . $post_title . '%20' . $post_url,
+            // 'icon_slug' => 'whatsapp' // Requires custom icon or Font Awesome
+            // ),
+        );
+
+        echo '<div class="social-share-buttons">';
+        echo '<h4 class="social-share-title">' . esc_html__( 'Share This Post:', 'milliondollartheme' ) . '</h4>';
+        echo '<div class="share-links-wrapper">';
+        foreach ( $social_sites as $slug => $site ) {
+            printf(
+                '<a href="%1$s" class="social-share-link social-share-%2\$s" target="_blank" rel="noopener noreferrer" aria-label="%3\$s">',
+                esc_url( $site['url'] ),
+                esc_attr( $slug ),
+                esc_attr( $site['label'] )
+            );
+
+            $icon_class = 'dashicons-' . esc_attr($site['icon_slug']);
+            echo '<span class="dashicons ' . $icon_class . '" title="' . esc_attr( $site['label'] ) . '"></span>';
+            // echo '<span class="share-label">' . esc_html( ucfirst(\$slug) ) . '</span>'; // Optional text label
+            echo '</a>';
+        }
+        echo '</div>'; // .share-links-wrapper
+        echo '</div>'; // .social-share-buttons
+    }
+endif;

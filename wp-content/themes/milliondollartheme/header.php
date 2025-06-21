@@ -67,7 +67,30 @@
                 ?>
             </div><!-- .primary-menu-container -->
         </nav><!-- #site-navigation -->
+
+        <div class="header-extras">
+            <?php // Display social media icons for header
+            if ( function_exists('milliondollartheme_get_social_media_icons') ) {
+                echo milliondollartheme_get_social_media_icons('header'); // Use context 'header'
+            }
+            ?>
+
+            <?php // Display search icon if enabled
+            if ( get_theme_mod('milliondollartheme_header_show_search_icon', true) ) : ?>
+                <button class="search-toggle" aria-label="<?php esc_attr_e('Toggle search', 'milliondollartheme'); ?>" aria-expanded="false" aria-controls="header-search-form">
+                    <span class="dashicons dashicons-search" aria-hidden="true"></span>
+                </button>
+            <?php endif; ?>
+        </div><!-- .header-extras -->
+
     </header><!-- #masthead -->
+
+    <?php // Display breadcrumbs if the function exists
+    if ( function_exists('milliondollartheme_breadcrumbs') ) : ?>
+        <div class="breadcrumb-container site-section-padding"> <?php // Wrapper for styling/spacing ?>
+            <?php milliondollartheme_breadcrumbs(); ?>
+        </div>
+    <?php endif; ?>
 
     <div id="content" class="site-content">
 EOF

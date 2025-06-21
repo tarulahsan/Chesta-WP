@@ -26,6 +26,11 @@ get_header();
                     )
                 );
 
+                // Display social share buttons
+                if ( function_exists('milliondollartheme_social_share_buttons') ) {
+                    milliondollartheme_social_share_buttons();
+                }
+
                 // If comments are open or we have at least one comment, load up the comment template.
                 if ( comments_open() || get_comments_number() ) :
                     comments_template();
