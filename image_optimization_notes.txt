@@ -1,0 +1,14 @@
+IMAGE OPTIMIZATION GUIDELINES FOR USERS (for theme documentation or help text):
+
+- Always optimize images before uploading them to the Media Library. Use tools like TinyPNG, ImageOptim, Squoosh, or ShortPixel (plugin or web) to reduce file sizes without significant quality loss.
+- For full-width backgrounds (e.g., Hero block, CTA block backgrounds, full-width page headers), aim for images around 1920px to 2560px wide, depending on the target audience's screen resolutions. Compress these to a reasonable file size (e.g., < 300-500KB if possible, definitely < 1MB).
+- For content images or portfolio items, upload images at a size slightly larger than their maximum display dimension within your layout. WordPress will create responsive sizes (srcset) from this upload. Avoid uploading excessively large images (e.g., 5000px wide) if they will only be displayed at a maximum of 800px wide.
+- Choose the right format:
+    - JPEG: For photographs and images with complex colors/gradients. Adjust quality settings during compression.
+    - PNG: For images requiring transparency (logos, icons) or those with sharp lines and text where quality is paramount (but be mindful of file size).
+    - WebP: Offers excellent compression and quality with transparency support. WordPress supports WebP. Consider using a plugin to help generate and serve WebP images if your hosting environment doesn't do it automatically.
+    - SVG: For logos and icons, as they are vector-based and scale perfectly without quality loss at very small file sizes.
+- Ensure all images have descriptive alt text for SEO and accessibility. This is crucial for users who rely on screen readers and for search engine understanding of image content.
+- WordPress automatically attempts to lazy-load images (since WP 5.5) using the `loading="lazy"` attribute. This theme supports and relies on that core feature. Ensure no plugins are interfering with this negatively.
+- Consider using a Content Delivery Network (CDN) that offers image optimization features to further improve image delivery speed and performance based on user location and device.
+- Regularly review your Media Library for very large images that could be further optimized or replaced with more appropriately sized versions.

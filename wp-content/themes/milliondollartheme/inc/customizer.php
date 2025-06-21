@@ -8,7 +8,7 @@
 if ( ! function_exists( 'milliondollartheme_customize_register' ) ) :
     /**
      * Add postMessage support for site title and description for the Theme Customizer.
-     * Also adds Theme Layout, Color, Typography, Header, Footer, and Single Post Settings.
+     * Also adds Theme Layout, Color, Typography, Header, Footer, Single Post, and Performance Settings.
      *
      * @param WP_Customize_Manager $wp_customize Theme Customizer object.
      */
@@ -67,7 +67,12 @@ if ( ! function_exists( 'milliondollartheme_customize_register' ) ) :
         $wp_customize->add_setting( 'milliondollartheme_enable_fontawesome', array( 'default' => false, 'sanitize_callback' => 'milliondollartheme_sanitize_checkbox', 'transport' => 'refresh' ) );
         $wp_customize->add_control( 'milliondollartheme_enable_fontawesome', array( 'label' => __( 'Enable Font Awesome 5 (CDN)', 'milliondollartheme' ), 'section' => 'milliondollartheme_typography_settings', 'type' => 'checkbox', 'description' => __('Loads Font Awesome Free from CDN.', 'milliondollartheme') ) );
         $wp_customize->add_setting( 'milliondollartheme_custom_font_face_css', array( 'default' => '', 'sanitize_callback' => 'wp_strip_all_tags', 'transport' => 'refresh' ) );
-        $wp_customize->add_control( 'milliondollartheme_custom_font_face_css', array( 'label' => __( 'Custom @font-face CSS', 'milliondollartheme' ), 'section' => 'milliondollartheme_typography_settings', 'type' => 'textarea', 'description' => __('For advanced users. Paste complete @font-face rules here for self-hosted fonts. Ensure font file paths are correct relative to your theme or use absolute URLs.', 'milliondollartheme') ) );
+        $wp_customize->add_control( 'milliondollartheme_custom_font_face_css', array(
+            'label' => __( 'Custom @font-face CSS', 'milliondollartheme' ),
+            'section' => 'milliondollartheme_typography_settings',
+            'type' => 'textarea',
+            'description' => __('For advanced users. Paste complete @font-face rules here for self-hosted fonts. IMPORTANT: Ensure font file paths are correct AND include `font-display: swap;` in each rule for optimal performance and to avoid layout shifts.', 'milliondollartheme')
+        ) );
 
         // --- Header Settings Panel ---
         $wp_customize->add_panel( 'milliondollartheme_header_panel', array( 'title' => __( 'Header Settings', 'milliondollartheme' ), 'priority' => 120, ) );
@@ -94,11 +99,7 @@ if ( ! function_exists( 'milliondollartheme_customize_register' ) ) :
         }
 
         // --- SEO Schema Settings Section ---
-        $wp_customize->add_section( 'milliondollartheme_seo_schema_settings', array(
-            'title'    => __( 'SEO: Schema Markup', 'milliondollartheme' ),
-            'priority' => 150,
-            'description' => __( 'Settings for Organization and WebSite schema.org markup. Ensure your site name and tagline are set correctly under Site Identity.', 'milliondollartheme' ),
-        ) );
+        $wp_customize->add_section( 'milliondollartheme_seo_schema_settings', array( 'title' => __( 'SEO: Schema Markup', 'milliondollartheme' ), 'priority' => 150, 'description' => __( 'Settings for Organization and WebSite schema.org markup. Ensure your site name and tagline are set correctly under Site Identity.', 'milliondollartheme' ), ) );
         $wp_customize->add_setting( 'milliondollartheme_org_name', array( 'default' => get_bloginfo( 'name' ), 'sanitize_callback' => 'sanitize_text_field', 'transport' => 'postMessage', ) );
         $wp_customize->add_control( 'milliondollartheme_org_name', array( 'label' => __( 'Organization Name (for Schema)', 'milliondollartheme' ), 'section' => 'milliondollartheme_seo_schema_settings', 'type' => 'text', 'description' => __( 'Defaults to Site Title. Used for Organization schema.', 'milliondollartheme' ), ) );
         $wp_customize->add_setting( 'milliondollartheme_org_logo_url', array( 'default' => '', 'sanitize_callback' => 'esc_url_raw', 'transport' => 'postMessage', ) );
@@ -107,22 +108,15 @@ if ( ! function_exists( 'milliondollartheme_customize_register' ) ) :
         $wp_customize->add_control( 'milliondollartheme_website_alternate_name', array( 'label' => __( 'Website Alternate Name (Optional)', 'milliondollartheme' ), 'section' => 'milliondollartheme_seo_schema_settings', 'type' => 'text', 'description' => __( 'An alternate name for your website, if applicable (e.g., an acronym).', 'milliondollartheme' ), ) );
 
         // --- Single Post Settings Section ---
-        $wp_customize->add_section( 'milliondollartheme_single_post_settings', array(
-            'title'    => __( 'Single Post Settings', 'milliondollartheme' ),
-            'priority' => 160, // After SEO Schema
-        ) );
-        // Toggle Social Share Buttons
-        $wp_customize->add_setting( 'milliondollartheme_show_social_share_buttons', array(
-            'default'   => true,
-            'sanitize_callback' => 'milliondollartheme_sanitize_checkbox',
-            'transport' => 'refresh', // Refresh needed as it changes PHP output in template
-        ) );
-        $wp_customize->add_control( 'milliondollartheme_show_social_share_buttons', array(
-            'label'    => __( 'Show Social Share Buttons on Single Posts', 'milliondollartheme' ),
-            'section'  => 'milliondollartheme_single_post_settings',
-            'type'     => 'checkbox',
-        ) );
+        $wp_customize->add_section( 'milliondollartheme_single_post_settings', array( 'title' => __( 'Single Post Settings', 'milliondollartheme' ), 'priority' => 160, ) );
+        $wp_customize->add_setting( 'milliondollartheme_show_social_share_buttons', array( 'default'   => true, 'sanitize_callback' => 'milliondollartheme_sanitize_checkbox', 'transport' => 'refresh', ) );
+        $wp_customize->add_control( 'milliondollartheme_show_social_share_buttons', array( 'label' => __( 'Show Social Share Buttons on Single Posts', 'milliondollartheme' ), 'section' => 'milliondollartheme_single_post_settings', 'type' => 'checkbox', ) );
 
+        // --- Performance Settings Panel ---
+        $wp_customize->add_panel( 'milliondollartheme_performance_panel', array( 'title'    => __( 'Performance', 'milliondollartheme' ), 'priority' => 170, ) );
+        $wp_customize->add_section( 'milliondollartheme_critical_css_section', array( 'title' => __( 'Critical CSS', 'milliondollartheme' ), 'panel' => 'milliondollartheme_performance_panel', 'priority' => 10, 'description' => __( 'For optimal Time to First Paint and Largest Contentful Paint, it is highly recommended to use a dedicated caching/optimization plugin that can generate and inline critical CSS for your pages. This theme is designed to be compatible with such plugins (e.g., WP Rocket, LiteSpeed Cache, Perfmatters). Manually implementing critical CSS is an advanced task and typically requires per-page generation.', 'milliondollartheme' ), ) );
+        $wp_customize->add_setting( 'milliondollartheme_critical_css_info', array( 'default' => '', 'sanitize_callback' => '__return_empty_string' ) );
+        $wp_customize->add_control( new WP_Customize_Control( $wp_customize, 'milliondollartheme_critical_css_info', array( 'label' => __( 'Recommendation', 'milliondollartheme'), 'section' => 'milliondollartheme_critical_css_section', 'type' => 'hidden', 'description' => __( 'This section is for informational purposes. Please refer to plugin documentation for critical CSS setup.', 'milliondollartheme' ), ) ) );
 
     } // End function milliondollartheme_customize_register
 endif;
@@ -232,3 +226,5 @@ if ( ! function_exists( 'milliondollartheme_get_font_stack' ) ) :
 endif;
 
 ?>
+
+[end of wp-content/themes/milliondollartheme/inc/customizer.php]

@@ -1,10 +1,21 @@
 <?php
 /**
  * Masonry Portfolio Gallery Block Render Callback.
+ * (Optimized with no_found_rows and transient caching)
  *
  * @param array $attributes Block attributes.
- * @return string HTML content for the block.
+ * @return void Echos HTML content for the block.
  */
+
+// Transient Caching: Try to get cached HTML first.
+// Note: $attributes are passed directly to this file when used as "render" field in block.json
+$transient_key_masonry = 'mdt_masonry_gallery_' . md5( wp_json_encode( $attributes ) );
+$cached_html_masonry = get_transient( $transient_key_masonry );
+
+if ( false !== $cached_html_masonry ) {
+    echo $cached_html_masonry;
+    return;
+}
 
 // Ensure all attributes from block.json have defaults or are checked for existence.
 $defaults = array(
@@ -14,17 +25,12 @@ $defaults = array(
     'order' => 'DESC',
     'columnMinWidth' => 250,
     'imageSize' => 'medium_large',
-    'imageAspectRatio' => 'auto', // New default
+    'imageAspectRatio' => 'auto',
     'showPostTitleOnHover' => true,
-    'hoverEffect' => 'zoom', // New default
+    'hoverEffect' => 'zoom',
     'itemStyle' => 'default',
     'gap' => 16,
     'align' => '',
-    // Attributes for future filtering/pagination are not used in query yet
-    // 'showFilterBar' => false,
-    // 'filterBy' => 'category',
-    // 'paginationType' => 'none',
-    // 'loadMoreButtonText' => __('Load More', 'milliondollartheme'),
 );
 $attr = array_merge($defaults, $attributes);
 
@@ -34,30 +40,30 @@ $query_args = array(
     'orderby'        => sanitize_text_field($attr['orderBy']),
     'order'          => sanitize_text_field($attr['order']),
     'post_status'    => 'publish',
+    'no_found_rows'  => true, // Optimization: Do not count total rows
 );
 
 if ( ! empty($attr['selectedCategories']) ) {
-    // Handle multiple categories (slugs or IDs)
     $cat_query_field = is_numeric(explode(',', $attr['selectedCategories'])[0]) ? 'category__in' : 'category_name';
     $query_args[$cat_query_field] = array_map('sanitize_text_field', explode(',', $attr['selectedCategories']));
     if ($cat_query_field === 'category__in') {
         $query_args[$cat_query_field] = array_map('intval', $query_args[$cat_query_field]);
     }
 }
-// TODO: Add similar logic for selectedTags if that attribute is used.
 
 $query = new WP_Query( $query_args );
 
+ob_start(); // Start output buffering AFTER transient check and initial setup
+
 if ( ! $query->have_posts() ) {
-    // It's important for ServerSideRender that the block wrapper is still output
-    // so block controls (like alignment) still work in the editor.
     $no_posts_message = '<p class="no-posts-found">' . esc_html__( 'No items found matching your criteria.', 'milliondollartheme' ) . '</p>';
-    // For ServerSideRender, it's often better to return the wrapper with the message inside.
-    // However, if the wrapper relies on JS for layout (like Masonry), an empty wrapper might be fine.
-    // For now, just the message if used directly.
-    // For SSR, it might be wrapped by the component in edit() if empty.
-    // Let's return the message directly for now.
-    echo $no_posts_message; // render.php echoes, doesn't return (WordPress captures output)
+    // For ServerSideRender, it might be better to wrap this in the block's outer div if that's expected by editor controls.
+    // However, as this render.php is used for front-end, this simple message is okay.
+    // If we were to cache this, it would be done before echo and return.
+    echo $no_posts_message;
+    $html_output_masonry = ob_get_clean();
+    set_transient( $transient_key_masonry, $html_output_masonry, 5 * MINUTE_IN_SECONDS );
+    echo $html_output_masonry; // Echo the final output for this request
     return;
 }
 
@@ -71,26 +77,22 @@ if ( !empty($attr['align']) ){
   $wrapper_classes[] = 'align' . esc_attr($attr['align']);
 }
 
-// Inline style for CSS variables used by masonry JS or CSS
 $wrapper_style = sprintf(
     '--masonry-gap: %dpx; --masonry-column-min-width: %dpx;',
     intval($attr['gap']),
     intval($attr['columnMinWidth'])
 );
 
-// Start output buffering
-ob_start();
 ?>
 <div class="<?php echo esc_attr( implode(' ', $wrapper_classes) ); ?>" style="<?php echo esc_attr($wrapper_style); ?>">
-    <div class="masonry-grid-sizer"></div> <?php // For Masonry JS: columnWidth sizer ?>
+    <div class="masonry-grid-sizer"></div>
     <?php while ( $query->have_posts() ) : $query->the_post(); ?>
         <?php
         $item_classes = get_post_class( 'portfolio-item masonry-item', get_the_ID() );
         $item_link = get_permalink();
-        // TODO: Add clickAction attribute handling here (e.g., lightbox link)
         ?>
         <article class="<?php echo esc_attr(implode(' ', $item_classes)); ?>">
-            <div class="portfolio-item-inner-wrapper"> <?php // New wrapper for styling individual items (e.g. card border) ?>
+            <div class="portfolio-item-inner-wrapper">
                 <?php if ( has_post_thumbnail() ) : ?>
                     <div class="portfolio-item-thumbnail aspect-ratio-<?php echo esc_attr(str_replace('/', '-', $attr['imageAspectRatio'])); ?>"
                          style="<?php if ($attr['imageAspectRatio'] === 'auto') { echo 'aspect-ratio: auto;'; } else { echo 'aspect-ratio: ' . esc_attr($attr['imageAspectRatio']) . ';'; } ?>">
@@ -100,13 +102,12 @@ ob_start();
                                 <div class="portfolio-item-overlay">
                                     <div class="portfolio-item-overlay-content">
                                         <h3 class="portfolio-item-title"><?php the_title(); ?></h3>
-                                        <?php // TODO: Add categories/tags to overlay if attribute exists ?>
                                     </div>
                                 </div>
                             <?php endif; ?>
                         </a>
                     </div>
-                <?php else : // Fallback if no thumbnail ?>
+                <?php else : ?>
                     <div class="portfolio-item-thumbnail is-placeholder aspect-ratio-<?php echo esc_attr(str_replace('/', '-', $attr['imageAspectRatio'])); ?>"
                          style="<?php if ($attr['imageAspectRatio'] === 'auto') { echo 'aspect-ratio: auto;'; } else { echo 'aspect-ratio: ' . esc_attr($attr['imageAspectRatio']) . ';'; } ?>">
                          <a href="<?php echo esc_url($item_link); ?>">
@@ -121,21 +122,15 @@ ob_start();
                         </a>
                     </div>
                 <?php endif; ?>
-                <?php // Optionally, display title below image if not overlay hover effect or if title always visible
-                if ($attr['hoverEffect'] !== 'overlay-title' && $attr['showPostTitleOnHover'] /* or a new 'showTitleAlways' attribute */ ) {
-                    // echo '<h4 class="portfolio-item-title-below"><a href="' . esc_url($item_link) . '">' . get_the_title() . '</a></h4>';
-                }
-                ?>
-            </div> <?php // .portfolio-item-inner-wrapper ?>
+            </div>
         </article>
     <?php endwhile; ?>
 </div>
 <?php
 wp_reset_postdata();
 
-// WordPress captures the echoed output when "render":"file:./render.php" is used.
-// No need to explicitly return ob_get_clean(), but it doesn't hurt.
-$html_output = ob_get_clean();
-echo $html_output;
+$html_output_masonry = ob_get_clean();
+set_transient( $transient_key_masonry, $html_output_masonry, 5 * MINUTE_IN_SECONDS ); // Cache for 5 minutes
+echo $html_output_masonry; // WordPress captures this echoed output
 
 ?>

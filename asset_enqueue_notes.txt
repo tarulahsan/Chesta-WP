@@ -1,0 +1,52 @@
+NOTE FOR DEVELOPER: Update theme and block asset enqueueing logic:
+1. Main style.css: functions.php (milliondollartheme_scripts) should check for style.min.css and enqueue it if !WP_DEBUG and the file exists. If WP_DEBUG is true, or style.min.css does not exist, it should enqueue the non-minified style.css.
+   Example logic:
+   ```php
+   $is_debug = defined( 'WP_DEBUG' ) && WP_DEBUG;
+   $main_style_path = get_template_directory() . '/style.css';
+   $main_style_uri = get_stylesheet_uri(); // Points to style.css by default
+
+   $min_style_path = get_template_directory() . '/style.min.css';
+   $min_style_uri = get_template_directory_uri() . '/style.min.css';
+
+   if ( ! $is_debug && file_exists( $min_style_path ) ) {
+       wp_enqueue_style( 'milliondollartheme-style', $min_style_uri, array(), MILLIONDOLLARTHEME_VERSION );
+   } else {
+       wp_enqueue_style( 'milliondollartheme-style', $main_style_uri, array(), MILLIONDOLLARTHEME_VERSION );
+   }
+   ```
+
+2. Block view.js & style-index.css (and other block-specific assets like index.css for editor):
+   The 'viewScript', 'style', and 'editorStyle' fields in each block's block.json should ideally point to the minified versions in a production environment (e.g., when !WP_DEBUG).
+   This is typically handled by a build process that generates minified files (e.g., view.min.js, style-index.min.css) and dynamically updates block.json or filters its content.
+
+   Alternatively, use WordPress filters to change asset paths:
+   - `block_type_metadata`: Modify the `viewScript`, `style`, `editorStyle` paths.
+   - `script_loader_src` / `style_loader_src`: Conditionally change the URL to the `.min` version if `!WP_DEBUG` and the minified file exists. This requires careful checking of handles to target only theme/block assets.
+
+   Example for filtering (conceptual):
+   ```php
+   function milliondollartheme_use_minified_block_assets( $src, $handle ) {
+       if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
+           // Check if the handle belongs to one of your theme's blocks
+           // This is a simplified check; you might need a more robust way to identify your assets
+           if ( strpos( $src, get_template_directory_uri() . '/blocks/' ) !== false ) {
+               $min_src = str_replace( '.js', '.min.js', $src );
+               $min_path = str_replace( get_template_directory_uri(), get_template_directory(), $min_src );
+               if ( file_exists( $min_path ) ) {
+                   return $min_src;
+               }
+               // For CSS
+               $min_src_css = str_replace( '.css', '.min.css', $src );
+               $min_path_css = str_replace( get_template_directory_uri(), get_template_directory(), $min_src_css );
+               if ( file_exists( $min_path_css ) ) {
+                   return $min_src_css;
+               }
+           }
+       }
+       return $src;
+   }
+   // add_filter( 'script_loader_src', 'milliondollartheme_use_minified_block_assets', 20, 2 );
+   // add_filter( 'style_loader_src', 'milliondollartheme_use_minified_block_assets', 20, 2 );
+   ```
+   A build step that modifies `block.json` directly is generally more robust for block assets.
