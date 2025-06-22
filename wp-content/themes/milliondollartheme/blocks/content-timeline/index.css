@@ -1,0 +1,77 @@
+/* Editor-specific styles for chesta/content-timeline */
+
+.wp-block-chesta-content-timeline {
+    position: relative; /* For the main timeline line */
+    /* padding: 1px; */ /* Helps visualize block bounds if empty in editor */
+}
+
+/* Editor preview of the timeline line */
+.wp-block-chesta-content-timeline .block-editor-inner-blocks > .block-editor-block-list__layout::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: var(--timeline-line-width, 3px); /* Use CSS var from attributes */
+    background-color: var(--timeline-line-color, #ccc); /* Use CSS var */
+    transform: translateX(-50%);
+    z-index: 0; /* Behind items */
+}
+
+/* Adjust for left/right sided layouts in editor */
+.wp-block-chesta-content-timeline.timeline-layout-left-sided .block-editor-inner-blocks > .block-editor-block-list__layout::before {
+    left: calc(var(--timeline-point-size, 16px) / 2 + 5px); /* Adjust based on point size and desired offset */
+    transform: translateX(0);
+}
+.wp-block-chesta-content-timeline.timeline-layout-right-sided .block-editor-inner-blocks > .block-editor-block-list__layout::before {
+    right: calc(var(--timeline-point-size, 16px) / 2 + 5px); /* Adjust */
+    left: auto;
+    transform: translateX(0);
+}
+
+
+/* Give some visual separation to items in editor, actual item styling in item's CSS */
+.wp-block-chesta-content-timeline .wp-block-chesta-content-timeline-item {
+    position: relative; /* For point positioning */
+    margin-bottom: 20px; /* Space between items in editor list view */
+    /* background: rgba(200,200,200,0.1); */
+    /* padding-left: 30px; /* If line is on left */
+}
+
+/* Basic preview of points in editor */
+.wp-block-chesta-content-timeline .wp-block-chesta-content-timeline-item::before {
+    content: '';
+    position: absolute;
+    top: 1em; /* Align with first line of text roughly */
+    left: 50%;
+    width: var(--timeline-point-size, 16px);
+    height: var(--timeline-point-size, 16px);
+    background-color: var(--timeline-point-color, #f00);
+    border-radius: var(--timeline-point-style, 'circle') === 'circle' ? 50% : 0; /* Basic shape */
+    transform: translateX(-50%) translateY(-50%);
+    z-index: 1;
+}
+
+.wp-block-chesta-content-timeline.timeline-layout-left-sided .wp-block-chesta-content-timeline-item::before {
+    left: calc(var(--timeline-point-size, 16px) / 2 + 5px); /* Match line position */
+    transform: translateX(-50%) translateY(-50%);
+}
+.wp-block-chesta-content-timeline.timeline-layout-right-sided .wp-block-chesta-content-timeline-item::before {
+    right: calc(var(--timeline-point-size, 16px) / 2 + 5px);
+    left: auto;
+    transform: translateX(50%) translateY(-50%);
+}
+
+/* Alternating items preview in editor */
+.wp-block-chesta-content-timeline.timeline-layout-center-alternating .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block-chesta-content-timeline-item:nth-child(odd) {
+    /* margin-right: 55%; */ /* Push to left */
+}
+.wp-block-chesta-content-timeline.timeline-layout-center-alternating .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block-chesta-content-timeline-item:nth-child(even) {
+    /* margin-left: 55%; */ /* Push to right */
+}
+.wp-block-chesta-content-timeline.timeline-layout-center-alternating .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block-chesta-content-timeline-item:nth-child(even)::before {
+    /* left: 50%; /* Point remains centered */
+}
+.wp-block-chesta-content-timeline.timeline-layout-center-alternating .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block-chesta-content-timeline-item:nth-child(odd)::before {
+    /* left: 50%; */
+}

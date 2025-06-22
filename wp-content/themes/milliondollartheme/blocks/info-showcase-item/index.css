@@ -1,0 +1,80 @@
+/* Editor-specific styles for chesta/info-showcase-item */
+
+.wp-block-chesta-info-showcase-item {
+    /* border: 1px dashed #ccc; /* Light border to see item bounds in editor */ */
+    padding: var(--spacing-sm); /* Default padding in editor if item padding attribute is not set */
+    /* text-align will be inherited from parent or set by parent's context class on this item */
+}
+
+/* Placeholder for media if not selected */
+.wp-block-chesta-info-showcase-item .info-showcase-item-icon-wrapper:empty,
+.wp-block-chesta-info-showcase-item .info-showcase-item-image-wrapper:empty {
+    min-height: 48px; /* Ensure some space for empty media */
+    background-color: #f0f0f0;
+    border-radius: var(--border-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--spacing-sm);
+}
+.wp-block-chesta-info-showcase-item .info-showcase-item-icon-wrapper:empty::before {
+    content: "Icon";
+    color: #777;
+    font-size: 0.8em;
+}
+.wp-block-chesta-info-showcase-item .info-showcase-item-image-wrapper:empty::before {
+    content: "Image";
+    color: #777;
+    font-size: 0.8em;
+}
+
+
+/* Ensure RichText placeholders are visible */
+.wp-block-chesta-info-showcase-item .info-showcase-item-title[data-rich-text-placeholder]::before,
+.wp-block-chesta-info-showcase-item .info-showcase-item-description[data-rich-text-placeholder]::before {
+    opacity: 0.7;
+}
+
+/* Alignment classes applied by parent's context to this item in editor */
+.wp-block-chesta-info-showcase-item.info-showcase-item-align-left { text-align: left; }
+.wp-block-chesta-info-showcase-item.info-showcase-item-align-center { text-align: center; }
+.wp-block-chesta-info-showcase-item.info-showcase-item-align-right { text-align: right; }
+
+/* Icon wrapper styling in editor */
+.wp-block-chesta-info-showcase-item .info-showcase-item-icon-wrapper {
+    display: inline-flex; /* Allows shape to wrap icon size */
+    justify-content: center;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+    padding: var(--spacing-xs); /* Default padding for icon background */
+}
+.wp-block-chesta-info-showcase-item .info-showcase-item-icon-wrapper.shape-circle {
+    border-radius: 50%;
+}
+.wp-block-chesta-info-showcase-item .info-showcase-item-icon-wrapper.shape-square {
+    border-radius: 0;
+}
+.wp-block-chesta-info-showcase-item .info-showcase-item-icon-wrapper.shape-rounded {
+    border-radius: var(--border-radius-sm);
+}
+
+.wp-block-chesta-info-showcase-item .info-showcase-item-image-wrapper img {
+    display: inline-block; /* If centered */
+    max-width: 100%;
+}
+
+.wp-block-chesta-info-showcase-item .info-showcase-item-title {
+    font-weight: 600; /* Default editor title weight */
+    margin-bottom: var(--spacing-xs);
+}
+.wp-block-chesta-info-showcase-item .info-showcase-item-description {
+    font-size: 0.9em; /* Default editor description size */
+    line-height: 1.5;
+}
+.wp-block-chesta-info-showcase-item .info-showcase-item-link-wrapper {
+    margin-top: var(--spacing-sm);
+}
+.wp-block-chesta-info-showcase-item .info-showcase-item-button.button {
+    /* Editor view of button can use global button styles if available or specific ones here */
+    font-size: 0.9em;
+}

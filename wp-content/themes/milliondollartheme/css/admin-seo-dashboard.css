@@ -174,3 +174,61 @@
         max-width: none; /* Allow full width on small screens */
     }
 }
+
+/* On-Page SEO Analyzer Styles */
+.mdt-seo-dashboard #tab-on-page-analyzer .form-table td input[type="url"],
+.mdt-seo-dashboard #tab-on-page-analyzer .form-table td input[type="text"],
+.mdt-seo-dashboard #tab-on-page-analyzer .form-table td select {
+    max-width: 100%; /* Allow URL and keyword fields to be wider */
+}
+
+.mdt-seo-results-area {
+    margin-top: var(--spacing-xl, 32px); /* WordPress uses similar spacing */
+    padding: var(--spacing-lg, 24px);
+    background-color: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: var(--border-radius-md, 4px); /* Match WP card radius */
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+}
+
+.mdt-seo-results-area h4 {
+    font-size: 1.2em;
+    margin-top: 0;
+    margin-bottom: var(--spacing-md, 16px);
+    padding-bottom: var(--spacing-sm, 8px);
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.mdt-seo-results-area table.widefat {
+    margin-top: 0; /* Reset default WP table margin if any */
+}
+.mdt-seo-results-area table.widefat th {
+    font-weight: 600;
+    background-color: #f6f7f7; /* Light background for table headers */
+}
+.mdt-seo-results-area table.widefat td {
+    vertical-align: top;
+    padding: var(--spacing-sm, 8px) var(--spacing-md, 10px); /* Consistent padding */
+}
+.mdt-seo-results-area table.widefat td em { /* For displaying heading content etc. */
+    color: #50575e;
+    font-size: 0.9em;
+    display: block;
+    margin-top: 4px;
+}
+
+/* Status indicators for recommendations */
+.mdt-seo-results-area td.status-good {
+    color: #006400; /* Dark green */
+    font-weight: 600;
+}
+.mdt-seo-results-area td.status-warning {
+    color: #FF8C00; /* Dark orange */
+}
+.mdt-seo-results-area td.status-bad {
+    color: #DC143C; /* Crimson red */
+    font-weight: 600;
+}
+.mdt-seo-results-area td.status-neutral {
+    color: #50575e; /* Default text color */
+}

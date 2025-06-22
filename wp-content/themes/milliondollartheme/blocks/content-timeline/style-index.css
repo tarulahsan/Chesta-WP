@@ -1,0 +1,60 @@
+/* Frontend and shared editor styles for chesta/content-timeline */
+
+.wp-block-chesta-content-timeline {
+    position: relative;
+    /* Padding and background are handled by block supports */
+    margin-top: var(--spacing-lg, 32px); /* Add some default vertical spacing */
+    margin-bottom: var(--spacing-lg, 32px);
+}
+
+/* The main timeline vertical line */
+.wp-block-chesta-content-timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: var(--timeline-line-width, 3px);
+    background-color: var(--timeline-line-color, var(--primary-color, #0052D4));
+    z-index: 0; /* Behind items and points */
+}
+
+/* Layout-specific line positioning */
+.wp-block-chesta-content-timeline.timeline-layout-center-alternating::before {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.wp-block-chesta-content-timeline.timeline-layout-left-sided::before {
+    /* Adjust based on point size and desired offset from left edge */
+    left: calc( (var(--timeline-point-size, 16px) / 2) + var(--spacing-md, 16px) );
+    transform: translateX(-50%); /* Center the line on its defined left position */
+}
+
+.wp-block-chesta-content-timeline.timeline-layout-right-sided::before {
+    /* Adjust based on point size and desired offset from right edge */
+    right: calc( (var(--timeline-point-size, 16px) / 2) + var(--spacing-md, 16px) );
+    left: auto;
+    transform: translateX(50%); /* Center the line on its defined right position */
+}
+
+/* Styling for the InnerBlocks wrapper if needed, but usually direct child styling is enough */
+.wp-block-chesta-content-timeline > .block-editor-inner-blocks > .block-editor-block-list__layout,
+.wp-block-chesta-content-timeline > .wp-block-innerblocks { /* For frontend */
+    position: relative; /* Ensure items are stacked correctly above the pseudo-element line */
+    z-index: 1;
+}
+
+
+/* Item positioning for different layouts will be handled by the item's CSS */
+/* For example, .timeline-layout-center-alternating .wp-block-chesta-content-timeline-item:nth-child(odd) */
+/* will have specific margins or positioning in content-timeline-item.css */
+
+/* Ensure there's some space at the top and bottom of the line visually */
+.wp-block-chesta-content-timeline > .block-editor-inner-blocks > .block-editor-block-list__layout > :first-child,
+.wp-block-chesta-content-timeline > .wp-block-innerblocks > :first-child {
+    margin-top: var(--spacing-md, 16px); /* Space above first item's point */
+}
+.wp-block-chesta-content-timeline > .block-editor-inner-blocks > .block-editor-block-list__layout > :last-child,
+.wp-block-chesta-content-timeline > .wp-block-innerblocks > :last-child {
+    margin-bottom: var(--spacing-md, 16px); /* Space below last item's point */
+}

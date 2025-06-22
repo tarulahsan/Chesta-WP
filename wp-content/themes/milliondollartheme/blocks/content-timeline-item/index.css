@@ -1,0 +1,111 @@
+/* Editor-specific styles for chesta/content-timeline-item */
+
+.wp-block-chesta-content-timeline-item {
+    position: relative; /* Crucial for point and line segment positioning */
+    /* Default padding is via block supports or item's style-index.css */
+    /* margin-bottom: var(--spacing-lg, 32px); /* Space between items in the column flow */
+    width: 100%; /* Default, will be adjusted by parent layout styles */
+}
+
+/* Basic preview of the timeline point for each item in the editor */
+/* This is a simplified visual cue; the main styling is in the parent's style-index.css for the ::before on the item */
+.wp-block-chesta-content-timeline-item .timeline-item-point-editor-preview {
+    content: '';
+    position: absolute;
+    top: 1.5em; /* Approximate vertical alignment with the date/title */
+    left: 50%; /* Default for center-alternating, will be overridden by layout classes */
+    width: var(--timeline-point-size, 16px); /* Get from context or default */
+    height: var(--timeline-point-size, 16px);
+    background-color: var(--item-point-color, var(--timeline-point-color, #f00)); /* Item override or parent context */
+    border-radius: 50%; /* Default, pointStyle from context will refine this */
+    transform: translateX(-50%) translateY(-50%);
+    z-index: 2; /* Above the main timeline line */
+    border: 2px solid var(--background-color-light, #fff); /* Make it stand out from line */
+}
+
+/* Editor layout adjustments based on parent context (chesta/timelineLayout) */
+/* These classes would be added dynamically in the item's edit function based on context if possible,
+   or rely on parent block applying classes to children in editor (less common for InnerBlocks children) */
+
+/* If parent is left-sided */
+.wp-block-chesta-content-timeline[data-layout="left-sided"] .wp-block-chesta-content-timeline-item {
+    padding-left: calc(var(--timeline-point-size, 16px) + var(--spacing-lg, 32px)); /* Space for line and point */
+    width: 100%;
+}
+.wp-block-chesta-content-timeline[data-layout="left-sided"] .wp-block-chesta-content-timeline-item .timeline-item-point-editor-preview {
+    left: calc( (var(--timeline-point-size, 16px) / 2) + var(--spacing-md, 16px) - (var(--timeline-line-width, 3px) / 2) ); /* Align with parent line */
+    transform: translateX(-50%) translateY(-50%);
+}
+
+
+/* If parent is right-sided */
+.wp-block-chesta-content-timeline[data-layout="right-sided"] .wp-block-chesta-content-timeline-item {
+    padding-right: calc(var(--timeline-point-size, 16px) + var(--spacing-lg, 32px));
+    width: 100%;
+    /* margin-left: auto; /* This might not be needed if parent handles item positioning */
+}
+.wp-block-chesta-content-timeline[data-layout="right-sided"] .wp-block-chesta-content-timeline-item .timeline-item-point-editor-preview {
+    right: calc( (var(--timeline-point-size, 16px) / 2) + var(--spacing-md, 16px) - (var(--timeline-line-width, 3px) / 2) );
+    left: auto;
+    transform: translateX(50%) translateY(-50%);
+}
+
+/* If parent is center-alternating - this is harder to simulate perfectly in editor without JS for child index */
+.wp-block-chesta-content-timeline[data-layout="center-alternating"] .wp-block-chesta-content-timeline-item {
+    width: calc(50% - (var(--spacing-lg, 32px) / 2) - (var(--timeline-line-width, 3px) / 2) ); /* Approx width */
+}
+.wp-block-chesta-content-timeline[data-layout="center-alternating"] .wp-block-chesta-content-timeline-item:nth-child(odd) {
+    margin-right: calc(50% + (var(--spacing-lg, 32px) / 2) + (var(--timeline-line-width, 3px) / 2) );
+    /* padding-right: var(--spacing-lg); */
+}
+.wp-block-chesta-content-timeline[data-layout="center-alternating"] .wp-block-chesta-content-timeline-item:nth-child(even) {
+    margin-left: calc(50% + (var(--spacing-lg, 32px) / 2) + (var(--timeline-line-width, 3px) / 2) );
+    /* padding-left: var(--spacing-lg); */
+}
+.wp-block-chesta-content-timeline[data-layout="center-alternating"] .wp-block-chesta-content-timeline-item .timeline-item-point-editor-preview {
+    left: 50%; /* Point is always on the center line */
+}
+/* For alternating, the item's content might need to be positioned relative to the point differently */
+.wp-block-chesta-content-timeline[data-layout="center-alternating"] .wp-block-chesta-content-timeline-item:nth-child(odd) .timeline-item-point-editor-preview {
+    /* If item content is to the left of the line */
+    /* transform: translateX(calc(-100% - var(--spacing-lg, 32px) + (var(--timeline-point-size, 16px) / 2) )) translateY(-50%); */
+}
+.wp-block-chesta-content-timeline[data-layout="center-alternating"] .wp-block-chesta-content-timeline-item:nth-child(even) .timeline-item-point-editor-preview {
+     /* If item content is to the right of the line */
+    /* transform: translateX(calc(var(--spacing-lg, 32px) - (var(--timeline-point-size, 16px) / 2) )) translateY(-50%); */
+}
+
+
+/* General item content styling for editor */
+.wp-block-chesta-content-timeline-item .timeline-item-date-wrapper {
+    margin-bottom: var(--spacing-xs);
+}
+.wp-block-chesta-content-timeline-item .timeline-item-date {
+    font-size: 0.9em;
+    color: var(--text-color-muted);
+    font-weight: 600;
+}
+.wp-block-chesta-content-timeline-item .timeline-item-title {
+    font-weight: 700;
+    margin-bottom: var(--spacing-xs);
+    line-height: 1.3;
+}
+.wp-block-chesta-content-timeline-item .timeline-item-description {
+    font-size: 0.95em;
+    line-height: 1.6;
+}
+.wp-block-chesta-content-timeline-item .timeline-item-image-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-sm);
+    margin-top: var(--spacing-sm);
+}
+
+/* Image alignment within item - editor preview */
+.wp-block-chesta-content-timeline-item.timeline-item-image-align-left .timeline-item-content-wrapper { display: flex; gap: var(--spacing-md); }
+.wp-block-chesta-content-timeline-item.timeline-item-image-align-left .timeline-item-image-container { order: -1; flex-shrink: 0; width: 100px; /* example size */ }
+
+.wp-block-chesta-content-timeline-item.timeline-item-image-align-right .timeline-item-content-wrapper { display: flex; gap: var(--spacing-md); }
+.wp-block-chesta-content-timeline-item.timeline-item-image-align-right .timeline-item-image-container { order: 1; flex-shrink: 0; width: 100px; /* example size */ }
+
+.wp-block-chesta-content-timeline-item.timeline-item-image-align-top .timeline-item-image-container { margin-bottom: var(--spacing-sm); }

@@ -1,0 +1,163 @@
+/* Frontend and shared editor styles for chesta/advanced-image */
+
+.wp-block-chesta-advanced-image {
+    /* Base styles for the block wrapper if any */
+    margin-bottom: var(--spacing-md, 16px); /* Default WP block margin */
+}
+
+.chesta-advanced-image-figure {
+    margin: 0; /* Reset default figure margin */
+    position: relative;
+    overflow: hidden; /* Important for border-radius, shape masks, and some hover effects */
+    line-height: 0; /* Prevent extra space below image if it's an inline-block internally */
+    display: inline-block; /* Default behavior, alignment will control block display */
+    max-width: 100%;
+}
+
+.wp-block-chesta-advanced-image.aligncenter .chesta-advanced-image-figure {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center; /* Centers the figcaption if present */
+}
+.wp-block-chesta-advanced-image.alignleft .chesta-advanced-image-figure {
+    margin-right: var(--spacing-md, 16px);
+    float: left;
+}
+.wp-block-chesta-advanced-image.alignright .chesta-advanced-image-figure {
+    margin-left: var(--spacing-md, 16px);
+    float: right;
+}
+
+
+.chesta-advanced-image-figure img {
+    display: block;
+    max-width: 100%;
+    height: auto; /* This will be overridden by aspectRatio or direct height/width attributes */
+    transition: transform var(--transition-speed-medium) var(--transition-timing-default),
+                opacity var(--transition-speed-medium) var(--transition-timing-default),
+                filter var(--transition-speed-medium) var(--transition-timing-default);
+    /* border-radius is applied via inline style from attributes or specific shape mask class */
+}
+
+.chesta-advanced-image-link {
+    display: inline-block; /* Ensure link wraps image correctly */
+    line-height: 0; /* Remove extra space from link around image */
+}
+
+.chesta-advanced-image-caption {
+    display: block; /* Ensure caption is block for proper spacing */
+    font-size: 0.9em;
+    color: var(--text-color-muted-darker, #495057);
+    text-align: center; /* Default, can be overridden by block styles or attributes */
+    margin-top: var(--spacing-sm, 8px);
+    line-height: 1.5; /* Reset line height for text */
+}
+
+/* Hover Effects */
+.chesta-advanced-image-figure.hover-zoom-in img {
+    transform-origin: center center;
+}
+.chesta-advanced-image-figure.hover-zoom-in:hover img {
+    transform: scale(1.1);
+}
+
+.chesta-advanced-image-figure.hover-zoom-out img {
+    transform: scale(1.1); /* Start slightly zoomed in */
+    transform-origin: center center;
+}
+.chesta-advanced-image-figure.hover-zoom-out:hover img {
+    transform: scale(1.0);
+}
+
+.chesta-advanced-image-figure.hover-grayscale img {
+    filter: grayscale(100%);
+}
+.chesta-advanced-image-figure.hover-grayscale:hover img {
+    filter: grayscale(0%);
+}
+
+.chesta-advanced-image-figure .image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5); /* Default, overridden by attribute */
+    opacity: 0;
+    transition: opacity var(--transition-speed-medium) var(--transition-timing-default);
+    pointer-events: none; /* Allows link underneath to be clickable */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.chesta-advanced-image-figure.hover-overlay-simple:hover .image-overlay,
+.chesta-advanced-image-figure.hover-overlay-text:hover .image-overlay {
+    opacity: 1;
+}
+
+.chesta-advanced-image-figure .overlay-text-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9); /* Start slightly small */
+    color: #fff; /* Default, should be customizable */
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-align: center;
+    opacity: 0;
+    transition: opacity var(--transition-speed-medium) var(--transition-timing-default) 0.1s, /* Slight delay */
+                transform var(--transition-speed-medium) var(--transition-timing-default) 0.1s;
+    pointer-events: none;
+    font-size: 1.2em; /* Example, make customizable */
+    font-weight: bold;
+}
+.chesta-advanced-image-figure.hover-overlay-text:hover .overlay-text-content {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+
+/* Box Shadow Presets */
+.chesta-advanced-image-figure.shadow-soft {
+    box-shadow: var(--box-shadow-soft, 0 2px 8px rgba(0,0,0,0.07));
+}
+.chesta-advanced-image-figure.shadow-medium {
+    box-shadow: var(--box-shadow-medium, 0 5px 15px rgba(0,0,0,0.1));
+}
+.chesta-advanced-image-figure.shadow-large {
+    box-shadow: var(--box-shadow-large, 0 10px 30px rgba(0,0,0,0.12));
+}
+
+/* Shape Masks - using clip-path. Browser support varies for complex paths. */
+/* These classes target the image directly if the figure has overflow:hidden, or the figure itself. */
+/* For simplicity, applying to figure and assuming image fills it. */
+
+.chesta-advanced-image-figure.shape-circle,
+.chesta-advanced-image-figure.shape-circle img {
+    border-radius: 50% !important; /* Overrides other border-radius */
+    clip-path: circle(50% at 50% 50%);
+}
+
+.chesta-advanced-image-figure.shape-blob-1 {
+    /* Example Blob - from https://bennettfeely.com/clippy/ */
+    clip-path: ellipse(35% 45% at 50% 50%);
+    /* For blobs, direct border might not look good. Consider a pseudo-element border or shadow. */
+}
+.chesta-advanced-image-figure.shape-blob-1 img {
+     clip-path: ellipse(35% 45% at 50% 50%);
+}
+
+
+.chesta-advanced-image-figure.shape-diamond {
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+.chesta-advanced-image-figure.shape-diamond img {
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+
+/* Ensure borders applied via inline styles on img don't get clipped weirdly by figure's overflow:hidden */
+/* It's often better to apply border to the figure or a wrapper, not directly to the img if using clip-path on img */
+.chesta-advanced-image-figure[style*="border-style"] {
+    /* If border is on the figure, it will be clipped by clip-path too. */
+    /* This indicates a more complex setup might be needed for borders + complex clip-paths. */
+    /* For simple shapes like circle, border-radius on the image itself is fine. */
+}

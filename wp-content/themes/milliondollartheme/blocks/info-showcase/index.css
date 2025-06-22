@@ -1,0 +1,34 @@
+/* Editor-specific styles for chesta/info-showcase */
+
+.wp-block-chesta-info-showcase {
+    /* If the block needs a distinct placeholder or wrapper style in the editor */
+    /* padding: 1px; /* Helps visualize the block bounds if empty */
+    /* background-color: rgba(0,0,255,0.05); /* Light blue tint for editor bounds */
+}
+
+/* Ensure InnerBlocks are visible and layout correctly in editor */
+.wp-block-chesta-info-showcase .block-editor-inner-blocks .block-editor-block-list__layout {
+    display: grid; /* Use grid in editor too for consistency */
+    grid-template-columns: repeat(var(--info-showcase-columns, 3), 1fr);
+    gap: var(--info-showcase-column-gap, 16px) var(--info-showcase-row-gap, 16px); /* Use CSS variables set by block props */
+}
+
+/* Responsive adjustments for editor grid preview if needed */
+/* This might be complex to perfectly match frontend without JS, but can approximate */
+@media (max-width: 1023px) {
+    .wp-block-chesta-info-showcase[data-columns="4"] .block-editor-inner-blocks .block-editor-block-list__layout,
+    .wp-block-chesta-info-showcase[data-columns="3"] .block-editor-inner-blocks .block-editor-block-list__layout {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 767px) {
+    .wp-block-chesta-info-showcase .block-editor-inner-blocks .block-editor-block-list__layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Style for the content alignment within items, applied to parent for context */
+.wp-block-chesta-info-showcase.items-align-left .chesta-info-showcase-item-align-left { text-align: left; }
+.wp-block-chesta-info-showcase.items-align-center .chesta-info-showcase-item-align-center { text-align: center; }
+.wp-block-chesta-info-showcase.items-align-right .chesta-info-showcase-item-align-right { text-align: right; }

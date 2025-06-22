@@ -1,0 +1,244 @@
+/* Frontend and shared editor styles for chesta/content-timeline-item */
+
+.wp-block-chesta-content-timeline-item {
+    position: relative; /* For point and line segment */
+    padding: var(--itemPadding, var(--spacing-md, 16px)); /* Default padding from attribute or fallback */
+    margin-bottom: var(--spacing-lg, 32px); /* Space between items */
+    background-color: var(--itemBackgroundColor, var(--background-color-light, #fff));
+    border-radius: var(--itemBorderRadius, var(--border-radius-md, 8px));
+    border-style: var(--itemBorderStyle, none);
+    border-width: var(--itemBorderWidth, 1px);
+    border-color: var(--itemBorderColor, var(--global-border-color, #ddd));
+    box-shadow: var(--box-shadow-soft, 0 2px 8px rgba(0,0,0,0.07));
+    width: 100%; /* Default, parent layout will size it */
+    box-sizing: border-box;
+}
+
+/* Timeline Point for each item */
+.wp-block-chesta-content-timeline-item .timeline-item-point {
+    content: '';
+    position: absolute;
+    top: 1.5em; /* Align with first line of text roughly, adjust as needed */
+    width: var(--itemPointSize, var(--timeline-point-size, 16px)); /* Item specific or parent context */
+    height: var(--itemPointSize, var(--timeline-point-size, 16px));
+    background-color: var(--itemPointColor, var(--timeline-point-color, var(--accent-color, #00C6AD)));
+    border-radius: 50%; /* Default, will be overridden by pointStyle class */
+    border: calc(var(--timeline-line-width, 3px) / 1.5) solid var(--background-color-light, #fff); /* Creates a border effect against the line */
+    z-index: 2; /* Above the main timeline line */
+}
+
+/* Point Styles (from parent context or item override if we add that) */
+.wp-block-chesta-content-timeline[class*="point-style-square"] .timeline-item-point {
+    border-radius: 0;
+}
+.wp-block-chesta-content-timeline[class*="point-style-diamond"] .timeline-item-point {
+    border-radius: 0;
+    transform: rotate(45deg);
+    /* Diamond positioning might need slight adjustment */
+}
+
+
+/* Timeline Line Segment before point (connects to previous item's point or top) */
+.wp-block-chesta-content-timeline-item .timeline-item-line-segment {
+    content: '';
+    position: absolute;
+    bottom: calc(1.5em + (var(--itemPointSize, var(--timeline-point-size, 16px)) / 2) - (var(--timeline-line-width, 3px) / 2) ); /* Start from center of point */
+    top: calc( -1 * var(--spacing-lg, 32px) + 1.5em - (var(--itemPointSize, var(--timeline-point-size, 16px)) / 2) ); /* Extend up to previous item's margin */
+    width: var(--timeline-line-width, 3px);
+    background-color: var(--itemLineColorBefore, var(--timeline-line-color, var(--primary-color, #0052D4)));
+    z-index: 0; /* Behind point and item content */
+}
+/* First item doesn't need a line segment above its point if it's the start of the timeline */
+.wp-block-chesta-content-timeline > .wp-block-innerblocks > .block-editor-block-list__layout > .wp-block-chesta-content-timeline-item:first-child .timeline-item-line-segment,
+.wp-block-chesta-content-timeline > .wp-block-innerblocks > .wp-block-chesta-content-timeline-item:first-child .timeline-item-line-segment { /* Editor and Frontend */
+    display: none;
+}
+
+
+/* Layout Specific Positioning for Item and its Point/Line */
+.timeline-layout-center-alternating .wp-block-chesta-content-timeline-item {
+    width: calc(50% - (var(--spacing-lg, 32px) / 2) - (var(--timeline-line-width, 3px) / 2) );
+}
+.timeline-layout-center-alternating .wp-block-chesta-content-timeline-item:nth-child(odd) {
+    margin-right: calc(50% + (var(--spacing-lg, 32px) / 2) + (var(--timeline-line-width, 3px) / 2) );
+    text-align: right; /* Content aligns right */
+}
+.timeline-layout-center-alternating .wp-block-chesta-content-timeline-item:nth-child(even) {
+    margin-left: calc(50% + (var(--spacing-lg, 32px) / 2) + (var(--timeline-line-width, 3px) / 2) );
+    text-align: left; /* Content aligns left */
+}
+
+.timeline-layout-center-alternating .wp-block-chesta-content-timeline-item .timeline-item-point,
+.timeline-layout-center-alternating .wp-block-chesta-content-timeline-item .timeline-item-line-segment {
+    left: 50%;
+    transform: translateX(-50%);
+}
+/* Adjust point/line for items on the left of the central line in alternating layout */
+.timeline-layout-center-alternating .wp-block-chesta-content-timeline-item:nth-child(odd) .timeline-item-point {
+    left: auto;
+    right: calc( -1 * ( (var(--spacing-lg, 32px) / 2) + (var(--timeline-line-width, 3px) / 2) + (var(--itemPointSize, var(--timeline-point-size, 16px)) / 2) ) );
+    transform: translateX(0); /* Reset transform as positioning is absolute */
+}
+.timeline-layout-center-alternating .wp-block-chesta-content-timeline-item:nth-child(odd) .timeline-item-line-segment {
+    left: auto;
+    right: calc( -1 * ( (var(--spacing-lg, 32px) / 2) + (var(--timeline-line-width, 3px) / 2) ) );
+    transform: translateX(50%);
+}
+
+/* Adjust point/line for items on the right of the central line in alternating layout */
+.timeline-layout-center-alternating .wp-block-chesta-content-timeline-item:nth-child(even) .timeline-item-point {
+    left: calc( -1 * ( (var(--spacing-lg, 32px) / 2) + (var(--timeline-line-width, 3px) / 2) + (var(--itemPointSize, var(--timeline-point-size, 16px)) / 2) ) );
+    transform: translateX(0);
+}
+.timeline-layout-center-alternating .wp-block-chesta-content-timeline-item:nth-child(even) .timeline-item-line-segment {
+    left: calc( -1 * ( (var(--spacing-lg, 32px) / 2) + (var(--timeline-line-width, 3px) / 2) ) );
+    transform: translateX(50%);
+}
+
+
+.timeline-layout-left-sided .wp-block-chesta-content-timeline-item {
+    margin-left: calc( (var(--timeline-point-size, 16px)) + var(--spacing-lg, 32px) + var(--spacing-md, 16px) ); /* Space for point, gap, and line */
+}
+.timeline-layout-left-sided .wp-block-chesta-content-timeline-item .timeline-item-point,
+.timeline-layout-left-sided .wp-block-chesta-content-timeline-item .timeline-item-line-segment {
+    left: calc( -1 * (var(--spacing-lg, 32px) + (var(--timeline-point-size, 16px) / 2) ) ); /* Position relative to item's left edge */
+    transform: translateX(0);
+}
+
+.timeline-layout-right-sided .wp-block-chesta-content-timeline-item {
+    margin-right: calc( (var(--timeline-point-size, 16px)) + var(--spacing-lg, 32px) + var(--spacing-md, 16px) );
+    /* margin-left: auto; /* This doesn't work as expected with grid from parent */
+}
+.timeline-layout-right-sided .wp-block-chesta-content-timeline-item .timeline-item-point,
+.timeline-layout-right-sided .wp-block-chesta-content-timeline-item .timeline-item-line-segment {
+    right: calc( -1 * (var(--spacing-lg, 32px) + (var(--timeline-point-size, 16px) / 2) ) );
+    left: auto;
+    transform: translateX(0);
+}
+
+
+/* Item Content Styling */
+.timeline-item-date-wrapper {
+    margin-bottom: var(--spacing-xs, 4px);
+}
+.timeline-item-date {
+    font-size: 0.9em;
+    color: var(--text-color-muted, #6c757d);
+    font-weight: 600;
+    display: inline-block;
+    padding: var(--spacing-xs, 4px) var(--spacing-sm, 8px);
+    background-color: rgba(var(--primary-color-rgb, 0,82,212), 0.05);
+    border-radius: var(--border-radius-pill, 50px);
+    margin-bottom: var(--spacing-sm, 8px); /* Space after date if it's block */
+}
+
+.timeline-item-title {
+    font-family: var(--font-family-heading);
+    font-weight: 700;
+    font-size: 1.4em; /* Example size */
+    color: var(--primary-color, #0052D4);
+    margin-top: 0;
+    margin-bottom: var(--spacing-sm, 8px);
+    line-height: 1.3;
+}
+
+.timeline-item-description {
+    font-size: 1em;
+    line-height: 1.7;
+    color: var(--text-color-dark, #1A1A1A);
+}
+.timeline-item-description p:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-item-image-container {
+    margin-bottom: var(--spacing-md, 16px);
+}
+.timeline-item-image-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-md, 8px);
+    display: block;
+}
+
+/* Image alignment within item */
+.timeline-item-content-wrapper { /* Wrapper for text content + potentially side-aligned image */
+    /* display: flex; /* Enable for side-by-side image/text */
+    /* gap: var(--spacing-md, 16px); */
+}
+
+.wp-block-chesta-content-timeline-item.timeline-item-image-align-left .timeline-item-content-wrapper,
+.wp-block-chesta-content-timeline-item.timeline-item-image-align-right .timeline-item-content-wrapper {
+    display: flex;
+    gap: var(--spacing-md, 16px);
+    align-items: flex-start; /* Or center, etc. */
+}
+.wp-block-chesta-content-timeline-item.timeline-item-image-align-left .timeline-item-image-container {
+    order: -1; /* Image first */
+    flex-shrink: 0;
+    width: 120px; /* Example fixed width for side image */
+}
+.wp-block-chesta-content-timeline-item.timeline-item-image-align-right .timeline-item-image-container {
+    order: 1; /* Image last */
+    flex-shrink: 0;
+    width: 120px; /* Example fixed width */
+}
+.wp-block-chesta-content-timeline-item.timeline-item-image-align-top .timeline-item-image-container {
+    /* Default block flow, image is above text elements */
+}
+
+
+/* Responsive adjustments for timeline items */
+@media (max-width: 767px) {
+    .timeline-layout-center-alternating .wp-block-chesta-content-timeline-item,
+    .wp-block-chesta-content-timeline.timeline-layout-center-alternating .wp-block-chesta-content-timeline-item:nth-child(odd),
+    .wp-block-chesta-content-timeline.timeline-layout-center-alternating .wp-block-chesta-content-timeline-item:nth-child(even) {
+        width: auto; /* Full width available */
+        margin-left: calc( (var(--timeline-point-size, 16px)) + var(--spacing-lg, 32px) + var(--spacing-md, 16px) );
+        margin-right: 0;
+        text-align: left !important; /* Force left align on mobile for alternating */
+    }
+
+    .timeline-layout-center-alternating .wp-block-chesta-content-timeline-item .timeline-item-point,
+    .timeline-layout-center-alternating .wp-block-chesta-content-timeline-item .timeline-item-line-segment,
+    .wp-block-chesta-content-timeline.timeline-layout-center-alternating .wp-block-chesta-content-timeline-item:nth-child(odd) .timeline-item-point,
+    .wp-block-chesta-content-timeline.timeline-layout-center-alternating .wp-block-chesta-content-timeline-item:nth-child(odd) .timeline-item-line-segment,
+    .wp-block-chesta-content-timeline.timeline-layout-center-alternating .wp-block-chesta-content-timeline-item:nth-child(even) .timeline-item-point,
+    .wp-block-chesta-content-timeline.timeline-layout-center-alternating .wp-block-chesta-content-timeline-item:nth-child(even) .timeline-item-line-segment {
+        left: calc( -1 * (var(--spacing-lg, 32px) + (var(--timeline-point-size, 16px) / 2) ) );
+        right: auto;
+        transform: translateX(0);
+    }
+
+    .wp-block-chesta-content-timeline.timeline-layout-left-sided::before,
+    .wp-block-chesta-content-timeline.timeline-layout-center-alternating::before { /* Force line to left on mobile for alternating too */
+        left: calc( (var(--timeline-point-size, 16px) / 2) + var(--spacing-md, 16px) );
+        transform: translateX(-50%);
+    }
+     .wp-block-chesta-content-timeline.timeline-layout-right-sided .wp-block-chesta-content-timeline-item {
+        margin-right: 0;
+        margin-left: calc( (var(--timeline-point-size, 16px)) + var(--spacing-lg, 32px) + var(--spacing-md, 16px) );
+    }
+    .wp-block-chesta-content-timeline.timeline-layout-right-sided .wp-block-chesta-content-timeline-item .timeline-item-point,
+    .wp-block-chesta-content-timeline.timeline-layout-right-sided .wp-block-chesta-content-timeline-item .timeline-item-line-segment {
+        left: calc( -1 * (var(--spacing-lg, 32px) + (var(--timeline-point-size, 16px) / 2) ) );
+        right: auto;
+        transform: translateX(0);
+    }
+     .wp-block-chesta-content-timeline.timeline-layout-right-sided::before {
+        left: calc( (var(--timeline-point-size, 16px) / 2) + var(--spacing-md, 16px) );
+        right: auto;
+        transform: translateX(-50%);
+    }
+
+    .wp-block-chesta-content-timeline-item.timeline-item-image-align-left .timeline-item-content-wrapper,
+    .wp-block-chesta-content-timeline-item.timeline-item-image-align-right .timeline-item-content-wrapper {
+        flex-direction: column; /* Stack image and text on mobile */
+    }
+    .wp-block-chesta-content-timeline-item.timeline-item-image-align-left .timeline-item-image-container,
+    .wp-block-chesta-content-timeline-item.timeline-item-image-align-right .timeline-item-image-container {
+        width: 100%; /* Full width image */
+        margin-bottom: var(--spacing-sm);
+        order: -1; /* Image always on top when stacked */
+    }
+}

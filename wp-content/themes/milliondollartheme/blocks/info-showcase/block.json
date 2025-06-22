@@ -1,0 +1,62 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "chesta/info-showcase",
+    "title": "Info Showcase (Chesta)",
+    "category": "chesta-blocks",
+    "description": "A container for displaying multiple info/feature items in a grid.",
+    "icon": "grid-view",
+    "keywords": ["features", "grid", "info", "showcase", "highlights", "services"],
+    "attributes": {
+        "columns": {
+            "type": "number",
+            "default": 3
+        },
+        "columnGap": {
+            "type": "string",
+            "default": "var(--spacing-md, 16px)"
+        },
+        "rowGap": {
+            "type": "string",
+            "default": "var(--spacing-md, 16px)"
+        },
+        "itemsAlign": {
+            "type": "string",
+            "default": "left"
+        },
+        "align": {
+            "type": "string"
+        },
+        "backgroundColor": {
+            "type": "string"
+        },
+        "paddingTop": {"type": "string"},
+        "paddingRight": {"type": "string"},
+        "paddingBottom": {"type": "string"},
+        "paddingLeft": {"type": "string"}
+    },
+    "supports": {
+        "align": ["wide", "full"],
+        "html": false,
+        "anchor": true,
+        "color": {
+            "background": true, /* For section background */
+            "text": false,
+            "link": false,
+            "gradients": true /* Allow gradient background for section */
+        },
+        "spacing": {
+            "padding": true, /* Overall section padding */
+            "margin": true, /* Overall section margin */
+            "blockGap": false /* Internal gap handled by attributes */
+        }
+    },
+    "providesContext": {
+        "chesta/infoShowcase/columns": "columns",
+        "chesta/infoShowcase/itemsAlign": "itemsAlign"
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css"
+}

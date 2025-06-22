@@ -1,0 +1,68 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "chesta/content-timeline-item",
+    "title": "Timeline Item (Chesta)",
+    "category": "chesta-blocks",
+    "description": "A single event or entry in the Content Timeline.",
+    "icon": "flag",
+    "parent": ["chesta/content-timeline"],
+    "usesContext": [
+        "chesta/timelineLayout",
+        "chesta/timelinePointColor",
+        "chesta/timelinePointSize",
+        "chesta/timelinePointStyle",
+        "chesta/timelineLineColor"
+    ],
+    "attributes": {
+        "date": {
+            "type": "string",
+            "source": "html",
+            "selector": ".timeline-item-date",
+            "default": "Event Date"
+        },
+        "title": {
+            "type": "string",
+            "source": "html",
+            "selector": ".timeline-item-title",
+            "default": "Timeline Event Title"
+        },
+        "titleTag": {
+            "type": "string",
+            "default": "h4"
+        },
+        "description": {
+            "type": "string",
+            "source": "html",
+            "selector": ".timeline-item-description",
+            "default": "Detailed description of the timeline event goes here. Add more content to illustrate."
+        },
+        "imageUrl": { "type": "string" },
+        "imageId": { "type": "number" },
+        "imageAlignment": { "type": "string", "default": "none" },
+        "itemPointColor": { "type": "string" },
+        "itemLineColorBefore": { "type": "string" },
+        "itemPadding": { "type": "string", "default": "var(--spacing-md, 16px)"},
+        "itemBackgroundColor": { "type": "string" },
+        "itemBorderRadius": { "type": "string", "default": "var(--border-radius-md, 8px)" }
+    },
+    "supports": {
+        "html": false,
+        "reusable": false,
+        "inserter": false,
+        "color": {
+            "background": true, /* For item background */
+            "text": true,       /* For item text if not using specific controls */
+            "link": true,
+            "gradients": true
+        },
+        "spacing": {
+            "padding": true, /* If item needs its own padding control beyond default */
+            "margin": false
+        }
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css"
+}

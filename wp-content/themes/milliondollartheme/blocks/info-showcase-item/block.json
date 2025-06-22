@@ -1,0 +1,56 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "chesta/info-showcase-item",
+    "title": "Info Showcase Item (Chesta)",
+    "category": "chesta-blocks",
+    "description": "A single item for the Info Showcase block, containing an icon/image, title, and description.",
+    "icon": "lightbulb",
+    "parent": ["chesta/info-showcase"],
+    "usesContext": [ "chesta/infoShowcase/columns", "chesta/infoShowcase/itemsAlign" ],
+    "attributes": {
+        "mediaType": { "type": "string", "default": "icon" },
+        "icon": { "type": "string", "default": "star-filled" },
+        "iconSize": { "type": "string", "default": "48px" },
+        "iconColor": { "type": "string" },
+        "iconBackgroundColor": { "type": "string" },
+        "iconShape": { "type": "string", "default": "none" },
+        "imageUrl": { "type": "string" },
+        "imageId": { "type": "number" },
+        "imageWidth": { "type": "string", "default": "80px" },
+        "title": { "type": "string", "source": "html", "selector": ".info-showcase-item-title", "default": "Feature Title" },
+        "titleTag": { "type": "string", "default": "h4" },
+        "titleColor": { "type": "string" },
+        "description": { "type": "string", "source": "html", "selector": ".info-showcase-item-description", "default": "Briefly describe the feature or benefit here." },
+        "descriptionColor": { "type": "string" },
+        "linkUrl": { "type": "string" },
+        "linkText": { "type": "string", "default": "" },
+        "linkTarget": { "type": "string", "default": "_self" },
+        "rel": { "type": "string", "default": "" },
+        "itemBackgroundColor": { "type": "string" },
+        "itemPadding": { "type": "string" },
+        "itemBorderRadius": { "type": "string" },
+        "itemBorderStyle": { "type": "string", "default": "none" },
+        "itemBorderWidth": { "type": "string", "default": "1px" },
+        "itemBorderColor": { "type": "string" }
+    },
+    "supports": {
+        "html": false,
+        "reusable": false,
+        "inserter": false, /* Should only be insertable via parent's InnerBlocks */
+        "color": { /* Allow some text/bg colors if not handled by attributes above */
+            "text": true,
+            "background": true,
+            "link": true,
+            "gradients": true
+        },
+        "spacing": {
+            "padding": true, /* For individual item padding */
+            "margin": false /* Margin controlled by parent's gap */
+        }
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css"
+}

@@ -135,6 +135,30 @@ function milliondollartheme_register_blocks() {
 }
 add_action( 'init', 'milliondollartheme_register_blocks' );
 
+// Register custom block category
+if ( ! function_exists( 'milliondollartheme_block_categories' ) ) {
+    function milliondollartheme_block_categories( $categories, $block_editor_context ) {
+        // Check if block editor context is available (WP 5.0+)
+        // if ( ! empty( $block_editor_context->post ) ) { // Could also check post type if needed
+            return array_merge(
+                $categories,
+                array(
+                    array(
+                        'slug'  => 'chesta-blocks',
+                        'title' => __( 'Chesta Blocks', 'milliondollartheme' ),
+                        'icon'  => 'star-filled', // Optional Dashicon
+                    ),
+                )
+            );
+        // }
+        // return $categories; // Fallback for contexts without post object or older WP
+    }
+}
+// Use 'block_categories_all' for WP 5.8+ or 'block_categories' for older versions.
+// 'block_categories_all' is preferred for modern WordPress.
+add_filter( 'block_categories_all', 'milliondollartheme_block_categories', 10, 2 );
+
+
 function milliondollartheme_render_posts_display_block( $attributes ) {
     // Optimized query based on attributes
     // This is a placeholder for the actual rendering logic which can be quite complex
@@ -1494,7 +1518,8 @@ if ( ! function_exists( 'milliondollartheme_seo_dashboard_page' ) ) {
             <!-- Basic Tab Navigation (can be enhanced with JS later) -->
             <nav class="nav-tab-wrapper">
                 <a href="#general-seo-settings" class="nav-tab nav-tab-active"><?php esc_html_e( 'General Settings', 'milliondollartheme' ); ?></a>
-                <a href="#on-page-seo-tools" class="nav-tab"><?php esc_html_e( 'On-Page Tools (Coming Soon)', 'milliondollartheme' ); ?></a>
+                <a href="#on-page-analyzer" class="nav-tab"><?php esc_html_e( 'On-Page Analyzer', 'milliondollartheme' ); ?></a>
+                <a href="#sitemap-info" class="nav-tab"><?php esc_html_e( 'Sitemap Info (Coming Soon)', 'milliondollartheme' ); ?></a>
             </nav>
 
             <div id="tab-general-seo-settings" class="tab-content active">
@@ -1535,9 +1560,147 @@ if ( ! function_exists( 'milliondollartheme_seo_dashboard_page' ) ) {
                 </form>
             </div>
 
-            <div id="tab-on-page-seo-tools" class="tab-content">
-                <h2><?php esc_html_e( 'On-Page SEO Tools', 'milliondollartheme' ); ?></h2>
-                <p class="placeholder"><?php esc_html_e( 'Advanced on-page analysis tools will be available here in a future update.', 'milliondollartheme' ); ?></p>
+            <div id="tab-on-page-analyzer" class="tab-content">
+                <h2><?php esc_html_e( 'On-Page SEO Analyzer', 'milliondollartheme' ); ?></h2>
+                <form method="POST" action="#on-page-analyzer"> <?php // Post to the same page, anchor to the tab ?>
+                    <?php wp_nonce_field( 'milliondollartheme_analyze_seo_nonce', 'milliondollartheme_seo_analyze_nonce' ); ?>
+                    <input type="hidden" name="mdt_seo_action" value="analyze_page">
+
+                    <table class="form-table">
+                        <tr valign="top">
+                            <th scope="row">
+                                <label for="mdt_seo_analyze_url"><?php esc_html_e( 'URL to Analyze', 'milliondollartheme' ); ?></label>
+                            </th>
+                            <td>
+                                <input type="url" id="mdt_seo_analyze_url" name="mdt_seo_analyze_url" class="regular-text" placeholder="<?php esc_attr_e( 'Enter full URL (e.g., https://example.com/my-post)', 'milliondollartheme' ); ?>" />
+                                <p class="description"><?php esc_html_e( 'Enter a URL of a live page (internal or external).', 'milliondollartheme' ); ?></p>
+                            </td>
+                        </tr>
+                        <tr valign="top">
+                            <th scope="row">
+                                <label for="mdt_seo_analyze_post_id"><?php esc_html_e( 'Or Select Internal Content', 'milliondollartheme' ); ?></label>
+                            </th>
+                            <td>
+                                <?php
+                                wp_dropdown_pages( array(
+                                    'name'             => 'mdt_seo_analyze_post_id',
+                                    'id'               => 'mdt_seo_analyze_post_id',
+                                    'show_option_none' => esc_html__( '&mdash; Select a Post/Page &mdash;', 'milliondollartheme' ),
+                                    'option_none_value'=> '0',
+                                    'post_type'        => array( 'post', 'page' ), // Add other CPTs if needed
+                                    'selected'         => 0, // Add logic to retain selection if needed
+                                ) );
+                                ?>
+                                <p class="description"><?php esc_html_e( 'Alternatively, select a published post or page from your site.', 'milliondollartheme' ); ?></p>
+                            </td>
+                        </tr>
+                         <tr valign="top">
+                            <th scope="row">
+                                <label for="mdt_seo_focus_keyword"><?php esc_html_e( 'Focus Keyword', 'milliondollartheme' ); ?></label>
+                            </th>
+                            <td>
+                                <input type="text" id="mdt_seo_focus_keyword" name="mdt_seo_focus_keyword" class="regular-text" />
+                                <p class="description"><?php esc_html_e( 'Enter the primary keyword or phrase you are targeting for this page.', 'milliondollartheme' ); ?></p>
+                            </td>
+                        </tr>
+                    </table>
+                    <?php submit_button( __( 'Analyze Page SEO', 'milliondollartheme' ), 'primary', 'analyze_seo_submit' ); ?>
+                </form>
+
+                <div id="mdt-seo-analysis-results" class="mdt-seo-results-area" style="margin-top: 20px;">
+                    <?php
+                    // PHP analysis results will be displayed here.
+                    // This part will be populated by the PHP logic handling the form submission.
+                    if ( isset( $_POST['mdt_seo_action'] ) && $_POST['mdt_seo_action'] === 'analyze_page' &&
+                         isset( $_POST['milliondollartheme_seo_analyze_nonce'] ) &&
+                         wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['milliondollartheme_seo_analyze_nonce'] ) ), 'milliondollartheme_analyze_seo_nonce' ) ) {
+
+                        // Placeholder for where milliondollartheme_handle_seo_analysis() would be called and output results.
+                        // For now, just acknowledging the submission.
+                        // echo '<p><strong>Analysis would appear here...</strong></p>';
+                        // In a real implementation, you'd call a function that does the analysis and echoes HTML.
+                        milliondollartheme_handle_seo_analysis_submission();
+                    }
+                    ?>
+                </div>
+            </div>
+            <div id="tab-sitemap-info" class="tab-content">
+                <h2><?php esc_html_e( 'XML Sitemap Information', 'milliondollartheme' ); ?></h2>
+                <?php
+                $sitemap_urls_found = array();
+                $sitemap_suggestions = array();
+
+                // 1. Check for Core WordPress Sitemap (available since WP 5.5)
+                // The default path is /wp-sitemap.xml
+                $core_sitemap_url = home_url( '/wp-sitemap.xml' );
+                $response = wp_remote_head( $core_sitemap_url, array( 'timeout' => 5 ) );
+                if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
+                    $sitemap_urls_found['core'] = $core_sitemap_url;
+                } else {
+                    // Check if 'sitemaps_enabled' filter is false (meaning they are disabled)
+                    if ( ! apply_filters( 'wp_sitemaps_enabled', true ) ) {
+                         $sitemap_suggestions[] = __( 'WordPress core sitemaps are currently disabled via the "wp_sitemaps_enabled" filter.', 'milliondollartheme');
+                    } else {
+                        // Check if a plugin might be overriding the sitemap functionality or if it's just not generating.
+                        // This is harder to detect definitively without checking specific plugin options.
+                    }
+                }
+
+                // 2. Check for common SEO plugin sitemap paths
+                // These often override the core sitemap or use their own index.
+                $common_plugin_paths = array(
+                    '/sitemap_index.xml', // Common for Yoast, Rank Math, etc.
+                    '/sitemap.xml',       // General fallback or some plugins
+                    // Add more specific paths if known for other popular plugins
+                );
+
+                foreach ( $common_plugin_paths as $path ) {
+                    $plugin_sitemap_url = home_url( $path );
+                    if ( $plugin_sitemap_url === $core_sitemap_url && isset($sitemap_urls_found['core'])) { // Avoid re-checking core if it's the same path
+                        continue;
+                    }
+                    $response = wp_remote_head( $plugin_sitemap_url, array( 'timeout' => 5 ) );
+                    if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
+                        $sitemap_urls_found['plugin_'.sanitize_key($path)] = $plugin_sitemap_url;
+                        // If a plugin sitemap is found, it often means core might be disabled or less relevant.
+                        // We can refine this logic later if needed.
+                        // For now, just list all found.
+                    }
+                }
+
+                if ( ! empty( $sitemap_urls_found ) ) {
+                    echo '<p>' . esc_html__( 'The following XML sitemap(s) appear to be active on your site:', 'milliondollartheme' ) . '</p>';
+                    echo '<ul>';
+                    foreach ( $sitemap_urls_found as $key => $url ) {
+                        echo '<li><a href="' . esc_url( $url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html( $url ) . '</a>';
+                        if ($key === 'core') echo ' <em>(' . __('WordPress Core', 'milliondollartheme') . ')</em>';
+                        elseif (strpos($key, 'plugin_') === 0) echo ' <em>(' . __('Likely Plugin-Generated', 'milliondollartheme') . ')</em>';
+                        echo '</li>';
+                    }
+                    echo '</ul>';
+                    echo '<p>' . esc_html__( 'It is recommended to submit your primary sitemap URL to search engines like Google and Bing.', 'milliondollartheme' ) . '</p>';
+                } else {
+                    echo '<p class="notice notice-warning" style="padding:10px;">' . esc_html__( 'No active XML sitemap was automatically detected at common locations.', 'milliondollartheme' ) . '</p>';
+                    $sitemap_suggestions[] = __( 'Ensure you have an SEO plugin (like Yoast SEO, Rank Math, All in One SEO) installed and configured to generate an XML sitemap, or that WordPress core sitemaps are enabled.', 'milliondollartheme');
+                }
+
+                if (!empty($sitemap_suggestions)) {
+                    echo '<h4>' . __('Suggestions:', 'milliondollartheme') . '</h4>';
+                    echo '<ul>';
+                    foreach($sitemap_suggestions as $suggestion) {
+                        echo '<li>' . esc_html($suggestion) . '</li>';
+                    }
+                    echo '</ul>';
+                }
+                ?>
+                <h4><?php esc_html_e( 'Submit Your Sitemap', 'milliondollartheme' ); ?></h4>
+                <p><?php esc_html_e( 'Once you have identified your sitemap URL, submit it to:', 'milliondollartheme' ); ?></p>
+                <ul>
+                    <li><a href="https://search.google.com/search-console" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Google Search Console', 'milliondollartheme' ); ?></a></li>
+                    <li><a href="https://www.bing.com/webmasters" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Bing Webmaster Tools', 'milliondollartheme' ); ?></a></li>
+                    <?php // Add other search engines if desired ?>
+                </ul>
+                <p><small><?php esc_html_e( 'Note: This tool performs a basic check for sitemaps at common URLs. The actual sitemap URL might differ based on your specific SEO plugin settings.', 'milliondollartheme' ); ?></small></p>
             </div>
 
         </div><!-- .wrap -->
@@ -1587,6 +1750,179 @@ if ( ! function_exists( 'milliondollartheme_seo_dashboard_page' ) ) {
         <?php
     }
 }
+
+// --- SEO Analysis Helper Functions ---
+if ( ! function_exists( 'milliondollartheme_fetch_page_content_for_seo' ) ) {
+    function milliondollartheme_fetch_page_content_for_seo( $url = '', $post_id = 0 ) {
+        $content = '';
+        $target_url = '';
+
+        if ( ! empty( $post_id ) ) {
+            $post_id = absint( $post_id );
+            if ( get_post_status( $post_id ) === 'publish' ) {
+                $target_url = get_permalink( $post_id );
+            } else {
+                return new WP_Error( 'invalid_post', __( 'Selected post/page is not published.', 'milliondollartheme' ) );
+            }
+        } elseif ( ! empty( $url ) ) {
+            $target_url = esc_url_raw( $url );
+            if ( ! wp_http_validate_url( $target_url ) ) {
+                 return new WP_Error( 'invalid_url', __( 'Invalid URL provided.', 'milliondollartheme' ) );
+            }
+        } else {
+            return new WP_Error( 'no_target', __( 'No URL or Post/Page ID provided for analysis.', 'milliondollartheme' ) );
+        }
+
+        $response = wp_remote_get( $target_url, array( 'timeout' => 20 ) );
+
+        if ( is_wp_error( $response ) ) {
+            return $response;
+        }
+
+        $response_code = wp_remote_retrieve_response_code( $response );
+        if ( $response_code !== 200 ) {
+            return new WP_Error( 'fetch_error', sprintf( __( 'Could not fetch content. Server responded with code: %s', 'milliondollartheme' ), $response_code ) );
+        }
+
+        $content = wp_remote_retrieve_body( $response );
+        if ( empty( $content ) ) {
+            return new WP_Error( 'empty_content', __( 'Fetched content is empty.', 'milliondollartheme' ) );
+        }
+        return $content;
+    }
+}
+
+if ( ! function_exists( 'milliondollartheme_analyze_seo_content' ) ) {
+    function milliondollartheme_analyze_seo_content( $html_content, $focus_keyword = '' ) {
+        $results = array();
+        if ( empty( $html_content ) ) {
+            $results['error'] = __( 'Cannot analyze empty content.', 'milliondollartheme' );
+            return $results;
+        }
+
+        libxml_use_internal_errors( true ); // Suppress DOMDocument warnings for invalid HTML
+        $dom = new DOMDocument();
+        $dom->loadHTML( mb_convert_encoding( $html_content, 'HTML-ENTITIES', 'UTF-8' ), LIBXML_NOWARNING | LIBXML_NOERROR );
+        libxml_clear_errors();
+
+        $xpath = new DOMXPath( $dom );
+
+        // 1. Meta Title
+        $title_nodes = $xpath->query( '//title' );
+        $results['meta_title'] = $title_nodes->length > 0 ? trim( $title_nodes->item(0)->textContent ) : __( 'Not found', 'milliondollartheme' );
+        $results['meta_title_length'] = mb_strlen( $results['meta_title'] );
+
+        // 2. Meta Description
+        $description_nodes = $xpath->query( "//meta[@name='description']/@content" );
+        $results['meta_description'] = $description_nodes->length > 0 ? trim( $description_nodes->item(0)->value ) : __( 'Not found', 'milliondollartheme' );
+        $results['meta_description_length'] = mb_strlen( $results['meta_description'] );
+
+        // 3. Headings (H1-H6)
+        $results['headings'] = array( 'h1' => 0, 'h2' => 0, 'h3' => 0, 'h4' => 0, 'h5' => 0, 'h6' => 0 );
+        $results['heading_texts'] = array( 'h1' => array(), 'h2' => array() ); // Store H1 and H2 texts
+        for ( $i = 1; $i <= 6; $i++ ) {
+            $heading_nodes = $xpath->query( "//h{$i}" );
+            $results['headings']["h{$i}"] = $heading_nodes->length;
+            if ($i <=2 && $heading_nodes->length > 0) {
+                foreach($heading_nodes as $node) {
+                    $results['heading_texts']["h{$i}"][] = trim($node->textContent);
+                }
+            }
+        }
+
+        // 4. Keyword Density (Basic)
+        $results['keyword_density'] = __( 'N/A', 'milliondollartheme' );
+        if ( ! empty( $focus_keyword ) ) {
+            $body_node = $xpath->query('//body')->item(0);
+            $text_content = $body_node ? strtolower(trim($body_node->textContent)) : '';
+            $focus_keyword_lower = strtolower(trim($focus_keyword));
+
+            if(!empty($text_content) && !empty($focus_keyword_lower)) {
+                $word_count = str_word_count( $text_content );
+                $keyword_occurrences = substr_count( $text_content, $focus_keyword_lower );
+                $results['keyword_density'] = ($word_count > 0) ? sprintf( "%.2f%% (%d occurrences / %d words)", ( $keyword_occurrences / $word_count ) * 100, $keyword_occurrences, $word_count ) : __( 'Not enough content to calculate.', 'milliondollartheme' );
+            }
+        }
+
+        // 5. Image Alt Attributes
+        $image_nodes = $xpath->query( '//img' );
+        $results['total_images'] = $image_nodes->length;
+        $results['images_missing_alt'] = 0;
+        foreach ( $image_nodes as $img ) {
+            if ( ! $img->hasAttribute( 'alt' ) || trim( $img->getAttribute( 'alt' ) ) === '' ) {
+                $results['images_missing_alt']++;
+            }
+        }
+        return $results;
+    }
+}
+
+
+if ( ! function_exists( 'milliondollartheme_handle_seo_analysis_submission' ) ) {
+    function milliondollartheme_handle_seo_analysis_submission() {
+        $url_to_analyze = isset( $_POST['mdt_seo_analyze_url'] ) ? sanitize_url( $_POST['mdt_seo_analyze_url'] ) : '';
+        $post_id_to_analyze = isset( $_POST['mdt_seo_analyze_post_id'] ) ? absint( $_POST['mdt_seo_analyze_post_id'] ) : 0;
+        $focus_keyword = isset( $_POST['mdt_seo_focus_keyword'] ) ? sanitize_text_field( $_POST['mdt_seo_focus_keyword'] ) : '';
+
+        $html_content_result = milliondollartheme_fetch_page_content_for_seo( $url_to_analyze, $post_id_to_analyze );
+
+        if ( is_wp_error( $html_content_result ) ) {
+            echo '<div class="notice notice-error"><p>' . esc_html( $html_content_result->get_error_message() ) . '</p></div>';
+            return;
+        }
+
+        $analysis_results = milliondollartheme_analyze_seo_content( $html_content_result, $focus_keyword );
+
+        if (isset($analysis_results['error'])) {
+             echo '<div class="notice notice-error"><p>' . esc_html( $analysis_results['error'] ) . '</p></div>';
+             return;
+        }
+
+        echo '<h4>' . esc_html__( 'Analysis Results:', 'milliondollartheme' ) . '</h4>';
+        echo '<table class="widefat striped">';
+        echo '<thead><tr><th>' . esc_html__( 'Check', 'milliondollartheme' ) . '</th><th>' . esc_html__( 'Result', 'milliondollartheme' ) . '</th><th>' . esc_html__( 'Recommendation', 'milliondollartheme' ) . '</th></tr></thead>';
+        echo '<tbody>';
+
+        // Meta Title
+        $title_status = ($analysis_results['meta_title_length'] >= 30 && $analysis_results['meta_title_length'] <= 60) ? 'good' : (($analysis_results['meta_title_length'] > 0) ? 'warning': 'bad');
+        echo '<tr><td>Meta Title</td><td>' . esc_html($analysis_results['meta_title']) . ' (Length: ' . esc_html($analysis_results['meta_title_length']) . ')</td><td class="status-' . $title_status . '">';
+        echo ($title_status === 'good') ? 'Good length (30-60 chars).' : 'Aim for 30-60 characters.';
+        echo '</td></tr>';
+
+        // Meta Description
+        $desc_status = ($analysis_results['meta_description_length'] >= 70 && $analysis_results['meta_description_length'] <= 160) ? 'good' : (($analysis_results['meta_description_length'] > 0) ? 'warning': 'bad');
+        echo '<tr><td>Meta Description</td><td>' . esc_html($analysis_results['meta_description']) . ' (Length: ' . esc_html($analysis_results['meta_description_length']) . ')</td><td class="status-' . $desc_status . '">';
+        echo ($desc_status === 'good') ? 'Good length (70-160 chars).' : 'Aim for 70-160 characters.';
+        echo '</td></tr>';
+
+        // Headings
+        echo '<tr><td>H1 Tags</td><td>' . esc_html($analysis_results['headings']['h1']) . '</td><td class="status-' . ($analysis_results['headings']['h1'] === 1 ? 'good' : 'bad') . '">';
+        echo ($analysis_results['headings']['h1'] === 1) ? 'Exactly one H1 tag found.' : 'Aim for exactly one H1 tag.';
+        if($analysis_results['headings']['h1'] > 0) echo '<br><em>Content: ' . esc_html(implode(', ', $analysis_results['heading_texts']['h1'])) . '</em>';
+        echo '</td></tr>';
+
+        echo '<tr><td>H2 Tags</td><td>' . esc_html($analysis_results['headings']['h2']) . '</td><td>';
+        echo ($analysis_results['headings']['h2'] > 0) ? 'Found H2 tags. Good for structure.' : 'Consider using H2 tags for main sections.';
+        if($analysis_results['headings']['h2'] > 0) echo '<br><em>First H2: ' . esc_html($analysis_results['heading_texts']['h2'][0] ?? '') . '</em>';
+        echo '</td></tr>';
+        // Could add more for H3-H6 and hierarchy checks later
+
+        // Keyword Density
+        echo '<tr><td>Keyword Density for "'.esc_html($focus_keyword).'"</td><td>' . esc_html($analysis_results['keyword_density']) . '</td><td>';
+        echo (strpos($analysis_results['keyword_density'], 'N/A') === false) ? 'Aim for a natural distribution (e.g., 1-2%).' : 'Enter a focus keyword to check density.';
+        echo '</td></tr>';
+
+        // Image Alt Texts
+        $alt_status = ($analysis_results['total_images'] > 0 && $analysis_results['images_missing_alt'] == 0) ? 'good' : (($analysis_results['total_images'] > 0) ? 'warning' : 'neutral');
+        echo '<tr><td>Image Alt Attributes</td><td>' . esc_html($analysis_results['images_missing_alt']) . ' of ' . esc_html($analysis_results['total_images']) . ' images missing alt text.</td><td class="status-'.$alt_status.'">';
+        echo ($analysis_results['images_missing_alt'] == 0 && $analysis_results['total_images'] > 0) ? 'All images have alt text.' : 'Ensure all images have descriptive alt text.';
+        echo '</td></tr>';
+
+        echo '</tbody></table>';
+    }
+}
+// --- End SEO Analysis Helper Functions ---
+
 
 // --- End SEO Dashboard Functionality ---
 
@@ -1693,9 +2029,34 @@ if ( ! function_exists( 'milliondollartheme_site_details_dashboard_page' ) ) {
             </div>
 
              <div class="postbox">
-                 <h2 class="hndle"><span><?php esc_html_e( 'Analytics Overview (Coming Soon)', 'milliondollartheme' ); ?></span></h2>
+                 <h2 class="hndle"><span><?php esc_html_e( 'Website Analytics Overview', 'milliondollartheme' ); ?></span></h2>
                  <div class="inside">
-                    <p class="placeholder"><?php esc_html_e( 'Integration with analytics services to display viewer data will be available here.', 'milliondollartheme' ); ?></p>
+                    <p><?php esc_html_e( 'Tracking your website\'s traffic and user behavior is crucial for understanding your audience and improving your content. We recommend using Google Analytics, a powerful and free tool.', 'milliondollartheme' ); ?></p>
+
+                    <h4><?php esc_html_e( 'How to Add Google Analytics to Your Site:', 'milliondollartheme' ); ?></h4>
+                    <ol>
+                        <li><strong><?php esc_html_e( 'Using Site Kit by Google (Recommended):', 'milliondollartheme' ); ?></strong>
+                            <ul>
+                                <li><?php printf( wp_kses_post( __( 'Install and activate the <a href="%s" target="_blank">Site Kit by Google</a> plugin.', 'milliondollartheme' ) ), 'https://wordpress.org/plugins/google-site-kit/' ); ?></li>
+                                <li><?php esc_html_e( 'Follow the setup wizard in Site Kit to connect your Google Analytics account.', 'milliondollartheme' ); ?></li>
+                                <li><?php esc_html_e( 'Site Kit will automatically insert the necessary tracking code and display stats in your WordPress dashboard.', 'milliondollartheme' ); ?></li>
+                            </ul>
+                        </li>
+                        <li><strong><?php esc_html_e( 'Using Other Analytics Plugins:', 'milliondollartheme' ); ?></strong>
+                            <ul>
+                                <li><?php esc_html_e( 'Plugins like MonsterInsights, Analytify, or GA Google Analytics offer various features for adding and managing Google Analytics.', 'milliondollartheme' ); ?></li>
+                                <li><?php esc_html_e( 'Install your chosen plugin and follow its specific setup instructions.', 'milliondollartheme' ); ?></li>
+                            </ul>
+                        </li>
+                        <li><strong><?php esc_html_e( 'Manually Adding Tracking Code (Advanced):', 'milliondollartheme' ); ?></strong>
+                            <ul>
+                                <li><?php esc_html_e( 'Sign up or log in to your <a href="https://analytics.google.com/" target="_blank" rel="noopener noreferrer">Google Analytics</a> account and get your tracking ID (e.g., G-XXXXXXXXXX) or global site tag (gtag.js).', 'milliondollartheme' ); ?></li>
+                                <li><?php esc_html_e( 'You can insert the gtag.js snippet into your theme\'s header. It is recommended to use a child theme or a code snippets plugin to avoid losing changes on theme updates.', 'milliondollartheme' ); ?></li>
+                                <li><?php esc_html_e( 'Alternatively, some themes provide a specific field in theme options or the Customizer for adding header/footer scripts.', 'milliondollartheme' ); ?> (<em><?php esc_html_e('Note: This theme currently does not have a dedicated script insertion field in the Customizer.', 'milliondollartheme'); ?></em>)</li>
+                            </ul>
+                        </li>
+                    </ol>
+                    <p><?php esc_html_e( 'Once set up, you can view your website statistics directly in your Google Analytics dashboard.', 'milliondollartheme' ); ?></p>
                  </div>
             </div>
 

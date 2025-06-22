@@ -1,0 +1,127 @@
+/* Frontend and shared editor styles for chesta/info-showcase-item */
+
+.wp-block-chesta-info-showcase-item {
+    /* Default item padding can be set here if not overridden by attributes */
+    /* padding: var(--spacing-md, 16px); */
+    /* Background, border etc. applied via inline styles from attributes */
+    height: 100%; /* Ensure items in a row can have same height if desired by parent grid */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Content alignment (text-align) is applied based on parent's context via className on the wrapper */
+.wp-block-chesta-info-showcase-item.info-showcase-item-align-left { text-align: left; }
+.wp-block-chesta-info-showcase-item.info-showcase-item-align-center { text-align: center; }
+.wp-block-chesta-info-showcase-item.info-showcase-item-align-right { text-align: right; }
+
+/* Media (Icon/Image) Wrapper */
+.info-showcase-item-icon-wrapper,
+.info-showcase-item-image-wrapper {
+    margin-bottom: var(--spacing-md, 16px);
+    line-height: 0; /* Prevent extra space for inline-flex/block */
+}
+.info-showcase-item-align-center .info-showcase-item-icon-wrapper,
+.info-showcase-item-align-center .info-showcase-item-image-wrapper {
+    margin-left: auto;
+    margin-right: auto;
+}
+.info-showcase-item-align-right .info-showcase-item-icon-wrapper,
+.info-showcase-item-align-right .info-showcase-item-image-wrapper {
+    margin-left: auto;
+    margin-right: 0; /* If item is text-align right, media might need to be explicitly right */
+}
+
+
+/* Icon Specific Styles */
+.info-showcase-item-icon-wrapper {
+    display: inline-flex; /* So background shape wraps the icon size */
+    justify-content: center;
+    align-items: center;
+    padding: var(--spacing-sm, 8px); /* Default padding for icon background */
+    /* background-color is inline style */
+    /* color (icon color) is inline style on span */
+    transition: background-color var(--transition-speed-medium) var(--transition-timing-default),
+                color var(--transition-speed-medium) var(--transition-timing-default);
+}
+.info-showcase-item-icon-wrapper .dashicons {
+    /* font-size, width, height, color are inline styles */
+    line-height: 1; /* Ensure icon is centered in its own box */
+}
+.info-showcase-item-icon-wrapper.shape-none {
+    background-color: transparent !important; /* No background if shape is none */
+    padding: 0;
+}
+.info-showcase-item-icon-wrapper.shape-circle {
+    border-radius: 50%;
+}
+.info-showcase-item-icon-wrapper.shape-square {
+    border-radius: 0;
+}
+.info-showcase-item-icon-wrapper.shape-rounded {
+    border-radius: var(--border-radius-md, 8px);
+}
+
+/* Image Specific Styles */
+.info-showcase-item-image-wrapper img {
+    display: inline-block; /* For centering via text-align on parent if needed */
+    max-width: 100%;
+    height: auto;
+    /* width is inline style */
+    /* border-radius is inline style based on iconShape attribute, which is a bit of a misnomer here */
+    /* For consistency, we can use iconShape for image shape too */
+}
+.info-showcase-item-image-wrapper img.shape-circle { border-radius: 50%; }
+.info-showcase-item-image-wrapper img.shape-rounded { border-radius: var(--border-radius-md, 8px); }
+
+
+/* Title Styles */
+.info-showcase-item-title {
+    font-family: var(--font-family-heading);
+    font-weight: 700;
+    font-size: 1.25em; /* Example size, can be adjusted */
+    margin-top: 0;
+    margin-bottom: var(--spacing-xs, 4px);
+    /* color is inline style */
+    line-height: 1.3;
+}
+
+/* Description Styles */
+.info-showcase-item-description {
+    font-size: 0.95em;
+    color: var(--text-color-muted-darker, #495057); /* Default, can be overridden by inline style */
+    line-height: 1.6;
+    margin-bottom: var(--spacing-sm, 8px);
+    flex-grow: 1; /* Allows description to take up space and push link to bottom */
+}
+.info-showcase-item-description p:last-child {
+    margin-bottom: 0;
+}
+
+/* Link/Button Styles */
+.info-showcase-item-link-wrapper {
+    margin-top: auto; /* Pushes button to the bottom of the flex container */
+    padding-top: var(--spacing-sm, 8px); /* Space above button if description is short */
+}
+.info-showcase-item-button.button {
+    /* Inherits from global .button styles */
+    /* Add any specific overrides if needed */
+    font-size: 0.9em;
+    /* Example: width: 100%; if itemsAlign is center and button should be full-width */
+}
+.info-showcase-item-align-center .info-showcase-item-button.button {
+    /* display: inline-block; /* if it shouldn't be full width */
+}
+
+/* Full item link style */
+.info-showcase-item-link-wrapper-full {
+    text-decoration: none;
+    color: inherit; /* Inherit text colors from internal elements */
+    display: block;
+    height: 100%; /* Make the link wrapper fill the item for clickability */
+    display: flex;
+    flex-direction: column;
+}
+.wp-block-chesta-info-showcase-item:hover .info-showcase-item-link-wrapper-full {
+    /* Optional: Add hover style to whole item if linked */
+    /* box-shadow: var(--box-shadow-medium); */
+}

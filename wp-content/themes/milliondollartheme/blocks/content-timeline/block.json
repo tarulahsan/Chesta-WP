@@ -1,0 +1,72 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "chesta/content-timeline",
+    "title": "Content Timeline (Chesta)",
+    "category": "chesta-blocks",
+    "description": "Displays a series of events or posts in a vertical timeline format.",
+    "icon": "backup",
+    "keywords": ["timeline", "history", "events", "roadmap", "chronology"],
+    "attributes": {
+        "layout": {
+            "type": "string",
+            "default": "center-alternating"
+        },
+        "lineColor": {
+            "type": "string",
+            "default": "var(--primary-color, #0052D4)"
+        },
+        "lineWidth": {
+            "type": "string",
+            "default": "3px"
+        },
+        "pointColor": {
+            "type": "string",
+            "default": "var(--accent-color, #00C6AD)"
+        },
+        "pointSize": {
+            "type": "string",
+            "default": "16px"
+        },
+        "pointStyle": {
+            "type": "string",
+            "default": "circle"
+        },
+        "align": {
+            "type": "string"
+        },
+        "backgroundColor": {
+            "type": "string"
+        },
+        "paddingTop": {"type": "string"},
+        "paddingRight": {"type": "string"},
+        "paddingBottom": {"type": "string"},
+        "paddingLeft": {"type": "string"}
+    },
+    "supports": {
+        "align": ["wide", "full"],
+        "html": false,
+        "anchor": true,
+        "color": {
+            "background": true,
+            "text": false, /* Text color handled by items */
+            "link": false,
+            "gradients": true
+        },
+        "spacing": {
+            "padding": true,
+            "margin": true
+        }
+    },
+    "providesContext": {
+        "chesta/timelineLayout": "layout",
+        "chesta/timelinePointColor": "pointColor",
+        "chesta/timelinePointSize": "pointSize",
+        "chesta/timelinePointStyle": "pointStyle",
+        "chesta/timelineLineColor": "lineColor"
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css"
+}

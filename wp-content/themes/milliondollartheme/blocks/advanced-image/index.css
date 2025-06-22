@@ -1,0 +1,66 @@
+/* Editor-specific styles for chesta/advanced-image */
+
+.wp-block-chesta-advanced-image .chesta-advanced-image-placeholder {
+    border: 2px dashed #a0a5aa;
+    padding: 20px;
+    text-align: center;
+    background-color: #f8f9f9;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Style for the preview image in the editor to reflect some attributes */
+.wp-block-chesta-advanced-image .chesta-advanced-image-figure {
+    margin: 0; /* Reset default figure margin */
+    position: relative; /* For overlay positioning */
+    overflow: hidden; /* For border-radius and shape masks if applied directly to figure */
+}
+
+/* Preview of hover effects might be limited in editor without complex JS,
+   but we can style the base image and overlay elements if present */
+
+.wp-block-chesta-advanced-image .chesta-advanced-image-figure img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.wp-block-chesta-advanced-image .chesta-advanced-image-figure .image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none; /* So it doesn't interfere with image selection */
+}
+
+.wp-block-chesta-advanced-image .chesta-advanced-image-figure .overlay-text-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white; /* Default, can be overridden by block style variations or attributes */
+    padding: 10px;
+    text-align: center;
+    pointer-events: none;
+    font-size: 1.2em; /* Example size */
+    font-weight: bold;
+}
+
+.wp-block-chesta-advanced-image .chesta-advanced-image-caption {
+    font-size: 0.9em;
+    color: #50575e;
+    text-align: center; /* Default caption alignment */
+    margin-top: 8px;
+}
+
+/* Placeholder for shape mask previews - these would require more complex inline styles or SVG masks in JS */
+/* For now, these are primarily handled by frontend CSS via classes */
+.wp-block-chesta-advanced-image .chesta-advanced-image-figure.shape-circle img {
+    border-radius: 50%; /* Simple preview for circle */
+}

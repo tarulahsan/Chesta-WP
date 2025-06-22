@@ -1,0 +1,48 @@
+/* Frontend and shared editor styles for chesta/info-showcase */
+
+.wp-block-chesta-info-showcase {
+    display: grid;
+    /* Columns are set by inline style --info-showcase-columns via JS */
+    /* Gap is set by inline style --info-showcase-column-gap and --info-showcase-row-gap via JS */
+    grid-template-columns: repeat(var(--info-showcase-columns, 3), 1fr);
+    column-gap: var(--info-showcase-column-gap, var(--spacing-md, 16px));
+    row-gap: var(--info-showcase-row-gap, var(--spacing-md, 16px));
+    /* Padding, background, margin are handled by block supports */
+}
+
+/* Responsive column adjustments */
+@media (max-width: 1023px) { /* Tablet */
+    .wp-block-chesta-info-showcase {
+        /* If 4 columns, go to 2. If 3 columns, go to 2. If 2, stay 2. If 1, stay 1. */
+        grid-template-columns: repeat( min(var(--info-showcase-columns, 3), 2), 1fr);
+    }
+    /* More specific overrides if needed for particular column counts */
+    .wp-block-chesta-info-showcase[style*="--info-showcase-columns: 4;"],
+    .wp-block-chesta-info-showcase[style*="--info-showcase-columns: 3;"] {
+        grid-template-columns: repeat(2, 1fr);
+    }
+     .wp-block-chesta-info-showcase[style*="--info-showcase-columns: 1;"] {
+        grid-template-columns: 1fr; /* Ensure 1 column stays 1 column */
+    }
+}
+
+@media (max-width: 767px) { /* Mobile */
+    .wp-block-chesta-info-showcase {
+        grid-template-columns: 1fr !important; /* Stack to 1 column */
+    }
+}
+
+/* Alignment of content within each item - class applied to parent by JS,
+   then child block .info-showcase-item-align-X class will be styled in its own CSS.
+   This is just to show how the parent class from attribute translates.
+   The actual text-align will be on the child items.
+*/
+.wp-block-chesta-info-showcase.items-align-left .wp-block-chesta-info-showcase-item {
+    /* Child items will self-align if their own text-align is set to inherit or similar */
+}
+.wp-block-chesta-info-showcase.items-align-center .wp-block-chesta-info-showcase-item {
+    /* text-align: center; /* This would be on the child */
+}
+.wp-block-chesta-info-showcase.items-align-right .wp-block-chesta-info-showcase-item {
+    /* text-align: right; /* This would be on the child */
+}

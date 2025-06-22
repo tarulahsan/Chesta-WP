@@ -1,0 +1,91 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "chesta/advanced-image",
+    "title": "Advanced Image (Chesta)",
+    "category": "chesta-blocks",
+    "description": "An enhanced image block with hover effects, borders, shadows, and shape masks.",
+    "icon": "format-image",
+    "keywords": ["image", "picture", "photo", "advanced", "effects", "shape"],
+    "attributes": {
+        "imageUrl": {
+            "type": "string",
+            "source": "attribute",
+            "selector": "img",
+            "attribute": "src"
+        },
+        "imageId": {
+            "type": "number"
+        },
+        "alt": {
+            "type": "string",
+            "source": "attribute",
+            "selector": "img",
+            "attribute": "alt",
+            "default": ""
+        },
+        "caption": {
+            "type": "string",
+            "source": "html",
+            "selector": "figcaption"
+        },
+        "linkUrl": {
+            "type": "string"
+        },
+        "linkTarget": {
+            "type": "string",
+            "default": "_self"
+        },
+        "rel": {
+            "type": "string",
+            "default": ""
+        },
+        "hoverEffect": {
+            "type": "string",
+            "default": "none"
+        },
+        "overlayColor": {
+            "type": "string",
+            "default": "rgba(0,0,0,0.5)"
+        },
+        "overlayText": {
+            "type": "string",
+            "default": ""
+        },
+        "borderStyle": { "type": "string", "default": "none" },
+        "borderWidth": { "type": "string", "default": "1px" },
+        "borderColor": { "type": "string" },
+        "borderRadius": { "type": "string", "default": "0px" },
+        "boxShadowPreset": { "type": "string", "default": "none" },
+        "shapeMask": { "type": "string", "default": "none" },
+        "align": { "type": "string" },
+        "width": { "type": "number" },
+        "height": { "type": "number" },
+        "aspectRatio": { "type": "string" },
+        "scale": { "type": "string", "default": "cover" }
+    },
+    "supports": {
+        "align": ["left", "center", "right", "wide", "full"],
+        "html": false,
+        "anchor": true,
+        "spacing": {
+            "margin": true,
+            "padding": false, /* Padding might be part of internal wrapper for effects */
+            "blockGap": null
+        },
+        "color": {
+            "gradients": false,
+            "link": false,
+            "text": false, /* For caption, handled internally or via block style variations */
+            "background": false /* Background is image or overlay */
+        },
+        "dimensions": {
+            "aspectRatio": true,
+            "minHeight": false
+        }
+    },
+    "textdomain": "milliondollartheme",
+    "editorScript": "file:./index.js",
+    "editorStyle": "file:./index.css",
+    "style": "file:./style-index.css"
+}
