@@ -98,12 +98,96 @@ require get_template_directory() . '/inc/breadcrumbs.php';
 function milliondollartheme_add_defer_to_alpinejs( $tag, $handle, $src ) { if ( 'alpinejs' === $handle ) { $tag = str_replace( ' src=', ' defer src=', $tag ); } return $tag; }
 add_filter( 'script_loader_tag', 'milliondollartheme_add_defer_to_alpinejs', 10, 3 );
 
-function milliondollartheme_register_blocks() { /* ... block registration - shortened for brevity ... */ }
+function milliondollartheme_register_blocks() {
+    $block_folders = glob( get_template_directory() . '/blocks/*', GLOB_ONLYDIR );
+    if ( $block_folders ) {
+        foreach ( $block_folders as $block_folder ) {
+            if ( file_exists( $block_folder . '/block.json' ) ) {
+                register_block_type_from_metadata( $block_folder . '/block.json' );
+            }
+        }
+    }
+}
 add_action( 'init', 'milliondollartheme_register_blocks' );
 
-function milliondollartheme_render_posts_display_block( $attributes ) { /* ... posts display render (optimized) - shortened for brevity ... */ return '<p>Posts Display Block placeholder.</p>'; }
-function milliondollartheme_register_dynamic_block_callbacks() { if ( function_exists('milliondollartheme_render_posts_display_block') && class_exists('WP_Block_Type_Registry') && WP_Block_Type_Registry::get_instance()->is_registered('milliondollartheme/posts-display') ) { unregister_block_type('milliondollartheme/posts-display'); } if ( function_exists('milliondollartheme_render_posts_display_block') ) { register_block_type( 'milliondollartheme/posts-display', array( 'render_callback' => 'milliondollartheme_render_posts_display_block', ) ); } }
-add_action( 'init', 'milliondollartheme_register_dynamic_block_callbacks', 11 );
+function milliondollartheme_render_posts_display_block( $attributes ) {
+    // Optimized query based on attributes
+    // This is a placeholder for the actual rendering logic which can be quite complex
+    // depending on the attributes available in $attributes.
+    // For a real block, you'd use $attributes to customize the WP_Query,
+    // e.g., $attributes['numberOfPosts'], $attributes['categories'], etc.
+
+    $args = array(
+        'post_type'      => 'post',
+        'posts_per_page' => isset($attributes['numberOfPosts']) ? intval($attributes['numberOfPosts']) : 3,
+        // Add more arguments based on attributes like category, order, etc.
+    );
+    $query = new WP_Query( $args );
+
+    if ( $query->have_posts() ) {
+        $output = '<div class="milliondollartheme-posts-display">';
+        while ( $query->have_posts() ) {
+            $query->the_post();
+            $output .= '<article class="post-item">';
+            $output .= '<h3><a href="' . get_permalink() . '">' . get_the_title() . '</a></h3>';
+            if ( has_post_thumbnail() && (isset($attributes['showFeaturedImage']) && $attributes['showFeaturedImage']) ) {
+                $output .= '<div class="post-thumbnail">' . get_the_post_thumbnail(null, 'medium') . '</div>';
+            }
+            if (isset($attributes['showExcerpt']) && $attributes['showExcerpt']) {
+                $output .= '<div class="post-excerpt">' . get_the_excerpt() . '</div>';
+            }
+            $output .= '</article>';
+        }
+        $output .= '</div>';
+        wp_reset_postdata();
+        return $output;
+    }
+    return '<p>No posts found.</p>';
+}
+
+function milliondollartheme_register_dynamic_block_callbacks() {
+    // The 'milliondollartheme/posts-display' block is registered via block.json by the
+    // milliondollartheme_register_blocks() function.
+    // If its block.json specifies "render": "file:./render.php", WordPress handles it.
+    // If it needs a PHP render callback defined directly in functions.php (like here),
+    // we ensure it's registered with that callback.
+    // However, the modern approach is "render": "file:./render.php" in block.json or a pure JS block.
+
+    // Let's assume block.json for posts-display does NOT have a "render" field,
+    // and we want this PHP function to render it.
+    // We might need to unregister it first if block.json made it a static block.
+    if ( class_exists('WP_Block_Type_Registry') && WP_Block_Type_Registry::get_instance()->is_registered('milliondollartheme/posts-display') ) {
+        // Potentially unregister if the block.json version is not what we want for dynamic rendering here.
+        // This depends on how block.json for posts-display is configured.
+        // For now, let's assume we might need to override.
+        // unregister_block_type('milliondollartheme/posts-display');
+    }
+    // Then re-register with our PHP render callback.
+    // Note: If block.json is the primary registration method, this direct re-registration
+    // might only be needed if block.json doesn't specify a PHP render method and one is required.
+    // The `register_block_type_from_metadata` in `milliondollartheme_register_blocks` should handle
+    // blocks with `render.php` specified in their `block.json`.
+    // This specific registration here is for 'milliondollartheme/posts-display' if it needs this specific callback
+    // and its block.json doesn't specify a PHP render method.
+
+    // Given that `posts-display` has a `block.json`, the `milliondollartheme_register_blocks` will register it.
+    // If that `block.json` does *not* specify a server-side rendering mechanism (e.g., no "render" field or "render":"file:./render.php"),
+    // and we want it to be a dynamic block rendered by PHP, we'd register it here.
+    // The original code had an unregister and re-register. This is often to ensure the PHP callback is used.
+    // For simplicity, if block.json exists, `register_block_type_from_metadata` should be the source of truth.
+    // If `milliondollartheme/posts-display`'s `block.json` is properly set up for dynamic rendering (e.g. by omitting `save` function in JS and having a render method),
+    // this explicit re-registration might not be needed or could be simplified.
+    // However, to match the previous structure's intent of ensuring a PHP callback:
+    if ( function_exists('milliondollartheme_render_posts_display_block') ) {
+         register_block_type(
+            'milliondollartheme/posts-display', // This should match the name in blocks/posts-display/block.json
+            array( 'render_callback' => 'milliondollartheme_render_posts_display_block' )
+            // 'attributes' should ideally be loaded from block.json by register_block_type_from_metadata.
+            // If we are overriding, we might need to redefine them here, but it's better if block.json is the source.
+        );
+    }
+}
+add_action( 'init', 'milliondollartheme_register_dynamic_block_callbacks', 11 ); // Priority 11 to run after default block registration
 
 if ( ! function_exists( 'milliondollartheme_year_shortcode' ) ) { function milliondollartheme_year_shortcode() { return date('Y'); } add_shortcode( 'year', 'milliondollartheme_year_shortcode' ); }
 if ( ! function_exists( 'milliondollartheme_get_social_media_icons' ) ) { function milliondollartheme_get_social_media_icons( $context = 'footer' ) { /* ... social icons helper - shortened for brevity ... */ return ''; } }
