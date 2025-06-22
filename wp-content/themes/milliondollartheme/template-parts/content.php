@@ -29,7 +29,18 @@
         <?php endif; ?>
     </header><!-- .entry-header -->
 
-    <?php milliondollartheme_post_thumbnail(); // We'll enable this later ?>
+    <?php
+    if ( is_singular() ) {
+        $featured_image_pos = get_theme_mod( 'milliondollartheme_single_featured_image_pos', 'above_title' );
+        if ( 'below_title' === $featured_image_pos ) {
+            milliondollartheme_post_thumbnail();
+        }
+        // If 'above_title', it will be handled before this template part or higher up in single.php
+        // If 'hidden', milliondollartheme_post_thumbnail() will return early.
+    } else {
+        milliondollartheme_post_thumbnail(); // Standard behavior for archives
+    }
+    ?>
 
     <div class="entry-content">
         <?php

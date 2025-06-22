@@ -1330,3 +1330,287 @@ if ( class_exists( 'WooCommerce' ) ) {
     }
 
 } // End if class_exists WooCommerce
+
+// --- SEO Dashboard Functionality ---
+
+if ( ! function_exists( 'milliondollartheme_seo_dashboard_menu' ) ) {
+    function milliondollartheme_seo_dashboard_menu() {
+        add_menu_page(
+            __( 'SEO Dashboard', 'milliondollartheme' ),
+            __( 'SEO Dashboard', 'milliondollartheme' ),
+            'manage_options',
+            'milliondollartheme-seo-dashboard',
+            'milliondollartheme_seo_dashboard_page',
+            'dashicons-search', // Using search icon for SEO
+            30 // Position after AI Dashboard
+        );
+    }
+}
+add_action( 'admin_menu', 'milliondollartheme_seo_dashboard_menu' );
+
+if ( ! function_exists( 'milliondollartheme_seo_dashboard_admin_scripts' ) ) {
+    function milliondollartheme_seo_dashboard_admin_scripts( $hook_suffix ) {
+        // The hook_suffix for a top-level page is 'toplevel_page_{menu_slug}'.
+        if ( 'toplevel_page_milliondollartheme-seo-dashboard' === $hook_suffix ) {
+            wp_enqueue_style(
+                'milliondollartheme-seo-dashboard-styles',
+                get_template_directory_uri() . '/css/admin-seo-dashboard.css',
+                array(),
+                MILLIONDOLLARTHEME_VERSION
+            );
+            // Potentially enqueue JS for tabs later if needed
+        }
+    }
+}
+add_action( 'admin_enqueue_scripts', 'milliondollartheme_seo_dashboard_admin_scripts' );
+
+
+if ( ! function_exists( 'milliondollartheme_seo_dashboard_page' ) ) {
+    function milliondollartheme_seo_dashboard_page() {
+        // Handle saving SEO settings
+        if ( isset( $_POST['milliondollartheme_seo_settings_nonce'] ) &&
+             wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['milliondollartheme_seo_settings_nonce'] ) ), 'milliondollartheme_save_seo_settings' ) ) {
+
+            $options_to_save = array(
+                'milliondollartheme_seo_home_title' => 'sanitize_text_field',
+                'milliondollartheme_seo_home_description' => 'sanitize_textarea_field',
+                'milliondollartheme_seo_title_suffix' => 'sanitize_text_field',
+            );
+
+            foreach ( $options_to_save as $option_name => $sanitize_callback ) {
+                if ( isset( $_POST[$option_name] ) ) {
+                    $value = wp_unslash( $_POST[$option_name] );
+                    update_option( $option_name, call_user_func( $sanitize_callback, $value ) );
+                } else {
+                    // If a checkbox is not set, it might not be in _POST, handle accordingly if you add checkboxes
+                    // For text fields, if not set, it implies clearing the option or saving empty.
+                    // update_option( $option_name, '' ); // Or delete_option( $option_name );
+                }
+            }
+            echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'SEO settings saved.', 'milliondollartheme' ) . '</p></div>';
+        }
+
+        // Get current settings
+        $home_title = get_option( 'milliondollartheme_seo_home_title', '' );
+        $home_description = get_option( 'milliondollartheme_seo_home_description', '' );
+        $title_suffix = get_option( 'milliondollartheme_seo_title_suffix', get_bloginfo('name') ); // Default to site name
+
+        ?>
+        <div class="wrap mdt-seo-dashboard">
+            <h1><?php esc_html_e( 'MillionDollarTheme SEO Dashboard', 'milliondollartheme' ); ?></h1>
+            <p><?php esc_html_e( 'Manage your theme\'s SEO settings and tools.', 'milliondollartheme' ); ?></p>
+
+            <!-- Basic Tab Navigation (can be enhanced with JS later) -->
+            <nav class="nav-tab-wrapper">
+                <a href="#general-seo-settings" class="nav-tab nav-tab-active"><?php esc_html_e( 'General Settings', 'milliondollartheme' ); ?></a>
+                <a href="#on-page-seo-tools" class="nav-tab"><?php esc_html_e( 'On-Page Tools (Coming Soon)', 'milliondollartheme' ); ?></a>
+            </nav>
+
+            <div id="tab-general-seo-settings" class="tab-content active">
+                <h2><?php esc_html_e( 'General SEO Settings', 'milliondollartheme' ); ?></h2>
+                <form method="POST" action="">
+                    <?php wp_nonce_field( 'milliondollartheme_save_seo_settings', 'milliondollartheme_seo_settings_nonce' ); ?>
+
+                    <table class="form-table">
+                        <tr valign="top">
+                            <th scope="row">
+                                <label for="milliondollartheme_seo_home_title"><?php esc_html_e( 'Homepage Meta Title', 'milliondollartheme' ); ?></label>
+                            </th>
+                            <td>
+                                <input type="text" id="milliondollartheme_seo_home_title" name="milliondollartheme_seo_home_title" value="<?php echo esc_attr( $home_title ); ?>" class="regular-text" />
+                                <p class="description"><?php esc_html_e( 'The title tag for your homepage. Keep it concise and relevant.', 'milliondollartheme' ); ?></p>
+                            </td>
+                        </tr>
+                        <tr valign="top">
+                            <th scope="row">
+                                <label for="milliondollartheme_seo_home_description"><?php esc_html_e( 'Homepage Meta Description', 'milliondollartheme' ); ?></label>
+                            </th>
+                            <td>
+                                <textarea id="milliondollartheme_seo_home_description" name="milliondollartheme_seo_home_description" rows="3" class="widefat"><?php echo esc_textarea( $home_description ); ?></textarea>
+                                <p class="description"><?php esc_html_e( 'The meta description for your homepage. Aim for 150-160 characters.', 'milliondollartheme' ); ?></p>
+                            </td>
+                        </tr>
+                        <tr valign="top">
+                            <th scope="row">
+                                <label for="milliondollartheme_seo_title_suffix"><?php esc_html_e( 'Default Title Suffix', 'milliondollartheme' ); ?></label>
+                            </th>
+                            <td>
+                                <input type="text" id="milliondollartheme_seo_title_suffix" name="milliondollartheme_seo_title_suffix" value="<?php echo esc_attr( $title_suffix ); ?>" class="regular-text" placeholder="<?php echo esc_attr(get_bloginfo('name')); ?>" />
+                                <p class="description"><?php esc_html_e( 'Appended to the title of posts and pages (e.g., "Post Title | Suffix"). Leave blank to use only the post/page title.', 'milliondollartheme' ); ?></p>
+                            </td>
+                        </tr>
+                    </table>
+                    <?php submit_button( __( 'Save SEO Settings', 'milliondollartheme' ) ); ?>
+                </form>
+            </div>
+
+            <div id="tab-on-page-seo-tools" class="tab-content">
+                <h2><?php esc_html_e( 'On-Page SEO Tools', 'milliondollartheme' ); ?></h2>
+                <p class="placeholder"><?php esc_html_e( 'Advanced on-page analysis tools will be available here in a future update.', 'milliondollartheme' ); ?></p>
+            </div>
+
+        </div><!-- .wrap -->
+        <script type="text/javascript">
+            // Basic tab switching for admin pages - can be reused
+            document.addEventListener('DOMContentLoaded', function() {
+                const seoTabs = document.querySelectorAll('.mdt-seo-dashboard .nav-tab');
+                const seoTabContents = document.querySelectorAll('.mdt-seo-dashboard .tab-content');
+
+                if (seoTabs.length > 0 && seoTabContents.length > 0) {
+                    seoTabs.forEach(tab => {
+                        tab.addEventListener('click', function(event) {
+                            event.preventDefault();
+
+                            seoTabs.forEach(t => t.classList.remove('nav-tab-active'));
+                            this.classList.add('nav-tab-active');
+
+                            const targetContentId = this.getAttribute('href').substring(1);
+
+                            seoTabContents.forEach(content => {
+                                if (content.id === 'tab-' + targetContentId) {
+                                    content.classList.add('active');
+                                } else {
+                                    content.classList.remove('active');
+                                }
+                            });
+                             // If a #hash is in URL, activate corresponding tab
+                            if(window.location.hash && document.querySelector('.mdt-seo-dashboard .nav-tab[href="' + window.location.hash + '"]')) {
+                                document.querySelector('.mdt-seo-dashboard .nav-tab[href="' + window.location.hash + '"]').click();
+                            } else {
+                                // Default to first tab if no hash or invalid hash
+                                seoTabs[0].classList.add('nav-tab-active');
+                                seoTabContents[0].classList.add('active');
+                            }
+                        });
+                    });
+                    // Trigger click on hash if present, otherwise first tab
+                    if(window.location.hash && document.querySelector('.mdt-seo-dashboard .nav-tab[href="' + window.location.hash + '"]')) {
+                        document.querySelector('.mdt-seo-dashboard .nav-tab[href="' + window.location.hash + '"]').click();
+                    } else if (seoTabs.length > 0) {
+                         seoTabs[0].classList.add('nav-tab-active'); // Ensure first tab is active by default
+                         seoTabContents[0].classList.add('active');
+                    }
+                }
+            });
+        </script>
+        <?php
+    }
+}
+
+// --- End SEO Dashboard Functionality ---
+
+// --- Site Details Dashboard Functionality ---
+
+if ( ! function_exists( 'milliondollartheme_site_details_dashboard_menu' ) ) {
+    function milliondollartheme_site_details_dashboard_menu() {
+        add_menu_page(
+            __( 'Site Details', 'milliondollartheme' ),
+            __( 'Site Details', 'milliondollartheme' ),
+            'manage_options',
+            'milliondollartheme-site-details-dashboard',
+            'milliondollartheme_site_details_dashboard_page',
+            'dashicons-info-outline', // Using info icon
+            35 // Position after SEO Dashboard
+        );
+    }
+}
+add_action( 'admin_menu', 'milliondollartheme_site_details_dashboard_menu' );
+
+if ( ! function_exists( 'milliondollartheme_site_details_dashboard_admin_scripts' ) ) {
+    function milliondollartheme_site_details_dashboard_admin_scripts( $hook_suffix ) {
+        if ( 'toplevel_page_milliondollartheme-site-details-dashboard' === $hook_suffix ) {
+            wp_enqueue_style(
+                'milliondollartheme-site-details-dashboard-styles',
+                get_template_directory_uri() . '/css/admin-site-details-dashboard.css',
+                array(),
+                MILLIONDOLLARTHEME_VERSION
+            );
+        }
+    }
+}
+add_action( 'admin_enqueue_scripts', 'milliondollartheme_site_details_dashboard_admin_scripts' );
+
+if ( ! function_exists( 'milliondollartheme_site_details_dashboard_page' ) ) {
+    function milliondollartheme_site_details_dashboard_page() {
+        $theme_obj = wp_get_theme();
+        ?>
+        <div class="wrap mdt-site-details-dashboard">
+            <h1><?php esc_html_e( 'MillionDollarTheme Site Details', 'milliondollartheme' ); ?></h1>
+            <p><?php esc_html_e( 'Overview of your WordPress environment and site health.', 'milliondollartheme' ); ?></p>
+
+            <div class="postbox">
+                <h2 class="hndle"><span><?php esc_html_e( 'WordPress Environment', 'milliondollartheme' ); ?></span></h2>
+                <div class="inside">
+                    <table class="form-table">
+                        <tr>
+                            <th scope="row"><?php esc_html_e( 'WordPress Version', 'milliondollartheme' ); ?></th>
+                            <td><?php echo esc_html( get_bloginfo( 'version' ) ); ?></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><?php esc_html_e( 'Theme Name', 'milliondollartheme' ); ?></th>
+                            <td><?php echo esc_html( $theme_obj->get( 'Name' ) ); ?></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><?php esc_html_e( 'Theme Version', 'milliondollartheme' ); ?></th>
+                            <td><?php echo esc_html( $theme_obj->get( 'Version' ) ); ?></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><?php esc_html_e( 'PHP Version', 'milliondollartheme' ); ?></th>
+                            <td><?php echo esc_html( phpversion() ); ?></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><?php esc_html_e( 'Server Software', 'milliondollartheme' ); ?></th>
+                            <td><?php echo isset($_SERVER['SERVER_SOFTWARE']) ? esc_html( sanitize_text_field(wp_unslash($_SERVER['SERVER_SOFTWARE'])) ) : esc_html__('N/A', 'milliondollartheme'); ?></td>
+                        </tr>
+                         <tr>
+                            <th scope="row"><?php esc_html_e( 'WP Memory Limit', 'milliondollartheme' ); ?></th>
+                            <td><?php echo esc_html( WP_MEMORY_LIMIT ); ?></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><?php esc_html_e( 'PHP Memory Limit', 'milliondollartheme' ); ?></th>
+                            <td><?php echo esc_html( ini_get('memory_limit') ); ?></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><?php esc_html_e( 'PHP Post Max Size', 'milliondollartheme' ); ?></th>
+                            <td><?php echo esc_html( ini_get('post_max_size') ); ?></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><?php esc_html_e( 'PHP Time Limit', 'milliondollartheme' ); ?></th>
+                            <td><?php echo esc_html( ini_get('max_execution_time') ); ?>s</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="postbox">
+                 <h2 class="hndle"><span><?php esc_html_e( 'Site Health (Core)', 'milliondollartheme' ); ?></span></h2>
+                 <div class="inside">
+                    <p>
+                        <?php
+                        printf(
+                            // translators: %s: Link to WordPress Site Health page.
+                            wp_kses_post( __( 'For a comprehensive site health check, please visit the core <a href="%s">WordPress Site Health page</a>.', 'milliondollartheme' ) ),
+                            esc_url( admin_url( 'site-health.php' ) )
+                        );
+                        ?>
+                    </p>
+                    <?php
+                    // Potentially add a summary or critical issues from Site Health API if desired in future.
+                    // Example: $issues = get_transient( 'health-check-site-status-result' );
+                    ?>
+                 </div>
+            </div>
+
+             <div class="postbox">
+                 <h2 class="hndle"><span><?php esc_html_e( 'Analytics Overview (Coming Soon)', 'milliondollartheme' ); ?></span></h2>
+                 <div class="inside">
+                    <p class="placeholder"><?php esc_html_e( 'Integration with analytics services to display viewer data will be available here.', 'milliondollartheme' ); ?></p>
+                 </div>
+            </div>
+
+        </div><!-- .wrap -->
+        <?php
+    }
+}
+
+// --- End Site Details Dashboard Functionality ---

@@ -1,87 +1,160 @@
 /* MillionDollarTheme AI Dashboard Admin Styles */
 
+.mdt-ai-dashboard {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    color: #3c434a;
+}
+
+.mdt-ai-dashboard h1 {
+    font-size: 2em;
+    margin-bottom: 0.5em;
+    font-weight: 600;
+    color: #1d2327;
+}
+.mdt-ai-dashboard h2 {
+    font-size: 1.6em;
+    margin-top: 1.5em;
+    margin-bottom: 0.8em;
+    font-weight: 600;
+    color: #2c3338;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid #e0e0e0;
+}
+.mdt-ai-dashboard h3 {
+    font-size: 1.3em;
+    margin-top: 1.2em;
+    margin-bottom: 0.6em;
+    font-weight: 600;
+    color: #2271b1; /* WordPress blue for emphasis */
+}
+.mdt-ai-dashboard p {
+    line-height: 1.6;
+    margin-bottom: 1em;
+}
+
 /* Tab Navigation */
 .mdt-ai-dashboard .nav-tab-wrapper {
-    margin-bottom: 20px;
-    border-bottom: 1px solid #ccc;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #c3c4c7;
+    padding-bottom: 0;
 }
 
 .mdt-ai-dashboard .nav-tab {
-    padding: 10px 15px;
-    margin: 0 5px -1px 0; /* Overlap border slightly */
-    border: 1px solid #ccc;
-    background-color: #f7f7f7;
-    color: #555;
+    padding: 10px 18px;
+    margin: 0 3px -1px 0; /* Overlap border slightly */
+    border: 1px solid #c3c4c7;
+    background-color: #f0f0f1;
+    color: #2c3338;
     text-decoration: none;
-    border-radius: 4px 4px 0 0;
+    border-radius: 3px 3px 0 0;
     font-weight: 600;
-    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+    font-size: 14px;
+    transition: background-color 0.1s ease-in-out, border-color 0.1s ease-in-out, color 0.1s ease-in-out;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
 }
 
 .mdt-ai-dashboard .nav-tab:hover,
 .mdt-ai-dashboard .nav-tab:focus {
-    background-color: #f0f0f0;
-    border-color: #bbb;
-    outline: none;
+    background-color: #f6f7f7;
+    border-color: #a7aaad;
+    color: #1d2327;
+    outline: 1px solid transparent; /* Replace default outline */
+    box-shadow: 0 0 0 1px #2271b1, 0 1px 1px rgba(0,0,0,0.04); /* WordPress focus style */
 }
 
 .mdt-ai-dashboard .nav-tab-active,
 .mdt-ai-dashboard .nav-tab-active:hover,
 .mdt-ai-dashboard .nav-tab-active:focus {
-    background-color: #fff;
-    border-color: #ccc;
-    border-bottom-color: #fff; /* Makes it look like it's part of the content area */
-    color: #000;
+    background-color: #f0f0f1; /* Admin body background */
+    border-color: #c3c4c7;
+    border-bottom-color: #f0f0f1; /* Makes it look like it's part of the content area */
+    color: #1d2327;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.04);
 }
+.mdt-ai-dashboard .nav-tab-active:focus {
+    box-shadow: 0 0 0 1px #2271b1, 0 1px 1px rgba(0,0,0,0.04);
+}
+
 
 /* Tab Content */
 .mdt-ai-dashboard .tab-content {
     display: none; /* Hidden by default, shown by JS */
-    padding: 20px;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-top: none; /* Connected to nav tabs */
-    border-radius: 0 0 4px 4px;
-    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    padding: 25px;
+    background-color: #fff; /* Clearer distinction from admin bg */
+    border: 1px solid #dcdcde;
+    border-top: none;
+    border-radius: 0 0 3px 3px;
+    box-shadow: 0 1px 1px rgba(0,0,0,.05);
 }
 
 .mdt-ai-dashboard .tab-content.active {
     display: block;
 }
 
-/* General Dashboard Layout (can be adjusted) */
-.mdt-ai-dashboard #dashboard-widgets-wrap {
-    /* Optional: If you want to keep the multi-column layout inside tabs */
+/* Postbox Styling */
+.mdt-ai-dashboard .postbox {
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    margin-bottom: 25px;
+    background: #fff;
 }
-
-.mdt-ai-dashboard #dashboard-widgets.metabox-holder {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 20px;
+.mdt-ai-dashboard .postbox .hndle {
+    font-size: 1.1em; /* Slightly larger */
+    padding: 10px 15px;
+    margin: 0;
+    border-bottom: 1px solid #ccd0d4;
+    background-color: #f6f7f7;
+    font-weight: 600;
 }
-
-.mdt-ai-dashboard .postbox-container {
-    width: 100%; /* Make postboxes full width within their grid cell */
+.mdt-ai-dashboard .postbox .inside {
+    padding: 15px;
+    line-height: 1.6;
 }
 
 /* Form Styling */
 .mdt-ai-dashboard .form-table {
     margin-bottom: 20px;
+    width: 100%;
 }
 .mdt-ai-dashboard .form-table th {
-    width: 200px;
-    padding: 15px 10px 15px 0;
+    width: 220px;
+    padding: 15px 15px 15px 0;
+    vertical-align: top;
+    font-weight: 600;
 }
 .mdt-ai-dashboard .form-table td {
     padding: 10px 0;
+    vertical-align: top;
 }
-.mdt-ai-dashboard .form-table .regular-text {
+.mdt-ai-dashboard .form-table .regular-text,
+.mdt-ai-dashboard .form-table textarea,
+.mdt-ai-dashboard .form-table select {
     width: 100%;
-    max-width: 400px;
+    max-width: 450px;
+    padding: 8px 10px;
+    border: 1px solid #8c8f94;
+    border-radius: 3px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,.07);
 }
+.mdt-ai-dashboard .form-table textarea {
+    min-height: 100px;
+}
+.mdt-ai-dashboard .form-table .small-text {
+    max-width: 80px;
+}
+
+.mdt-ai-dashboard .form-table .regular-text:focus,
+.mdt-ai-dashboard .form-table textarea:focus,
+.mdt-ai-dashboard .form-table select:focus {
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+    outline: 1px solid transparent;
+}
+
 .mdt-ai-dashboard .form-table p.description {
     font-size: 0.9em;
-    color: #666;
+    color: #50575e;
+    margin-top: 5px;
 }
 
 .mdt-ai-dashboard .api-key-status {
@@ -90,41 +163,131 @@
     margin-top: 5px;
     display: inline-block;
     font-weight: 600;
+    font-size: 0.9em;
+    border: 1px solid transparent;
 }
 .mdt-ai-dashboard .api-key-status.set {
-    background-color: #e7f7e7;
-    color: #006400;
-    border: 1px solid #c8e6c9;
+    background-color: #f0f6fc; /* Lighter blue */
+    color: #0c5688;
+    border-color: #75a5cc;
 }
 .mdt-ai-dashboard .api-key-status.not-set {
-    background-color: #fdecea;
-    color: #a94442;
-    border: 1px solid #ebccd1;
+    background-color: #fef7f1; /* Lighter orange/yellow */
+    color: #764c1e;
+    border-color: #f0b880;
 }
 
 .mdt-ai-dashboard hr {
     border: 0;
     border-top: 1px solid #ddd;
-    margin: 20px 0;
+    margin: 30px 0;
 }
 
-/* Styling for sections within API Keys tab */
 .mdt-ai-dashboard .api-key-section {
     margin-bottom: 30px;
     padding-bottom: 20px;
-    border-bottom: 1px dashed #eee;
 }
-.mdt-ai-dashboard .api-key-section:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
+.mdt-ai-dashboard .api-key-section:not(:last-child) {
+    border-bottom: 1px dashed #e0e0e0;
 }
 
 .mdt-ai-dashboard .api-key-section h3 {
     font-size: 1.2em;
-    color: #2271b1; /* WordPress blue */
+    color: #1d2327;
     margin-top: 0;
     margin-bottom: 15px;
+}
+
+/* Buttons */
+.mdt-ai-dashboard .button {
+    transition: background-color 0.1s ease-in-out, border-color 0.1s ease-in-out, color 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+}
+.mdt-ai-dashboard .button.button-primary {
+    background: #2271b1;
+    border-color: #2271b1;
+    color: #fff;
+    text-shadow: none;
+    box-shadow: 0 1px 0 #135e96;
+}
+.mdt-ai-dashboard .button.button-primary:hover,
+.mdt-ai-dashboard .button.button-primary:focus {
+    background: #135e96;
+    border-color: #135e96;
+    color: #fff;
+    box-shadow: 0 0 0 1px #fff, 0 0 0 3px #2271b1; /* WP focus style */
+}
+.mdt-ai-dashboard .button.button-small {
+    min-height: 24px;
+    line-height: 22px;
+    padding: 0 8px;
+    font-size: 12px;
+}
+
+/* Tool output textareas */
+.mdt-ai-dashboard textarea[readonly] {
+    background-color: #f6f7f7;
+    border: 1px solid #dcdcde;
+    color: #3c434a;
+    padding: 10px;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-top: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Usage Analytics Table */
+.mdt-ai-dashboard .ai-usage-logs-table {
+    margin-top: 15px;
+}
+.mdt-ai-dashboard .ai-usage-logs-table th {
+    font-weight: 600;
+}
+
+/* Charts Container */
+#mdt-ai-charts-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Adjusted minmax for better fit */
+    gap: 20px;
+    margin-bottom: 30px;
+}
+#mdt-ai-charts-container .postbox {
+    margin-bottom: 0; /* Gap handles spacing */
+}
+#mdt-ai-charts-container canvas {
+    max-width: 100%;
+    height: auto; /* Let Chart.js handle aspect ratio or set specific height */
+}
+/* Specific adjustment for bar chart to ensure it doesn't get too tall */
+#tasktype-usage-chart-postbox canvas {
+    max-height: 400px;
+}
+
+
+/* Responsive adjustments */
+@media screen and (max-width: 782px) {
+    .mdt-ai-dashboard .form-table th {
+        width: auto;
+        display: block;
+        padding-bottom: 5px;
+    }
+    .mdt-ai-dashboard .form-table td {
+        display: block;
+        padding-top: 0;
+    }
+    .mdt-ai-dashboard .form-table .regular-text,
+    .mdt-ai-dashboard .form-table textarea,
+    .mdt-ai-dashboard .form-table select {
+        max-width: none; /* Allow full width on small screens */
+    }
+
+    #mdt-ai-charts-container {
+        grid-template-columns: 1fr; /* Stack charts on smaller screens */
+    }
+    #tasktype-usage-chart-postbox {
+        grid-column: auto !important; /* Reset grid column span */
+    }
 }
 
 /* Placeholder for content in other tabs */

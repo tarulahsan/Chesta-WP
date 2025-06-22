@@ -147,8 +147,43 @@ if ( ! function_exists( 'milliondollartheme_customize_register' ) ) :
 
         // --- Single Post Settings Section ---
         $wp_customize->add_section( 'milliondollartheme_single_post_settings', array( 'title' => __( 'Single Post Settings', 'milliondollartheme' ), 'priority' => 160, ) );
+
+        // Show/Hide Social Share Buttons
         $wp_customize->add_setting( 'milliondollartheme_show_social_share_buttons', array( 'default'   => true, 'sanitize_callback' => 'milliondollartheme_sanitize_checkbox', 'transport' => 'refresh', ) );
-        $wp_customize->add_control( 'milliondollartheme_show_social_share_buttons', array( 'label' => __( 'Show Social Share Buttons on Single Posts', 'milliondollartheme' ), 'section' => 'milliondollartheme_single_post_settings', 'type' => 'checkbox', ) );
+        $wp_customize->add_control( 'milliondollartheme_show_social_share_buttons', array( 'label' => __( 'Show Social Share Buttons', 'milliondollartheme' ), 'section' => 'milliondollartheme_single_post_settings', 'type' => 'checkbox', ) );
+
+        // Show/Hide Publish Date
+        $wp_customize->add_setting( 'milliondollartheme_single_show_publish_date', array( 'default'   => true, 'sanitize_callback' => 'milliondollartheme_sanitize_checkbox', 'transport' => 'refresh', ) );
+        $wp_customize->add_control( 'milliondollartheme_single_show_publish_date', array( 'label' => __( 'Show Publish Date', 'milliondollartheme' ), 'section' => 'milliondollartheme_single_post_settings', 'type' => 'checkbox', ) );
+
+        // Show/Hide Post Author Name
+        $wp_customize->add_setting( 'milliondollartheme_single_show_author_name', array( 'default'   => true, 'sanitize_callback' => 'milliondollartheme_sanitize_checkbox', 'transport' => 'refresh', ) );
+        $wp_customize->add_control( 'milliondollartheme_single_show_author_name', array( 'label' => __( 'Show Post Author Name', 'milliondollartheme' ), 'section' => 'milliondollartheme_single_post_settings', 'type' => 'checkbox', ) );
+
+        // Show/Hide Categories
+        $wp_customize->add_setting( 'milliondollartheme_single_show_categories', array( 'default'   => true, 'sanitize_callback' => 'milliondollartheme_sanitize_checkbox', 'transport' => 'refresh', ) );
+        $wp_customize->add_control( 'milliondollartheme_single_show_categories', array( 'label' => __( 'Show Categories Link', 'milliondollartheme' ), 'section' => 'milliondollartheme_single_post_settings', 'type' => 'checkbox', ) );
+
+        // Show/Hide Tags
+        $wp_customize->add_setting( 'milliondollartheme_single_show_tags', array( 'default'   => true, 'sanitize_callback' => 'milliondollartheme_sanitize_checkbox', 'transport' => 'refresh', ) );
+        $wp_customize->add_control( 'milliondollartheme_single_show_tags', array( 'label' => __( 'Show Tags Link', 'milliondollartheme' ), 'section' => 'milliondollartheme_single_post_settings', 'type' => 'checkbox', ) );
+
+        // Featured Image Position
+        $wp_customize->add_setting( 'milliondollartheme_single_featured_image_pos', array(
+            'default'           => 'above_title',
+            'sanitize_callback' => 'milliondollartheme_sanitize_select',
+            'transport'         => 'refresh',
+        ) );
+        $wp_customize->add_control( 'milliondollartheme_single_featured_image_pos', array(
+            'label'   => __( 'Featured Image Position', 'milliondollartheme' ),
+            'section' => 'milliondollartheme_single_post_settings',
+            'type'    => 'select',
+            'choices' => array(
+                'above_title' => __( 'Above Content & Title', 'milliondollartheme' ),
+                'below_title' => __( 'Below Title, Above Content', 'milliondollartheme' ),
+                'hidden'      => __( 'Hidden', 'milliondollartheme' ),
+            ),
+        ) );
 
         // --- Performance Settings Panel ---
         $wp_customize->add_panel( 'milliondollartheme_performance_panel', array( 'title'    => __( 'Performance', 'milliondollartheme' ), 'priority' => 170, ) );

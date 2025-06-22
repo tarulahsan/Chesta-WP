@@ -1,0 +1,82 @@
+/* MillionDollarTheme Site Details Dashboard Admin Styles */
+
+.mdt-site-details-dashboard {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    color: #3c434a;
+}
+
+.mdt-site-details-dashboard h1 {
+    font-size: 2em;
+    margin-bottom: 0.5em;
+    font-weight: 600;
+    color: #1d2327;
+}
+.mdt-site-details-dashboard h2 { /* Used for postbox titles */
+    font-size: 1.3em; /* Slightly smaller than SEO dashboard's H2 as these are postbox titles */
+    padding: 8px 12px; /* Matches .hndle more closely */
+    margin: 0;
+    line-height: 1.4;
+    border-bottom: 1px solid #ccd0d4;
+    background-color: #f6f7f7;
+    font-weight: 600;
+}
+.mdt-site-details-dashboard p {
+    line-height: 1.6;
+    margin-bottom: 1em;
+}
+
+/* Postbox Styling (if not already covered by general admin CSS) */
+.mdt-site-details-dashboard .postbox {
+    border: 1px solid #ccd0d4;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+    margin-bottom: 25px;
+    background: #fff;
+}
+.mdt-site-details-dashboard .postbox .inside {
+    padding: 15px;
+    line-height: 1.6;
+}
+
+/* Table for displaying details */
+.mdt-site-details-dashboard .form-table { /* Reusing form-table for consistent styling, though it's not a form */
+    margin-bottom: 0; /* No bottom margin if it's the only thing in .inside */
+    width: 100%;
+}
+.mdt-site-details-dashboard .form-table th {
+    width: 220px;
+    padding: 12px 15px 12px 0; /* Adjusted padding */
+    vertical-align: top;
+    font-weight: 600;
+    color: #2c3338;
+}
+.mdt-site-details-dashboard .form-table td {
+    padding: 12px 0; /* Adjusted padding */
+    vertical-align: top;
+    color: #3c434a;
+}
+
+/* Placeholder for content */
+.mdt-site-details-dashboard p.placeholder {
+    font-size: 1.1em;
+    color: #777;
+    text-align: center;
+    padding: 40px 20px;
+    border: 2px dashed #eee;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+@media screen and (max-width: 782px) {
+    .mdt-site-details-dashboard .form-table th,
+    .mdt-site-details-dashboard .form-table td {
+        display: block;
+        width: auto;
+        padding-right: 0;
+    }
+    .mdt-site-details-dashboard .form-table th {
+        padding-bottom: 5px;
+    }
+    .mdt-site-details-dashboard .form-table td {
+        padding-top: 0;
+    }
+}

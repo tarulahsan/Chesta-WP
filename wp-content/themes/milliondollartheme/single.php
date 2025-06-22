@@ -17,6 +17,14 @@ get_header();
             while ( have_posts() ) :
                 the_post();
 
+                // Handle 'Above Title' featured image position
+                if ( is_singular() ) { // Double check, though it's single.php
+                    $featured_image_pos = get_theme_mod( 'milliondollartheme_single_featured_image_pos', 'above_title' );
+                    if ( 'above_title' === $featured_image_pos ) {
+                        milliondollartheme_post_thumbnail();
+                    }
+                }
+
                 get_template_part( 'template-parts/content', get_post_type() );
 
                 the_post_navigation(

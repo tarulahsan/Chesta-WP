@@ -12,6 +12,10 @@ if ( ! function_exists( 'milliondollartheme_posted_on' ) ) :
      * Prints HTML with meta information for the current post-date/time.
      */
     function milliondollartheme_posted_on() {
+        if ( is_singular() && ! get_theme_mod( 'milliondollartheme_single_show_publish_date', true ) ) {
+            return;
+        }
+
         $time_string = '<time class="entry-date published updated" datetime="%1$s">%2$s</time>';
         if ( get_the_time( 'U' ) !== get_the_modified_time( 'U' ) ) {
             $time_string = '<time class="entry-date published" datetime="%1$s">%2$s</time><time class="updated" datetime="%3$s">%4$s</time>';
@@ -31,7 +35,6 @@ if ( ! function_exists( 'milliondollartheme_posted_on' ) ) :
         );
 
         echo '<span class="posted-on">' . $posted_on . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-
     }
 endif;
 
@@ -40,6 +43,10 @@ if ( ! function_exists( 'milliondollartheme_posted_by' ) ) :
      * Prints HTML with meta information for the current author.
      */
     function milliondollartheme_posted_by() {
+        if ( is_singular() && ! get_theme_mod( 'milliondollartheme_single_show_author_name', true ) ) {
+            return;
+        }
+
         $byline = sprintf(
             /* translators: %s: post author. */
             esc_html_x( 'by %s', 'post author', 'milliondollartheme' ),
@@ -47,7 +54,6 @@ if ( ! function_exists( 'milliondollartheme_posted_by' ) ) :
         );
 
         echo '<span class="byline"> ' . $byline . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-
     }
 endif;
 // Add more template tags here
@@ -64,13 +70,20 @@ if ( ! function_exists( 'milliondollartheme_post_thumbnail' ) ) :
             return;
         }
 
-        if ( is_singular() ) :
+        // For singular views, check the Customizer setting for featured image position
+        if ( is_singular() ) {
+            $featured_image_pos = get_theme_mod( 'milliondollartheme_single_featured_image_pos', 'above_title' );
+            if ( 'hidden' === $featured_image_pos ) {
+                return; // Don't output anything if hidden
+            }
+            // Output logic will be handled in content.php for positioning 'above_title' or 'below_title'
+            // This function will just output the thumbnail HTML when called at the right place.
             ?>
             <div class="post-thumbnail">
                 <?php the_post_thumbnail( 'large' ); // Or 'full' or custom size ?>
             </div><!-- .post-thumbnail -->
             <?php
-        else :
+        } else { // For archive views, display as before
             ?>
             <a class="post-thumbnail" href="<?php the_permalink(); ?>" aria-hidden="true" tabindex="-1">
                 <?php
@@ -93,22 +106,28 @@ if ( ! function_exists( 'milliondollartheme_entry_footer' ) ) :
     function milliondollartheme_entry_footer() {
         // Hide category and tag text for pages.
         if ( 'post' === get_post_type() ) {
-            /* translators: used between list items, there is a space after the comma */
-            $categories_list = get_the_category_list( esc_html__( ', ', 'milliondollartheme' ) );
-            if ( $categories_list ) {
-                /* translators: 1: list of categories. */
-                printf( '<span class="cat-links">' . esc_html__( 'Posted in %1$s', 'milliondollartheme' ) . '</span>', $categories_list ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            // Categories
+            if ( ! is_singular() || get_theme_mod( 'milliondollartheme_single_show_categories', true ) ) {
+                /* translators: used between list items, there is a space after the comma */
+                $categories_list = get_the_category_list( esc_html__( ', ', 'milliondollartheme' ) );
+                if ( $categories_list ) {
+                    /* translators: 1: list of categories. */
+                    printf( '<span class="cat-links">' . esc_html__( 'Posted in %1$s', 'milliondollartheme' ) . '</span>', $categories_list ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                }
             }
 
-            /* translators: used between list items, there is a space after the comma */
-            $tags_list = get_the_tag_list( '', esc_html_x( ', ', 'list item separator', 'milliondollartheme' ) );
-            if ( $tags_list ) {
-                /* translators: 1: list of tags. */
-                printf( '<span class="tags-links">' . esc_html__( 'Tagged %1$s', 'milliondollartheme' ) . '</span>', $tags_list ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            // Tags
+            if ( ! is_singular() || get_theme_mod( 'milliondollartheme_single_show_tags', true ) ) {
+                /* translators: used between list items, there is a space after the comma */
+                $tags_list = get_the_tag_list( '', esc_html_x( ', ', 'list item separator', 'milliondollartheme' ) );
+                if ( $tags_list ) {
+                    /* translators: 1: list of tags. */
+                    printf( '<span class="tags-links">' . esc_html__( 'Tagged %1$s', 'milliondollartheme' ) . '</span>', $tags_list ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                }
             }
         }
 
-        if ( ! is_single() && ! post_password_required() && ( comments_open() || get_comments_number() ) ) {
+        if ( ! is_singular() && ! post_password_required() && ( comments_open() || get_comments_number() ) ) {
             echo '<span class="comments-link">';
             comments_popup_link(
                 sprintf(
