@@ -1,0 +1,139 @@
+/* MillionDollarTheme AI Dashboard Admin Styles */
+
+/* Tab Navigation */
+.mdt-ai-dashboard .nav-tab-wrapper {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ccc;
+}
+
+.mdt-ai-dashboard .nav-tab {
+    padding: 10px 15px;
+    margin: 0 5px -1px 0; /* Overlap border slightly */
+    border: 1px solid #ccc;
+    background-color: #f7f7f7;
+    color: #555;
+    text-decoration: none;
+    border-radius: 4px 4px 0 0;
+    font-weight: 600;
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+.mdt-ai-dashboard .nav-tab:hover,
+.mdt-ai-dashboard .nav-tab:focus {
+    background-color: #f0f0f0;
+    border-color: #bbb;
+    outline: none;
+}
+
+.mdt-ai-dashboard .nav-tab-active,
+.mdt-ai-dashboard .nav-tab-active:hover,
+.mdt-ai-dashboard .nav-tab-active:focus {
+    background-color: #fff;
+    border-color: #ccc;
+    border-bottom-color: #fff; /* Makes it look like it's part of the content area */
+    color: #000;
+}
+
+/* Tab Content */
+.mdt-ai-dashboard .tab-content {
+    display: none; /* Hidden by default, shown by JS */
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-top: none; /* Connected to nav tabs */
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 1px 1px rgba(0,0,0,.04);
+}
+
+.mdt-ai-dashboard .tab-content.active {
+    display: block;
+}
+
+/* General Dashboard Layout (can be adjusted) */
+.mdt-ai-dashboard #dashboard-widgets-wrap {
+    /* Optional: If you want to keep the multi-column layout inside tabs */
+}
+
+.mdt-ai-dashboard #dashboard-widgets.metabox-holder {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.mdt-ai-dashboard .postbox-container {
+    width: 100%; /* Make postboxes full width within their grid cell */
+}
+
+/* Form Styling */
+.mdt-ai-dashboard .form-table {
+    margin-bottom: 20px;
+}
+.mdt-ai-dashboard .form-table th {
+    width: 200px;
+    padding: 15px 10px 15px 0;
+}
+.mdt-ai-dashboard .form-table td {
+    padding: 10px 0;
+}
+.mdt-ai-dashboard .form-table .regular-text {
+    width: 100%;
+    max-width: 400px;
+}
+.mdt-ai-dashboard .form-table p.description {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.mdt-ai-dashboard .api-key-status {
+    padding: 8px 12px;
+    border-radius: 3px;
+    margin-top: 5px;
+    display: inline-block;
+    font-weight: 600;
+}
+.mdt-ai-dashboard .api-key-status.set {
+    background-color: #e7f7e7;
+    color: #006400;
+    border: 1px solid #c8e6c9;
+}
+.mdt-ai-dashboard .api-key-status.not-set {
+    background-color: #fdecea;
+    color: #a94442;
+    border: 1px solid #ebccd1;
+}
+
+.mdt-ai-dashboard hr {
+    border: 0;
+    border-top: 1px solid #ddd;
+    margin: 20px 0;
+}
+
+/* Styling for sections within API Keys tab */
+.mdt-ai-dashboard .api-key-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed #eee;
+}
+.mdt-ai-dashboard .api-key-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.mdt-ai-dashboard .api-key-section h3 {
+    font-size: 1.2em;
+    color: #2271b1; /* WordPress blue */
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+/* Placeholder for content in other tabs */
+.mdt-ai-dashboard .tab-content p.placeholder {
+    font-size: 1.1em;
+    color: #777;
+    text-align: center;
+    padding: 40px 20px;
+    border: 2px dashed #eee;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
