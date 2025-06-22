@@ -12,6 +12,10 @@
 ?>
     </div><!-- #content -->
 
+    <?php
+    // Elementor Pro footer integration
+    if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_location( 'footer' ) ) :
+    ?>
     <footer id="colophon" class="site-footer">
         <div class="site-info">
             <div class="copyright-text">
@@ -44,6 +48,9 @@
             */ ?>
         </div><!-- .site-info -->
     </footer><!-- #colophon -->
+    <?php
+    endif; // End Elementor footer check
+    ?>
 </div><!-- #page -->
 
 <?php wp_footer(); ?>

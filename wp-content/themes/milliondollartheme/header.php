@@ -25,6 +25,10 @@
 <div id="page" class="site">
     <a class="skip-link screen-reader-text" href="#primary"><?php esc_html_e( 'Skip to content', 'milliondollartheme' ); ?></a>
 
+    <?php
+    // Elementor Pro header integration
+    if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_location( 'header' ) ) :
+    ?>
     <header id="masthead" class="site-header">
         <div class="site-branding">
             <?php
@@ -84,6 +88,9 @@
         </div><!-- .header-extras -->
 
     </header><!-- #masthead -->
+    <?php
+    endif; // End Elementor header check
+    ?>
 
     <?php // Display breadcrumbs if the function exists
     if ( function_exists('milliondollartheme_breadcrumbs') ) : ?>

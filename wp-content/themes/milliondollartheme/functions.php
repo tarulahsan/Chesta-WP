@@ -45,6 +45,9 @@ if ( ! function_exists( 'milliondollartheme_setup' ) ) :
         add_theme_support( 'wc-product-gallery-zoom' );
         add_theme_support( 'wc-product-gallery-lightbox' );
         add_theme_support( 'wc-product-gallery-slider' );
+
+        // Add Elementor theme support
+        add_theme_support( 'elementor' );
     }
 endif;
 add_action( 'after_setup_theme', 'milliondollartheme_setup' );
