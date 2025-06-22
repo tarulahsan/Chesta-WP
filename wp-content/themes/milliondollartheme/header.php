@@ -28,11 +28,20 @@
     <?php
     // Elementor Pro header integration
     if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_location( 'header' ) ) :
+
+        $header_layout = get_theme_mod( 'milliondollartheme_header_layout', 'logo_left_nav_right' );
+        $is_sticky_header = get_theme_mod( 'milliondollartheme_sticky_header_enabled', false );
+        $header_classes = ['site-header'];
+        $header_classes[] = 'header-layout-' . $header_layout;
+        if ( $is_sticky_header ) {
+            $header_classes[] = 'sticky-header'; // JS will add 'is-sticky' class on scroll
+        }
     ?>
-    <header id="masthead" class="site-header">
-        <div class="site-branding">
-            <?php
-            the_custom_logo();
+    <header id="masthead" class="<?php echo esc_attr( implode( ' ', $header_classes ) ); ?>">
+        <div class="container header-inner-container"> <?php // Added container for layout control ?>
+            <div class="site-branding">
+                <?php
+                the_custom_logo();
             if ( is_front_page() && is_home() ) :
                 ?>
                 <h1 class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></h1>
@@ -86,7 +95,7 @@
                 </button>
             <?php endif; ?>
         </div><!-- .header-extras -->
-
+        </div><!-- .header-inner-container -->
     </header><!-- #masthead -->
     <?php
     endif; // End Elementor header check

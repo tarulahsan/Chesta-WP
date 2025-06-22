@@ -666,6 +666,462 @@ or that WooCommerce default styles are dequeued if you want full control via the
 add_filter( 'woocommerce_enqueue_styles', '__return_empty_array' ); // To dequeue all Woo styles
 */
 
+/* Styles from previous step should be above this line if they were general WC styles */
+
+/* WooCommerce Shop Page Enhancements - Product Card Styles from Step 8 */
+/* ... (existing CSS from previous step for shop page) ... */
+
+
+/* --- Single Product Page Enhancements - Step 9 --- */
+
+/* Product Gallery Layouts */
+/* Default WooCommerce gallery is assumed if no body class is present or for .product-gallery-layout-default */
+
+/* Thumbnails Left */
+body.single-product.product-gallery-layout-thumbnails_left div.product .images { /* WC < 3.0 uses .images, >=3.0 uses .woocommerce-product-gallery */
+    display: flex;
+    flex-direction: row-reverse; /* Main image right, thumbs left */
+    gap: var(--spacing-md);
+}
+body.single-product.product-gallery-layout-thumbnails_left div.product .woocommerce-product-gallery {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: var(--spacing-md);
+}
+body.single-product.product-gallery-layout-thumbnails_left div.product .woocommerce-product-gallery__wrapper {
+    flex-grow: 1;
+    order: 1; /* Main image appears after thumbs in DOM order but flex-direction-reverse places it right visually */
+}
+body.single-product.product-gallery-layout-thumbnails_left div.product .flex-control-nav.flex-control-thumbs { /* For WC < 3.0 gallery with Flexslider */
+    flex: 0 0 100px; /* Fixed width for vertical thumbnails */
+    order: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    max-height: 500px; /* Or based on main image height */
+    overflow-y: auto;
+}
+body.single-product.product-gallery-layout-thumbnails_left div.product .woocommerce-product-gallery ol.flex-control-nav li {
+    width: 100%;
+    margin: 0 0 var(--spacing-xs) 0 !important; /* Override WC defaults */
+    padding: 0;
+}
+body.single-product.product-gallery-layout-thumbnails_left div.product .woocommerce-product-gallery ol.flex-control-nav li img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--global-border-color);
+    opacity: 0.7;
+    transition: opacity var(--transition-speed-fast) var(--transition-timing-default);
+}
+body.single-product.product-gallery-layout-thumbnails_left div.product .woocommerce-product-gallery ol.flex-control-nav li img.flex-active,
+body.single-product.product-gallery-layout-thumbnails_left div.product .woocommerce-product-gallery ol.flex-control-nav li:hover img {
+    opacity: 1;
+    border-color: var(--primary-color);
+}
+
+
+/* Thumbnails Bottom */
+body.single-product.product-gallery-layout-thumbnails_bottom div.product .images, /* WC < 3.0 */
+body.single-product.product-gallery-layout-thumbnails_bottom div.product .woocommerce-product-gallery {
+    /* Default WC structure for bottom thumbnails is generally okay. */
+    /* This class allows for specific tweaks if needed. */
+}
+body.single-product.product-gallery-layout-thumbnails_bottom div.product .flex-control-nav.flex-control-thumbs {
+    margin-top: var(--spacing-md) !important;
+}
+body.single-product.product-gallery-layout-thumbnails_bottom div.product .woocommerce-product-gallery ol.flex-control-nav li {
+    /* Adjust default WC thumbnail sizing/spacing if needed via the columns filter */
+     margin: 0 var(--spacing-xs) 0 0 !important;
+     /* Example: width: calc(20% - var(--spacing-xs)); for 5 thumbs */
+}
+
+
+/* General Single Product Page Refinements */
+.single-product div.product .summary {
+    padding: var(--spacing-lg); /* More padding for summary */
+    background-color: rgba(var(--primary-color-rgb), 0.02);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--global-border-color);
+}
+
+.single-product div.product .product_title {
+    font-size: 2.8em;
+    line-height: 1.1;
+    margin-bottom: var(--spacing-sm);
+}
+
+.single-product div.product p.price {
+    font-size: 2.2em;
+    margin-bottom: var(--spacing-lg);
+}
+
+.single-product div.product .woocommerce-product-details__short-description {
+    font-size: 1.15em;
+    margin-bottom: var(--spacing-lg);
+    color: var(--text-color-muted-darker);
+}
+
+.single-product div.product form.cart {
+    background-color: var(--background-color-light);
+    padding: var(--spacing-lg); /* More padding */
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--box-shadow-soft);
+    margin-bottom: var(--spacing-xl); /* More space after add to cart */
+}
+.single-product div.product form.cart .variations td,
+.single-product div.product form.cart .variations th {
+    border-color: var(--global-border-color);
+    padding: var(--spacing-sm);
+}
+.single-product div.product form.cart .variations select {
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-md); /* Increased padding */
+    min-width: 200px; /* Better default width */
+}
+.single-product div.product form.cart .reset_variations {
+    font-size: 0.9em;
+    margin-left: var(--spacing-sm);
+}
+.single-product div.product form.cart .single_add_to_cart_button {
+    padding: var(--spacing-md) var(--spacing-xl) !important; /* Ensure padding overrides */
+    font-size: 1.1em !important;
+}
+
+
+.single-product div.product .product_meta {
+    border-top: 1px solid var(--global-border-color);
+    padding-top: var(--spacing-lg);
+    margin-top: var(--spacing-xl); /* More space before meta */
+    font-size: 0.95em;
+}
+.single-product div.product .product_meta > span {
+    display: block;
+    margin-bottom: var(--spacing-sm);
+}
+
+/* WooCommerce Tabs on Single Product */
+.single-product .woocommerce-tabs {
+    margin-top: var(--spacing-xxl); /* More space before tabs */
+}
+.single-product .woocommerce-tabs ul.tabs {
+    margin-bottom: 0;
+    border-bottom: 2px solid var(--primary-color); /* Stronger bottom border for active tab line */
+    padding-left: 0; /* Reset WC padding */
+}
+.single-product .woocommerce-tabs ul.tabs li {
+    background-color: transparent;
+    border: 1px solid transparent; /* Remove individual borders initially */
+    border-bottom: none;
+    margin-right: var(--spacing-xs);
+    border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+    margin-bottom: -2px; /* Overlap with panel border */
+}
+.single-product .woocommerce-tabs ul.tabs li a {
+    color: var(--text-color-muted-darker);
+    font-weight: 600;
+    padding: var(--spacing-md) var(--spacing-lg); /* Generous padding */
+    font-size: 1.05em;
+}
+.single-product .woocommerce-tabs ul.tabs li:hover a {
+    color: var(--primary-color);
+}
+.single-product .woocommerce-tabs ul.tabs li.active {
+    background-color: var(--background-color-light);
+    border-color: var(--primary-color) var(--primary-color) var(--background-color-light) var(--primary-color); /* Border around active tab */
+    border-width: 2px;
+    border-style: solid;
+    border-bottom-color: var(--background-color-light); /* Match panel bg */
+}
+.single-product .woocommerce-tabs ul.tabs li.active a {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+.single-product .woocommerce-tabs .woocommerce-Tabs-panel {
+    border: 2px solid var(--primary-color); /* Panel border matches active tab */
+    border-top: none;
+    padding: var(--spacing-xl); /* More padding in panels */
+    border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+    background-color: var(--background-color-light);
+    box-shadow: var(--box-shadow-soft);
+    margin-top: 0; /* Remove space created by negative margin on li */
+}
+.single-product .woocommerce-tabs .panel h2:first-child { /* Reviews title for example */
+    margin-top: 0;
+    font-size: 1.6em;
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Review form styling */
+.single-product #review_form #respond .comment-form-rating label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+}
+.single-product #review_form #respond .stars a {
+    font-size: 1.5em; /* Make stars bigger */
+    color: var(--text-color-muted);
+}
+.single-product #review_form #respond .stars a:hover,
+.single-product #review_form #respond .stars a.active {
+    color: var(--accent-color);
+}
+
+
+/* Related and Upsell Products Section Titles */
+.single-product section.up-sells > h2, /* WC 3.0+ uses section */
+.single-product section.related.products > h2 {
+    text-align: center;
+    font-size: 2.2em; /* Larger titles */
+    color: var(--primary-color);
+    margin-top: var(--spacing-xxl); /* More space above */
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--global-border-color);
+}
+/* Ensure product cards in related/upsells use the selected card style */
+body.single-product .related ul.products li.product,
+body.single-product .up-sells ul.products li.product {
+    /* Styles will be inherited from global product card styles + body class for variation */
+}
+
+/* General Product Loop Styling (some might be refinements of above) */
+.woocommerce ul.products li.product {
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--global-border-color);
+    box-shadow: var(--box-shadow-soft);
+    transition: transform var(--transition-speed-medium) var(--transition-timing-default),
+                box-shadow var(--transition-speed-medium) var(--transition-timing-default);
+    background-color: var(--background-color-light);
+    overflow: hidden; /* For clean corners with images */
+    margin-bottom: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+}
+
+.woocommerce ul.products li.product:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--box-shadow-medium);
+}
+
+.woocommerce ul.products li.product .woocommerce-loop-product__link {
+    display: block;
+    text-decoration: none;
+    color: var(--text-color-dark);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Sale Badge Styling - ensuring it works with new structure */
+.woocommerce ul.products li.product .onsale {
+    background-color: var(--accent-color) !important; /* Override default WC if needed */
+    color: var(--text-color-light) !important;
+    border-radius: var(--border-radius-pill) !important;
+    padding: var(--spacing-xs) var(--spacing-sm) !important;
+    font-size: 0.85em !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    min-height: 0 !important;
+    min-width: 0 !important;
+    margin: 0 !important; /* Reset margin to position with absolute */
+    position: absolute !important;
+    top: var(--spacing-md) !important; /* Adjusted position */
+    left: var(--spacing-md) !important; /* Adjusted position */
+    z-index: 9 !important;
+    box-shadow: var(--box-shadow-soft) !important;
+}
+
+/* Product Image Wrapper */
+.woocommerce ul.products li.product .woocommerce-loop-product__link img {
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    margin-bottom: 0;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    transition: opacity var(--transition-speed-medium) var(--transition-timing-default);
+}
+.woocommerce ul.products li.product .woocommerce-loop-product__link:hover img {
+    opacity: 0.85;
+}
+
+/* Product Details Wrapper (Title, Price, etc.) */
+.woocommerce ul.products li.product .product-details-wrap {
+    padding: var(--spacing-md);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* Product Title */
+.woocommerce ul.products li.product .woocommerce-loop-product__title {
+    font-family: var(--font-family-heading);
+    font-size: 1.2em;
+    color: var(--primary-color);
+    margin: 0 0 var(--spacing-xs) 0;
+    padding: 0;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+/* Product Price */
+.woocommerce ul.products li.product .price {
+    display: block;
+    font-size: 1.1em;
+    font-weight: 700;
+    color: var(--accent-color-dark, var(--accent-color));
+    margin: 0 0 var(--spacing-sm) 0;
+    padding: 0;
+}
+.woocommerce ul.products li.product .price ins {
+    text-decoration: none;
+    background: none;
+}
+.woocommerce ul.products li.product .price del {
+    opacity: 0.7;
+    font-size: 0.85em;
+    margin-right: var(--spacing-xs);
+}
+
+
+/* Add to Cart Button & Placeholder Quick View */
+.woocommerce ul.products li.product .button-wrap {
+    padding: 0 var(--spacing-md) var(--spacing-md) var(--spacing-md);
+    margin-top: auto;
+}
+.woocommerce ul.products li.product .button,
+.woocommerce ul.products li.product .chesta-quick-view-button {
+    font-size: 0.9em;
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin: 0;
+    display: block;
+    text-align: center;
+    border-radius: var(--border-radius-md);
+    width: 100%;
+}
+
+.woocommerce ul.products li.product .chesta-quick-view-button {
+    background: var(--secondary-color);
+    color: var(--text-color-light);
+    margin-top: var(--spacing-xs);
+}
+.woocommerce ul.products li.product .chesta-quick-view-button:hover {
+    background: var(--secondary-color-dark, #A02CA0);
+    opacity: 0.9;
+}
+
+
+/* Product Card Style Specifics (body classes are added via milliondollartheme_woo_body_class_filter) */
+
+/* Minimal Card Style */
+body.product-card-style-minimal ul.products li.product {
+    box-shadow: none;
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--global-border-color); /* Ensure border for minimal */
+}
+body.product-card-style-minimal ul.products li.product .woocommerce-loop-product__title {
+    font-size: 1.1em;
+}
+body.product-card-style-minimal ul.products li.product .product-details-wrap {
+    padding: var(--spacing-sm); /* Less padding for minimal */
+}
+
+/* Outline Card Style */
+body.product-card-style-outline ul.products li.product {
+    box-shadow: none;
+    background-color: transparent;
+    border-width: 2px;
+    border-color: var(--global-border-color); /* Use global border as base */
+}
+body.product-card-style-outline ul.products li.product:hover {
+    border-color: var(--primary-color);
+    box-shadow: var(--box-shadow-soft);
+}
+
+/* Modern Overlay Card Style */
+body.product-card-style-modern-overlay ul.products li.product {
+    position: relative; /* Already set by WC usually, but good to ensure */
+    border: none; /* Often looks better without border for this style */
+    box-shadow: var(--box-shadow-medium); /* Slightly more prominent shadow */
+}
+body.product-card-style-modern-overlay ul.products li.product .woocommerce-loop-product__link img {
+    border-radius: var(--border-radius-lg);
+    transition: transform var(--transition-speed-slow) var(--transition-timing-default);
+}
+body.product-card-style-modern-overlay ul.products li.product:hover .woocommerce-loop-product__link img {
+    transform: scale(1.05);
+    opacity: 1;
+}
+body.product-card-style-modern-overlay ul.products li.product .product-details-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0) 100%);
+    padding: var(--spacing-lg) var(--spacing-md) var(--spacing-md);
+    color: var(--text-color-light);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity var(--transition-speed-medium) var(--transition-timing-default),
+                transform var(--transition-speed-medium) var(--transition-timing-default);
+    border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%;
+    box-sizing: border-box;
+    pointer-events: none; /* Allow hover on image through overlay initially */
+}
+body.product-card-style-modern-overlay ul.products li.product:hover .product-details-overlay {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto; /* Enable interaction when visible */
+}
+body.product-card-style-modern-overlay ul.products li.product .product-details-overlay .product-info-wrap {
+    margin-bottom: auto;
+}
+body.product-card-style-modern-overlay ul.products li.product .product-details-overlay .woocommerce-loop-product__title,
+body.product-card-style-modern-overlay ul.products li.product .product-details-overlay .price {
+    color: var(--text-color-light);
+    padding: 0;
+}
+body.product-card-style-modern-overlay ul.products li.product .product-details-overlay .woocommerce-loop-product__title {
+    font-size: 1.15em;
+    margin-bottom: var(--spacing-xs);
+}
+body.product-card-style-modern-overlay ul.products li.product .product-details-overlay .price {
+    font-size: 1em;
+    margin-bottom: var(--spacing-sm);
+}
+body.product-card-style-modern-overlay ul.products li.product .product-details-overlay .button,
+body.product-card-style-modern-overlay ul.products li.product .product-details-overlay .chesta-quick-view-button {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    background: rgba(255,255,255,0.2); /* Semi-transparent buttons on overlay */
+    color: var(--text-color-light);
+    border: 1px solid rgba(255,255,255,0.3);
+}
+body.product-card-style-modern-overlay ul.products li.product .product-details-overlay .button:hover,
+body.product-card-style-modern-overlay ul.products li.product .product-details-overlay .chesta-quick-view-button:hover {
+    background: rgba(255,255,255,0.3);
+    border-color: rgba(255,255,255,0.5);
+}
+
+
+/* Ensure the body class based column count from Customizer works with grid */
+/* The milliondollartheme_woo_loop_shop_columns_filter hook sets number of columns for WC,
+   which adds classes like .columns-3 to ul.products. We can use that. */
+
+/* Responsive adjustments for the grid (already present from previous WC styling) */
+/* @media (max-width: 1023px) { ... } */
+/* @media (max-width: 767px) { ... } */
+
 /* Product Card Style Variations (from Customizer body class) */
 /* Default style is already glassy from previous step styling of .woocommerce ul.products li.product */
 

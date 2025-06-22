@@ -39,6 +39,16 @@ get_header();
                     milliondollartheme_social_share_buttons();
                 }
 
+                // Author Bio Box
+                if ( function_exists( 'milliondollartheme_author_bio_box' ) ) {
+                    milliondollartheme_author_bio_box();
+                }
+
+                // Related Posts
+                if ( function_exists( 'milliondollartheme_related_posts' ) ) {
+                    milliondollartheme_related_posts();
+                }
+
                 // If comments are open or we have at least one comment, load up the comment template.
                 if ( comments_open() || get_comments_number() ) :
                     comments_template();

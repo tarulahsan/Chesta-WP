@@ -55,7 +55,26 @@ add_action( 'after_setup_theme', 'milliondollartheme_setup' );
 function milliondollartheme_content_width() { $GLOBALS['content_width'] = apply_filters( 'milliondollartheme_content_width', 640 ); }
 add_action( 'after_setup_theme', 'milliondollartheme_content_width', 0 );
 
-function milliondollartheme_widgets_init() { register_sidebar( array( 'name' => esc_html__( 'Sidebar', 'milliondollartheme' ), 'id' => 'sidebar-1', 'description' => esc_html__( 'Add widgets here.', 'milliondollartheme' ), 'before_widget' => '<section id="%1$s" class="widget %2$s">', 'after_widget'  => '</section>', 'before_title'  => '<h2 class="widget-title">', 'after_title' => '</h2>', ) ); }
+function milliondollartheme_widgets_init() {
+    register_sidebar( array(
+        'name'          => esc_html__( 'Main Sidebar', 'milliondollartheme' ),
+        'id'            => 'sidebar-1',
+        'description'   => esc_html__( 'Add widgets here to appear in your main sidebar.', 'milliondollartheme' ),
+        'before_widget' => '<section id="%1$s" class="widget %2$s">',
+        'after_widget'  => '</section>',
+        'before_title'  => '<h2 class="widget-title">',
+        'after_title'   => '</h2>',
+    ) );
+    register_sidebar( array(
+        'name'          => esc_html__( 'Footer Widgets', 'milliondollartheme' ),
+        'id'            => 'footer-widgets',
+        'description'   => esc_html__( 'Add widgets here to appear in your footer. The number of columns is set in the Customizer (Footer Settings).', 'milliondollartheme' ),
+        'before_widget' => '<section id="%1$s" class="widget footer-widget %2$s">',
+        'after_widget'  => '</section>',
+        'before_title'  => '<h3 class="widget-title footer-widget-title">',
+        'after_title'   => '</h3>',
+    ) );
+}
 add_action( 'widgets_init', 'milliondollartheme_widgets_init' );
 
 function milliondollartheme_scripts() {
@@ -70,6 +89,9 @@ function milliondollartheme_scripts() {
     wp_enqueue_script( 'masonry-layout', 'https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js', array('imagesloaded'), '4.2.2', true );
     wp_enqueue_style( 'milliondollartheme-style', get_stylesheet_uri(), array(), MILLIONDOLLARTHEME_VERSION );
     wp_style_add_data( 'milliondollartheme-style', 'rtl', 'replace' );
+
+    // Main theme JavaScript
+    wp_enqueue_script( 'milliondollartheme-main-js', get_template_directory_uri() . '/js/main.js', array(), MILLIONDOLLARTHEME_VERSION, true );
 
     // WooCommerce specific stylesheet
     if ( class_exists( 'WooCommerce' ) ) {
@@ -1331,6 +1353,75 @@ if ( class_exists( 'WooCommerce' ) ) {
 
 } // End if class_exists WooCommerce
 
+
+if ( class_exists( 'WooCommerce' ) ) {
+    // Show/Hide Upsells
+    function milliondollartheme_toggle_upsells_display() {
+        if ( ! get_theme_mod( 'milliondollartheme_woo_show_upsells', true ) ) {
+            remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_upsell_display', 15 );
+        }
+    }
+    add_action( 'wp', 'milliondollartheme_toggle_upsells_display' );
+
+    // Show/Hide Related Products
+    function milliondollartheme_toggle_related_products_display() {
+        if ( ! get_theme_mod( 'milliondollartheme_woo_show_related_products', true ) ) {
+            remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
+        }
+    }
+    add_action( 'wp', 'milliondollartheme_toggle_related_products_display' );
+
+    // Add body class for gallery layout
+    function milliondollartheme_woo_single_gallery_body_class( $classes ) {
+        if ( is_product() ) {
+            $gallery_layout = get_theme_mod( 'milliondollartheme_woo_single_gallery_layout', 'default' );
+            if ( $gallery_layout !== 'default' ) {
+                $classes[] = 'product-gallery-layout-' . sanitize_html_class( $gallery_layout );
+            }
+        }
+        return $classes;
+    }
+    add_filter( 'body_class', 'milliondollartheme_woo_single_gallery_body_class' );
+
+    // Potentially adjust gallery thumbnail columns for 'thumbnails_bottom'
+    function milliondollartheme_woo_gallery_thumbnail_columns_filter( $columns ) {
+        $gallery_layout = get_theme_mod( 'milliondollartheme_woo_single_gallery_layout', 'default' );
+        if ( 'thumbnails_bottom' === $gallery_layout || 'thumbnails_left' === $gallery_layout) { // Also for left to ensure enough space
+            return 4; // Or a dynamic number based on image count / available width
+        }
+        return $columns; // Default WooCommerce columns
+    }
+    add_filter( 'woocommerce_product_thumbnails_columns', 'milliondollartheme_woo_gallery_thumbnail_columns_filter' );
+
+    // Add Quick View Button Placeholder to Shop Loop
+    function milliondollartheme_add_quick_view_button_placeholder() {
+        if ( get_theme_mod( 'milliondollartheme_woo_show_quick_view_button', false ) ) {
+            global $product;
+            echo '<div class="button-wrap">'; // Wrap buttons for styling if not already done by add to cart
+            // Note: The add_to_cart_button is typically here. This adds another button.
+            // If add_to_cart is not desired on loop for this style, it needs removal too.
+            // This placeholder is very basic. A real quick view needs JS, a modal, and AJAX loading.
+            echo '<a href="#" class="button chesta-quick-view-button" data-product_id="' . esc_attr( $product->get_id() ) . '">' . esc_html__( 'Quick View', 'milliondollartheme' ) . '</a>';
+            echo '</div>';
+        }
+    }
+    // Decide on a hook. woocommerce_after_shop_loop_item is common, but might conflict if add_to_cart is also there.
+    // If you want it to replace add to cart, you'd remove that action and add this.
+    // If it's in addition, ensure styling accommodates it.
+    // add_action( 'woocommerce_after_shop_loop_item', 'milliondollartheme_add_quick_view_button_placeholder', 15 ); // After add to cart (default 10)
+
+    // Conditionally remove sale badge
+    function milliondollartheme_toggle_sale_badge() {
+        if ( !get_theme_mod( 'milliondollartheme_woo_show_sale_badge', true ) ) {
+            remove_action( 'woocommerce_before_shop_loop_item_title', 'woocommerce_show_product_loop_sale_flash', 10 );
+            remove_action( 'woocommerce_before_single_product_summary', 'woocommerce_show_product_sale_flash', 10 );
+        }
+    }
+    add_action( 'wp', 'milliondollartheme_toggle_sale_badge' );
+
+}
+
+
 // --- SEO Dashboard Functionality ---
 
 if ( ! function_exists( 'milliondollartheme_seo_dashboard_menu' ) ) {
@@ -1614,3 +1705,18 @@ if ( ! function_exists( 'milliondollartheme_site_details_dashboard_page' ) ) {
 }
 
 // --- End Site Details Dashboard Functionality ---
+
+/**
+ * Filters the excerpt length to the number of words set in the Customizer.
+ *
+ * @param int $length Excerpt length.
+ * @return int (Maybe) modified excerpt length.
+ */
+function milliondollartheme_custom_excerpt_length( $length ) {
+    if ( is_admin() ) {
+        return $length;
+    }
+    $custom_length = get_theme_mod( 'milliondollartheme_archive_excerpt_length', 25 );
+    return absint( $custom_length );
+}
+add_filter( 'excerpt_length', 'milliondollartheme_custom_excerpt_length', 999 );

@@ -71,9 +71,42 @@ if ( ! function_exists( 'milliondollartheme_customize_register' ) ) :
 
         // --- Header Settings Panel ---
         $wp_customize->add_panel( 'milliondollartheme_header_panel', array( 'title' => __( 'Header Settings', 'milliondollartheme' ), 'priority' => 120, ) );
-        $wp_customize->add_section( 'milliondollartheme_header_layout_section', array( 'title' => __( 'Header Elements', 'milliondollartheme' ), 'panel' => 'milliondollartheme_header_panel', 'priority' => 10, ) );
+        $wp_customize->add_section( 'milliondollartheme_header_layout_section', array( 'title' => __( 'Header Layout & Elements', 'milliondollartheme' ), 'panel' => 'milliondollartheme_header_panel', 'priority' => 10, ) );
+
+        // Header Layout
+        $wp_customize->add_setting( 'milliondollartheme_header_layout', array(
+            'default'           => 'logo_left_nav_right',
+            'sanitize_callback' => 'milliondollartheme_sanitize_select',
+            'transport'         => 'refresh', // Requires refresh as HTML structure might change
+        ) );
+        $wp_customize->add_control( 'milliondollartheme_header_layout', array(
+            'label'   => __( 'Header Layout', 'milliondollartheme' ),
+            'section' => 'milliondollartheme_header_layout_section',
+            'type'    => 'select',
+            'choices' => array(
+                'logo_left_nav_right' => __( 'Logo Left - Nav Right', 'milliondollartheme' ),
+                'logo_center_nav_below' => __( 'Logo Center - Nav Below', 'milliondollartheme' ),
+                // Add more layouts later if needed
+            ),
+        ) );
+
+        // Sticky Header
+        $wp_customize->add_setting( 'milliondollartheme_sticky_header_enabled', array(
+            'default'           => false,
+            'sanitize_callback' => 'milliondollartheme_sanitize_checkbox',
+            'transport'         => 'refresh', // Refresh to apply body class and JS
+        ) );
+        $wp_customize->add_control( 'milliondollartheme_sticky_header_enabled', array(
+            'label'   => __( 'Enable Sticky Header', 'milliondollartheme' ),
+            'section' => 'milliondollartheme_header_layout_section',
+            'type'    => 'checkbox',
+        ) );
+
+        // Show Search Icon (existing)
         $wp_customize->add_setting( 'milliondollartheme_header_show_search_icon', array( 'default' => true, 'sanitize_callback' => 'milliondollartheme_sanitize_checkbox', 'transport' => 'refresh', ) );
         $wp_customize->add_control( 'milliondollartheme_header_show_search_icon', array( 'label' => __( 'Show Search Icon in Header', 'milliondollartheme' ), 'section' => 'milliondollartheme_header_layout_section', 'type' => 'checkbox', ) );
+
+        // Social Links Section (existing)
         $wp_customize->add_section( 'milliondollartheme_header_social_links_section', array( 'title' => __( 'Social Media Links (Header)', 'milliondollartheme' ), 'panel' => 'milliondollartheme_header_panel', 'priority' => 20, 'description' => __( 'Enter full URLs for your social media profiles. Icons will appear in the header.', 'milliondollartheme'), ) );
         $social_networks_header = array( 'twitter', 'facebook', 'instagram', 'linkedin', 'youtube' );
         foreach ( $social_networks_header as $network_header ) {
@@ -81,11 +114,52 @@ if ( ! function_exists( 'milliondollartheme_customize_register' ) ) :
             $wp_customize->add_control( 'milliondollartheme_header_social_' . $network_header, array( 'label' => sprintf( __( '%s URL (Header)', 'milliondollartheme' ), ucfirst( $network_header ) ), 'section' => 'milliondollartheme_header_social_links_section', 'type' => 'url' ) );
         }
 
+
         // --- Footer Settings Panel ---
         $wp_customize->add_panel( 'milliondollartheme_footer_panel', array( 'title' => __( 'Footer Settings', 'milliondollartheme' ), 'priority' => 130, ) );
+
+        // Footer Layout Section
+        $wp_customize->add_section( 'milliondollartheme_footer_layout_section', array(
+            'title'       => __( 'Footer Layout & Widgets', 'milliondollartheme' ),
+            'panel'       => 'milliondollartheme_footer_panel',
+            'priority'    => 5,
+        ) );
+
+        $wp_customize->add_setting( 'milliondollartheme_footer_widget_columns', array(
+            'default'           => 3,
+            'sanitize_callback' => 'milliondollartheme_sanitize_select',
+            'transport'         => 'refresh',
+        ) );
+        $wp_customize->add_control( 'milliondollartheme_footer_widget_columns', array(
+            'label'   => __( 'Footer Widget Columns', 'milliondollartheme' ),
+            'section' => 'milliondollartheme_footer_layout_section',
+            'type'    => 'select',
+            'choices' => array(
+                '1' => __( '1 Column', 'milliondollartheme' ),
+                '2' => __( '2 Columns', 'milliondollartheme' ),
+                '3' => __( '3 Columns', 'milliondollartheme' ),
+                '4' => __( '4 Columns', 'milliondollartheme' ),
+            ),
+        ) );
+
+        // Scroll to Top Button
+        $wp_customize->add_setting( 'milliondollartheme_scroll_to_top_enabled', array(
+            'default'           => true,
+            'sanitize_callback' => 'milliondollartheme_sanitize_checkbox',
+            'transport'         => 'refresh',
+        ) );
+        $wp_customize->add_control( 'milliondollartheme_scroll_to_top_enabled', array(
+            'label'   => __( 'Enable "Scroll to Top" Button', 'milliondollartheme' ),
+            'section' => 'milliondollartheme_footer_layout_section', // Or a general 'Extras' section
+            'type'    => 'checkbox',
+        ) );
+
+        // Copyright Section (existing)
         $wp_customize->add_section( 'milliondollartheme_footer_copyright_section', array( 'title' => __( 'Copyright Text', 'milliondollartheme' ), 'panel' => 'milliondollartheme_footer_panel', 'priority' => 10, ) );
         $wp_customize->add_setting( 'milliondollartheme_footer_copyright_text', array( 'default' => sprintf( __( 'Copyright [year] %s. All rights reserved.', 'milliondollartheme' ), get_bloginfo( 'name', 'display' ) ), 'sanitize_callback' => 'wp_kses_post', 'transport' => 'postMessage', ) );
         $wp_customize->add_control( 'milliondollartheme_footer_copyright_text', array( 'label' => __( 'Copyright Text', 'milliondollartheme' ), 'description' => __( 'Use [year] to display current year automatically. HTML is allowed.', 'milliondollartheme' ), 'section' => 'milliondollartheme_footer_copyright_section', 'type' => 'textarea', ) );
+
+        // Footer Social Links Section (existing)
         $wp_customize->add_section( 'milliondollartheme_footer_social_links_section', array( 'title' => __( 'Social Media Links (Footer)', 'milliondollartheme' ), 'panel' => 'milliondollartheme_footer_panel', 'priority' => 20, ) );
         $social_networks_footer = array( 'twitter', 'facebook', 'instagram', 'linkedin', 'youtube', 'github', 'pinterest', 'rss' );
         foreach ( $social_networks_footer as $network_footer ) {
@@ -106,15 +180,51 @@ if ( ! function_exists( 'milliondollartheme_customize_register' ) ) :
                 'panel'    => 'milliondollartheme_woocommerce_panel',
                 'priority' => 10,
             ) );
-            $wp_customize->add_setting( 'milliondollartheme_woo_shop_columns', array( 'default' => 3, 'sanitize_callback' => 'absint' ) );
+            $wp_customize->add_setting( 'milliondollartheme_woo_shop_columns', array( 'default' => 3, 'sanitize_callback' => 'absint', 'transport' => 'refresh' ) ); // transport refresh for class change
             $wp_customize->add_control( 'milliondollartheme_woo_shop_columns', array(
                 'label' => __( 'Products per Row (Desktop)', 'milliondollartheme' ), 'section' => 'milliondollartheme_woo_shop_page_section', 'type' => 'select',
                 'choices' => array( '2' => __( '2 Columns', 'milliondollartheme' ), '3' => __( '3 Columns', 'milliondollartheme' ), '4' => __( '4 Columns', 'milliondollartheme' ) )
             ) );
-            $wp_customize->add_setting( 'milliondollartheme_woo_product_card_style', array( 'default' => 'default', 'sanitize_callback' => 'sanitize_key' ) );
+
+            // Enhanced Product Card Style
+            $wp_customize->add_setting( 'milliondollartheme_woo_product_card_style', array(
+                'default' => 'default',
+                'sanitize_callback' => 'sanitize_key',
+                'transport' => 'refresh' // Refresh needed for body class change potentially
+            ) );
             $wp_customize->add_control( 'milliondollartheme_woo_product_card_style', array(
                 'label' => __( 'Product Card Style', 'milliondollartheme' ), 'section' => 'milliondollartheme_woo_shop_page_section', 'type' => 'select',
-                'choices' => array( 'default' => __( 'Theme Default (Glassy)', 'milliondollartheme' ), 'minimal' => __( 'Minimal Card', 'milliondollartheme' ), 'outline' => __( 'Outline Card', 'milliondollartheme' ) )
+                'choices' => array(
+                    'default'         => __( 'Default (Glassy)', 'milliondollartheme' ),
+                    'minimal'         => __( 'Minimal Card', 'milliondollartheme' ),
+                    'outline'         => __( 'Outline Card', 'milliondollartheme' ),
+                    'modern-overlay'  => __( 'Modern (Image Overlay on Hover)', 'milliondollartheme' )
+                )
+            ) );
+
+            // Show Sale Badge
+            $wp_customize->add_setting( 'milliondollartheme_woo_show_sale_badge', array(
+                'default'           => true,
+                'sanitize_callback' => 'milliondollartheme_sanitize_checkbox',
+                'transport'         => 'refresh', // May need refresh if hooks are conditional
+            ) );
+            $wp_customize->add_control( 'milliondollartheme_woo_show_sale_badge', array(
+                'label'   => __( 'Show "Sale!" Badge', 'milliondollartheme' ),
+                'section' => 'milliondollartheme_woo_shop_page_section',
+                'type'    => 'checkbox',
+            ) );
+
+            // Show Quick View Button (Placeholder)
+            $wp_customize->add_setting( 'milliondollartheme_woo_show_quick_view_button', array(
+                'default'           => false,
+                'sanitize_callback' => 'milliondollartheme_sanitize_checkbox',
+                'transport'         => 'refresh',
+            ) );
+            $wp_customize->add_control( 'milliondollartheme_woo_show_quick_view_button', array(
+                'label'       => __( 'Show "Quick View" Button (Placeholder)', 'milliondollartheme' ),
+                'section'     => 'milliondollartheme_woo_shop_page_section',
+                'type'        => 'checkbox',
+                'description' => __( 'Note: Actual Quick View functionality requires a compatible plugin or further custom development.', 'milliondollartheme' ),
             ) );
 
             // Single Product Page Settings Section
@@ -128,6 +238,50 @@ if ( ! function_exists( 'milliondollartheme_customize_register' ) ) :
                 'label' => __( 'Related/Up-Sell Products per Row', 'milliondollartheme' ), 'section' => 'milliondollartheme_woo_single_product_section', 'type' => 'select',
                 'choices' => array( '2' => __( '2 Columns', 'milliondollartheme' ), '3' => __( '3 Columns', 'milliondollartheme' ), '4' => __( '4 Columns', 'milliondollartheme' ) )
             ) );
+
+            // Product Gallery Layout
+            $wp_customize->add_setting( 'milliondollartheme_woo_single_gallery_layout', array(
+                'default'           => 'default',
+                'sanitize_callback' => 'milliondollartheme_sanitize_select',
+                'transport'         => 'refresh', // Requires refresh for structural changes / class changes
+            ) );
+            $wp_customize->add_control( 'milliondollartheme_woo_single_gallery_layout', array(
+                'label'   => __( 'Product Gallery Layout', 'milliondollartheme' ),
+                'section' => 'milliondollartheme_woo_single_product_section',
+                'type'    => 'select',
+                'choices' => array(
+                    'default'           => __( 'Default (WooCommerce)', 'milliondollartheme' ),
+                    'thumbnails_left'   => __( 'Thumbnails Left', 'milliondollartheme' ),
+                    'thumbnails_bottom' => __( 'Thumbnails Bottom (Horizontal Strip)', 'milliondollartheme' ),
+                    // 'stacked'        => __( 'Stacked Images (No Thumbnails)', 'milliondollartheme' ),
+                ),
+            ) );
+
+            // Show Upsells
+            $wp_customize->add_setting( 'milliondollartheme_woo_show_upsells', array(
+                'default'           => true,
+                'sanitize_callback' => 'milliondollartheme_sanitize_checkbox',
+                'transport'         => 'refresh',
+            ) );
+            $wp_customize->add_control( 'milliondollartheme_woo_show_upsells', array(
+                'label'   => __( 'Show Up-sell Products', 'milliondollartheme' ),
+                'section' => 'milliondollartheme_woo_single_product_section',
+                'type'    => 'checkbox',
+            ) );
+
+            // Show Related Products (control visibility - already have column control)
+            $wp_customize->add_setting( 'milliondollartheme_woo_show_related_products', array(
+                'default'           => true,
+                'sanitize_callback' => 'milliondollartheme_sanitize_checkbox',
+                'transport'         => 'refresh',
+            ) );
+            $wp_customize->add_control( 'milliondollartheme_woo_show_related_products', array(
+                'label'   => __( 'Show Related Products', 'milliondollartheme' ),
+                'section' => 'milliondollartheme_woo_single_product_section',
+                'type'    => 'checkbox',
+            ) );
+
+
             $wp_customize->add_setting( 'milliondollartheme_woo_show_sku', array( 'default' => false, 'sanitize_callback' => 'milliondollartheme_sanitize_checkbox' ) );
             $wp_customize->add_control( 'milliondollartheme_woo_show_sku', array( 'label' => __( 'Show Product SKU', 'milliondollartheme' ), 'section' => 'milliondollartheme_woo_single_product_section', 'type' => 'checkbox' ) );
             $wp_customize->add_setting( 'milliondollartheme_woo_show_categories', array( 'default' => true, 'sanitize_callback' => 'milliondollartheme_sanitize_checkbox' ) );
@@ -185,11 +339,136 @@ if ( ! function_exists( 'milliondollartheme_customize_register' ) ) :
             ),
         ) );
 
-        // --- Performance Settings Panel ---
-        $wp_customize->add_panel( 'milliondollartheme_performance_panel', array( 'title'    => __( 'Performance', 'milliondollartheme' ), 'priority' => 170, ) );
-        $wp_customize->add_section( 'milliondollartheme_critical_css_section', array( 'title' => __( 'Critical CSS', 'milliondollartheme' ), 'panel' => 'milliondollartheme_performance_panel', 'priority' => 10, 'description' => __( 'For optimal Time to First Paint and Largest Contentful Paint, it is highly recommended to use a dedicated caching/optimization plugin that can generate and inline critical CSS for your pages. This theme is designed to be compatible with such plugins (e.g., WP Rocket, LiteSpeed Cache, Perfmatters). Manually implementing critical CSS is an advanced task and typically requires per-page generation.', 'milliondollartheme' ), ) );
-        $wp_customize->add_setting( 'milliondollartheme_critical_css_info', array( 'default' => '', 'sanitize_callback' => '__return_empty_string' ) );
-        $wp_customize->add_control( new WP_Customize_Control( $wp_customize, 'milliondollartheme_critical_css_info', array( 'label' => __( 'Recommendation', 'milliondollartheme'), 'section' => 'milliondollartheme_critical_css_section', 'type' => 'hidden', 'description' => __( 'This section is for informational purposes. Please refer to plugin documentation for critical CSS setup.', 'milliondollartheme' ), ) ) );
+        // Author Bio Box
+        $wp_customize->add_setting( 'milliondollartheme_single_show_author_bio', array(
+            'default'           => true,
+            'sanitize_callback' => 'milliondollartheme_sanitize_checkbox',
+            'transport'         => 'refresh',
+        ) );
+        $wp_customize->add_control( 'milliondollartheme_single_show_author_bio', array(
+            'label'   => __( 'Show Author Bio Box', 'milliondollartheme' ),
+            'section' => 'milliondollartheme_single_post_settings',
+            'type'    => 'checkbox',
+            'description' => __( 'Displays a box with the author\'s biographical info if available.', 'milliondollartheme' ),
+        ) );
+
+        // Related Posts Section
+        $wp_customize->add_setting( 'milliondollartheme_single_show_related_posts', array(
+            'default'           => true,
+            'sanitize_callback' => 'milliondollartheme_sanitize_checkbox',
+            'transport'         => 'refresh',
+        ) );
+        $wp_customize->add_control( 'milliondollartheme_single_show_related_posts', array(
+            'label'   => __( 'Show Related Posts Section', 'milliondollartheme' ),
+            'section' => 'milliondollartheme_single_post_settings',
+            'type'    => 'checkbox',
+            'description' => __( 'Displays a section of related posts based on categories or tags.', 'milliondollartheme' ),
+        ) );
+
+        // Blockquote Style
+        $wp_customize->add_setting( 'milliondollartheme_single_blockquote_style', array(
+            'default'           => 'default',
+            'sanitize_callback' => 'milliondollartheme_sanitize_select',
+            'transport'         => 'postMessage', // CSS change can be live previewed
+        ) );
+        $wp_customize->add_control( 'milliondollartheme_single_blockquote_style', array(
+            'label'   => __( 'Blockquote Style', 'milliondollartheme' ),
+            'section' => 'milliondollartheme_single_post_settings',
+            'type'    => 'select',
+            'choices' => array(
+                'default'         => __( 'Default (Simple Left Border)', 'milliondollartheme' ),
+                'enhanced-quote'  => __( 'Enhanced (e.g., Centered, Larger Quote Marks)', 'milliondollartheme' ),
+            ),
+        ) );
+
+        // --- Page Settings Section ---
+        $wp_customize->add_section( 'milliondollartheme_page_settings', array(
+            'title'       => __( 'Page Settings', 'milliondollartheme' ),
+            'priority'    => 162, // After Single Post, Before Blog/Archive
+        ) );
+
+        // Show/Hide Page Title
+        $wp_customize->add_setting( 'milliondollartheme_page_show_title', array(
+            'default'           => true,
+            'sanitize_callback' => 'milliondollartheme_sanitize_checkbox',
+            'transport'         => 'refresh',
+        ) );
+        $wp_customize->add_control( 'milliondollartheme_page_show_title', array(
+            'label'   => __( 'Show Page Title', 'milliondollartheme' ),
+            'section' => 'milliondollartheme_page_settings',
+            'type'    => 'checkbox',
+        ) );
+
+        // --- Blog / Archive Settings Section ---
+        $wp_customize->add_section( 'milliondollartheme_blog_archive_settings', array(
+            'title'       => __( 'Blog / Archive Settings', 'milliondollartheme' ),
+            'priority'    => 165, // After Single Post Settings
+        ) );
+
+        // Archive Layout
+        $wp_customize->add_setting( 'milliondollartheme_archive_layout', array(
+            'default'           => 'list',
+            'sanitize_callback' => 'milliondollartheme_sanitize_select',
+            'transport'         => 'refresh',
+        ) );
+        $wp_customize->add_control( 'milliondollartheme_archive_layout', array(
+            'label'   => __( 'Archive Layout', 'milliondollartheme' ),
+            'section' => 'milliondollartheme_blog_archive_settings',
+            'type'    => 'select',
+            'choices' => array(
+                'list' => __( 'List', 'milliondollartheme' ),
+                'grid' => __( 'Grid', 'milliondollartheme' ),
+            ),
+        ) );
+
+        // Grid Columns
+        $wp_customize->add_setting( 'milliondollartheme_archive_grid_columns', array(
+            'default'           => 3,
+            'sanitize_callback' => 'milliondollartheme_sanitize_select',
+            'transport'         => 'refresh',
+        ) );
+        $wp_customize->add_control( 'milliondollartheme_archive_grid_columns', array(
+            'label'   => __( 'Grid Columns', 'milliondollartheme' ),
+            'section' => 'milliondollartheme_blog_archive_settings',
+            'type'    => 'select',
+            'choices' => array(
+                '2' => __( '2 Columns', 'milliondollartheme' ),
+                '3' => __( '3 Columns', 'milliondollartheme' ),
+                '4' => __( '4 Columns', 'milliondollartheme' ),
+            ),
+            'active_callback' => function() use ($wp_customize) {
+                return 'grid' === $wp_customize->get_setting('milliondollartheme_archive_layout')->value();
+            },
+        ) );
+
+        // Excerpt Length
+        $wp_customize->add_setting( 'milliondollartheme_archive_excerpt_length', array(
+            'default'           => 25,
+            'sanitize_callback' => 'absint',
+            'transport'         => 'refresh',
+        ) );
+        $wp_customize->add_control( 'milliondollartheme_archive_excerpt_length', array(
+            'label'   => __( 'Excerpt Length (number of words)', 'milliondollartheme' ),
+            'section' => 'milliondollartheme_blog_archive_settings',
+            'type'    => 'number',
+            'input_attrs' => array( 'min' => 10, 'max' => 100, 'step' => 1 ),
+        ) );
+
+        // Show Post Date on Archives
+        $wp_customize->add_setting( 'milliondollartheme_archive_show_date', array( 'default' => true, 'sanitize_callback' => 'milliondollartheme_sanitize_checkbox', 'transport' => 'refresh' ) );
+        $wp_customize->add_control( 'milliondollartheme_archive_show_date', array( 'label' => __( 'Show Post Date', 'milliondollartheme' ), 'section' => 'milliondollartheme_blog_archive_settings', 'type' => 'checkbox' ) );
+
+        // Show Author on Archives
+        $wp_customize->add_setting( 'milliondollartheme_archive_show_author', array( 'default' => true, 'sanitize_callback' => 'milliondollartheme_sanitize_checkbox', 'transport' => 'refresh' ) );
+        $wp_customize->add_control( 'milliondollartheme_archive_show_author', array( 'label' => __( 'Show Post Author', 'milliondollartheme' ), 'section' => 'milliondollartheme_blog_archive_settings', 'type' => 'checkbox' ) );
+
+        // Show Categories on Archives
+        $wp_customize->add_setting( 'milliondollartheme_archive_show_categories', array( 'default' => true, 'sanitize_callback' => 'milliondollartheme_sanitize_checkbox', 'transport' => 'refresh' ) );
+        $wp_customize->add_control( 'milliondollartheme_archive_show_categories', array( 'label' => __( 'Show Categories Link', 'milliondollartheme' ), 'section' => 'milliondollartheme_blog_archive_settings', 'type' => 'checkbox' ) );
+
+        // Show Tags on Archives
+        $wp_customize->add_setting( 'milliondollartheme_archive_show_tags', array( 'default' => false, 'sanitize_callback' => 'milliondollartheme_sanitize_checkbox', 'transport' => 'refresh' ) );
+        $wp_customize->add_control( 'milliondollartheme_archive_show_tags', array( 'label' => __( 'Show Tags Link', 'milliondollartheme' ), 'section' => 'milliondollartheme_blog_archive_settings', 'type' => 'checkbox' ) );
 
     } // End function milliondollartheme_customize_register
 endif;
@@ -253,6 +532,53 @@ if ( ! function_exists( 'milliondollartheme_customizer_css' ) ) :
                 --global-font-size: <?php echo esc_attr( get_theme_mod('milliondollartheme_body_font_size', '16px') ); ?>;
                 --global-line-height: <?php echo esc_attr( get_theme_mod('milliondollartheme_body_line_height', '1.7') ); ?>;
             } /* End :root */
+
+            <?php
+            // Blockquote Style specific CSS
+            $blockquote_style = get_theme_mod( 'milliondollartheme_single_blockquote_style', 'default' );
+            if ( 'enhanced-quote' === $blockquote_style ) : ?>
+            .entry-content blockquote {
+                border-left: none;
+                padding: var(--spacing-md) var(--spacing-lg);
+                margin-left: 0;
+                margin-right: 0;
+                text-align: center;
+                background-color: rgba(var(--primary-color-rgb), 0.05);
+                border-radius: var(--border-radius-md);
+                position: relative;
+            }
+            .entry-content blockquote::before,
+            .entry-content blockquote::after {
+                font-family: serif; /* Or a specific quote font */
+                font-size: 3em; /* Larger quote marks */
+                color: rgba(var(--primary-color-rgb), 0.2);
+                position: absolute;
+                line-height: 1;
+            }
+            .entry-content blockquote::before {
+                content: "\201C"; /* Left double quote */
+                top: 0.1em;
+                left: var(--spacing-sm);
+            }
+            .entry-content blockquote::after {
+                content: "\201D"; /* Right double quote */
+                bottom: -0.1em; /* Adjust for visual centering */
+                right: var(--spacing-sm);
+            }
+            .entry-content blockquote p {
+                font-size: 1.2em; /* Slightly larger text for enhanced quotes */
+                font-style: italic;
+                margin-bottom: var(--spacing-sm);
+            }
+            .entry-content blockquote cite,
+            .entry-content blockquote footer {
+                font-size: 0.9em;
+                font-style: normal;
+                color: var(--text-color-muted-darker);
+                display: block;
+                margin-top: var(--spacing-sm);
+            }
+            <?php endif; ?>
         </style>
         <?php
         // Custom @font-face CSS
@@ -267,8 +593,32 @@ if ( ! function_exists( 'milliondollartheme_customizer_css' ) ) :
 endif;
 
 // Function to filter body classes
-if ( ! function_exists( 'milliondollartheme_customizer_body_classes' ) ) : /* ... */ endif;
-function milliondollartheme_customizer_body_classes( $classes ) { $sidebar_pos = get_theme_mod( 'milliondollartheme_default_sidebar_position', 'right' ); if ( $sidebar_pos === 'left' ) { $classes[] = 'has-sidebar-left'; } elseif ( $sidebar_pos === 'right' ) { $classes[] = 'has-sidebar-right'; } else { $classes[] = 'no-sidebar'; $classes[] = 'full-width-content'; } return $classes; }
+if ( ! function_exists( 'milliondollartheme_customizer_body_classes' ) ) :
+    function milliondollartheme_customizer_body_classes( $classes ) {
+        // Sidebar position
+        $sidebar_pos = get_theme_mod( 'milliondollartheme_default_sidebar_position', 'right' );
+        if ( $sidebar_pos === 'left' ) {
+            $classes[] = 'has-sidebar-left';
+        } elseif ( $sidebar_pos === 'right' ) {
+            $classes[] = 'has-sidebar-right';
+        } else {
+            $classes[] = 'no-sidebar';
+            $classes[] = 'full-width-content';
+        }
+
+        // Sticky Header
+        if ( get_theme_mod( 'milliondollartheme_sticky_header_enabled', false ) ) {
+            $classes[] = 'sticky-header-enabled-body'; // Used by js/main.js to activate sticky logic
+        }
+
+        // Header Layout
+        $header_layout = get_theme_mod( 'milliondollartheme_header_layout', 'logo_left_nav_right' );
+        $classes[] = 'header-style-' . sanitize_html_class( $header_layout );
+
+
+        return $classes;
+    }
+endif;
 add_filter( 'body_class', 'milliondollartheme_customizer_body_classes' );
 
 // Sanitize select choices

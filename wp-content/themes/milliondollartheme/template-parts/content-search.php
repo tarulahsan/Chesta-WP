@@ -16,21 +16,27 @@
         <?php if ( 'post' === get_post_type() ) : ?>
         <div class="entry-meta">
             <?php
-            // milliondollartheme_posted_on(); // Example, if you have this function
-            // milliondollartheme_posted_by(); // Example, if you have this function
+            // These will respect archive display settings from Customizer
+            milliondollartheme_posted_on();
+            milliondollartheme_posted_by();
             ?>
         </div><!-- .entry-meta -->
         <?php endif; ?>
     </header><!-- .entry-header -->
 
-    <?php // milliondollartheme_post_thumbnail(); ?>
+    <?php milliondollartheme_post_thumbnail(); // Display thumbnail ?>
 
     <div class="entry-summary">
         <?php the_excerpt(); ?>
     </div><!-- .entry-summary -->
 
     <footer class="entry-footer">
-        <?php // milliondollartheme_entry_footer(); // Example, if you have this function ?>
+        <a href="<?php the_permalink(); ?>" class="read-more-link">
+            <?php esc_html_e( 'Read More &raquo;', 'milliondollartheme' ); ?>
+        </a>
+        <?php
+        // milliondollartheme_entry_footer(); // For categories/tags, might be too much for search results
+        ?>
     </footer><!-- .entry-footer -->
 </article><!-- #post-<?php the_ID(); ?> -->
 EOF

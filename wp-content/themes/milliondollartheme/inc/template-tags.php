@@ -15,6 +15,9 @@ if ( ! function_exists( 'milliondollartheme_posted_on' ) ) :
         if ( is_singular() && ! get_theme_mod( 'milliondollartheme_single_show_publish_date', true ) ) {
             return;
         }
+        if ( ! is_singular() && ! get_theme_mod( 'milliondollartheme_archive_show_date', true ) ) { // Archive check
+            return;
+        }
 
         $time_string = '<time class="entry-date published updated" datetime="%1$s">%2$s</time>';
         if ( get_the_time( 'U' ) !== get_the_modified_time( 'U' ) ) {
@@ -44,6 +47,9 @@ if ( ! function_exists( 'milliondollartheme_posted_by' ) ) :
      */
     function milliondollartheme_posted_by() {
         if ( is_singular() && ! get_theme_mod( 'milliondollartheme_single_show_author_name', true ) ) {
+            return;
+        }
+        if ( ! is_singular() && ! get_theme_mod( 'milliondollartheme_archive_show_author', true ) ) { // Archive check
             return;
         }
 
@@ -107,7 +113,9 @@ if ( ! function_exists( 'milliondollartheme_entry_footer' ) ) :
         // Hide category and tag text for pages.
         if ( 'post' === get_post_type() ) {
             // Categories
-            if ( ! is_singular() || get_theme_mod( 'milliondollartheme_single_show_categories', true ) ) {
+            $show_categories_on_single = get_theme_mod( 'milliondollartheme_single_show_categories', true );
+            $show_categories_on_archive = get_theme_mod( 'milliondollartheme_archive_show_categories', true );
+            if ( ( is_singular() && $show_categories_on_single ) || ( ! is_singular() && $show_categories_on_archive ) ) {
                 /* translators: used between list items, there is a space after the comma */
                 $categories_list = get_the_category_list( esc_html__( ', ', 'milliondollartheme' ) );
                 if ( $categories_list ) {
@@ -117,7 +125,9 @@ if ( ! function_exists( 'milliondollartheme_entry_footer' ) ) :
             }
 
             // Tags
-            if ( ! is_singular() || get_theme_mod( 'milliondollartheme_single_show_tags', true ) ) {
+            $show_tags_on_single = get_theme_mod( 'milliondollartheme_single_show_tags', true );
+            $show_tags_on_archive = get_theme_mod( 'milliondollartheme_archive_show_tags', false ); // Default false for archives
+            if ( ( is_singular() && $show_tags_on_single ) || ( ! is_singular() && $show_tags_on_archive ) ) {
                 /* translators: used between list items, there is a space after the comma */
                 $tags_list = get_the_tag_list( '', esc_html_x( ', ', 'list item separator', 'milliondollartheme' ) );
                 if ( $tags_list ) {
@@ -231,5 +241,91 @@ if ( ! function_exists( 'milliondollartheme_social_share_buttons' ) ) :
         }
         echo '</div>'; // .share-links-wrapper
         echo '</div>'; // .social-share-buttons
+    }
+endif;
+
+if ( ! function_exists( 'milliondollartheme_author_bio_box' ) ) :
+    /**
+     * Displays an author bio box.
+     */
+    function milliondollartheme_author_bio_box() {
+        if ( (bool) get_the_author_meta( 'description' ) && get_theme_mod( 'milliondollartheme_single_show_author_bio', true ) ) : ?>
+            <div class="author-bio-box">
+                <div class="author-avatar">
+                    <?php echo get_avatar( get_the_author_meta( 'user_email' ), 80 ); ?>
+                </div>
+                <div class="author-info">
+                    <h3 class="author-name">
+                        <a class="author-link" href="<?php echo esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ); ?>" rel="author">
+                            <?php echo get_the_author(); ?>
+                        </a>
+                    </h3>
+                    <p class="author-description"><?php the_author_meta( 'description' ); ?></p>
+                    <?php
+                    // Optional: Add links to author's website or social profiles if you have user meta for them
+                    $author_website = get_the_author_meta('user_url');
+                    if ( ! empty( $author_website ) ) : ?>
+                        <p class="author-website">
+                            <a href="<?php echo esc_url( $author_website ); ?>" target="_blank" rel="noopener noreferrer">
+                                <?php esc_html_e( 'Visit Website', 'milliondollartheme' ); ?>
+                            </a>
+                        </p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endif;
+    }
+endif;
+
+if ( ! function_exists( 'milliondollartheme_related_posts' ) ) :
+    /**
+     * Displays related posts, typically by category.
+     */
+    function milliondollartheme_related_posts() {
+        if ( ! get_theme_mod( 'milliondollartheme_single_show_related_posts', true ) ) {
+            return;
+        }
+
+        $post_id = get_the_ID();
+        $categories = get_the_category( $post_id );
+
+        if ( empty( $categories ) ) {
+            return;
+        }
+
+        $category_ids = array();
+        foreach ( $categories as $individual_category ) {
+            $category_ids[] = $individual_category->term_id;
+        }
+
+        $args = array(
+            'category__in'        => $category_ids,
+            'post__not_in'        => array( $post_id ),
+            'posts_per_page'      => 3, // Number of related posts to display
+            'ignore_sticky_posts' => 1,
+            'orderby'             => 'rand', // Random order, or 'date'
+        );
+
+        $related_query = new WP_Query( $args );
+
+        if ( $related_query->have_posts() ) : ?>
+            <div class="related-posts-section">
+                <h3 class="related-posts-title"><?php esc_html_e( 'Related Posts', 'milliondollartheme' ); ?></h3>
+                <div class="related-posts-wrapper">
+                    <?php while ( $related_query->have_posts() ) : $related_query->the_post(); ?>
+                        <article class="related-post-item">
+                            <?php if ( has_post_thumbnail() ) : ?>
+                                <a href="<?php the_permalink(); ?>" class="related-post-thumbnail">
+                                    <?php the_post_thumbnail('medium'); ?>
+                                </a>
+                            <?php endif; ?>
+                            <h4 class="related-post-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h4>
+                            <p class="related-post-excerpt"><?php echo wp_trim_words( get_the_excerpt(), 15, '...' ); ?></p>
+                        </article>
+                    <?php endwhile; ?>
+                </div>
+            </div>
+        <?php endif;
+        wp_reset_postdata();
     }
 endif;

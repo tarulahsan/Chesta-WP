@@ -10,11 +10,17 @@
 ?>
 
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+    <?php if ( get_theme_mod( 'milliondollartheme_page_show_title', true ) ) : ?>
     <header class="entry-header">
         <?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
     </header><!-- .entry-header -->
+    <?php endif; ?>
 
-    <?php milliondollartheme_post_thumbnail(); ?>
+    <?php
+    // Standard thumbnail display for pages, could be enhanced with Customizer options later if needed
+    // For now, respecting the general post_thumbnail logic (which includes its own checks like has_post_thumbnail())
+    milliondollartheme_post_thumbnail();
+    ?>
 
     <div class="entry-content">
         <?php
