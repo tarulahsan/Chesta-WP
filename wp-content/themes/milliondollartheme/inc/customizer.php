@@ -8,7 +8,7 @@
 if ( ! function_exists( 'milliondollartheme_customize_register' ) ) :
     /**
      * Add postMessage support for site title and description for the Theme Customizer.
-     * Also adds Theme Layout, Color, Typography, Header, Footer, Single Post, and Performance Settings.
+     * Also adds Theme Layout, Color, Typography, Header, Footer, WooCommerce, SEO, Single Post, and Performance Settings.
      *
      * @param WP_Customize_Manager $wp_customize Theme Customizer object.
      */
@@ -67,12 +67,7 @@ if ( ! function_exists( 'milliondollartheme_customize_register' ) ) :
         $wp_customize->add_setting( 'milliondollartheme_enable_fontawesome', array( 'default' => false, 'sanitize_callback' => 'milliondollartheme_sanitize_checkbox', 'transport' => 'refresh' ) );
         $wp_customize->add_control( 'milliondollartheme_enable_fontawesome', array( 'label' => __( 'Enable Font Awesome 5 (CDN)', 'milliondollartheme' ), 'section' => 'milliondollartheme_typography_settings', 'type' => 'checkbox', 'description' => __('Loads Font Awesome Free from CDN.', 'milliondollartheme') ) );
         $wp_customize->add_setting( 'milliondollartheme_custom_font_face_css', array( 'default' => '', 'sanitize_callback' => 'wp_strip_all_tags', 'transport' => 'refresh' ) );
-        $wp_customize->add_control( 'milliondollartheme_custom_font_face_css', array(
-            'label' => __( 'Custom @font-face CSS', 'milliondollartheme' ),
-            'section' => 'milliondollartheme_typography_settings',
-            'type' => 'textarea',
-            'description' => __('For advanced users. Paste complete @font-face rules here for self-hosted fonts. IMPORTANT: Ensure font file paths are correct AND include `font-display: swap;` in each rule for optimal performance and to avoid layout shifts.', 'milliondollartheme')
-        ) );
+        $wp_customize->add_control( 'milliondollartheme_custom_font_face_css', array( 'label' => __( 'Custom @font-face CSS', 'milliondollartheme' ), 'section' => 'milliondollartheme_typography_settings', 'type' => 'textarea', 'description' => __('For advanced users. Paste complete @font-face rules here for self-hosted fonts. IMPORTANT: Ensure font file paths are correct AND include `font-display: swap;` in each rule for optimal performance and to avoid layout shifts.', 'milliondollartheme') ) );
 
         // --- Header Settings Panel ---
         $wp_customize->add_panel( 'milliondollartheme_header_panel', array( 'title' => __( 'Header Settings', 'milliondollartheme' ), 'priority' => 120, ) );
@@ -97,6 +92,49 @@ if ( ! function_exists( 'milliondollartheme_customize_register' ) ) :
             $wp_customize->add_setting( 'milliondollartheme_footer_social_' . $network_footer, array( 'default' => '', 'sanitize_callback' => 'esc_url_raw', 'transport' => 'refresh', ) );
             $wp_customize->add_control( 'milliondollartheme_footer_social_' . $network_footer, array( 'label' => sprintf( __( '%s URL', 'milliondollartheme' ), ucfirst( $network_footer ) ), 'section' => 'milliondollartheme_footer_social_links_section', 'type' => 'url' ) );
         }
+
+        // --- WooCommerce Settings Panel ---
+        if ( class_exists( 'WooCommerce' ) ) {
+            $wp_customize->add_panel( 'milliondollartheme_woocommerce_panel', array(
+                'title'    => __( 'WooCommerce Shop', 'milliondollartheme' ),
+                'priority' => 140,
+            ) );
+
+            // Shop Page Settings Section
+            $wp_customize->add_section( 'milliondollartheme_woo_shop_page_section', array(
+                'title'    => __( 'Shop / Product Archives', 'milliondollartheme' ),
+                'panel'    => 'milliondollartheme_woocommerce_panel',
+                'priority' => 10,
+            ) );
+            $wp_customize->add_setting( 'milliondollartheme_woo_shop_columns', array( 'default' => 3, 'sanitize_callback' => 'absint' ) );
+            $wp_customize->add_control( 'milliondollartheme_woo_shop_columns', array(
+                'label' => __( 'Products per Row (Desktop)', 'milliondollartheme' ), 'section' => 'milliondollartheme_woo_shop_page_section', 'type' => 'select',
+                'choices' => array( '2' => __( '2 Columns', 'milliondollartheme' ), '3' => __( '3 Columns', 'milliondollartheme' ), '4' => __( '4 Columns', 'milliondollartheme' ) )
+            ) );
+            $wp_customize->add_setting( 'milliondollartheme_woo_product_card_style', array( 'default' => 'default', 'sanitize_callback' => 'sanitize_key' ) );
+            $wp_customize->add_control( 'milliondollartheme_woo_product_card_style', array(
+                'label' => __( 'Product Card Style', 'milliondollartheme' ), 'section' => 'milliondollartheme_woo_shop_page_section', 'type' => 'select',
+                'choices' => array( 'default' => __( 'Theme Default (Glassy)', 'milliondollartheme' ), 'minimal' => __( 'Minimal Card', 'milliondollartheme' ), 'outline' => __( 'Outline Card', 'milliondollartheme' ) )
+            ) );
+
+            // Single Product Page Settings Section
+            $wp_customize->add_section( 'milliondollartheme_woo_single_product_section', array(
+                'title'    => __( 'Single Product Page', 'milliondollartheme' ),
+                'panel'    => 'milliondollartheme_woocommerce_panel',
+                'priority' => 20,
+            ) );
+            $wp_customize->add_setting( 'milliondollartheme_woo_related_products_columns', array( 'default' => 4, 'sanitize_callback' => 'absint' ) );
+            $wp_customize->add_control( 'milliondollartheme_woo_related_products_columns', array(
+                'label' => __( 'Related/Up-Sell Products per Row', 'milliondollartheme' ), 'section' => 'milliondollartheme_woo_single_product_section', 'type' => 'select',
+                'choices' => array( '2' => __( '2 Columns', 'milliondollartheme' ), '3' => __( '3 Columns', 'milliondollartheme' ), '4' => __( '4 Columns', 'milliondollartheme' ) )
+            ) );
+            $wp_customize->add_setting( 'milliondollartheme_woo_show_sku', array( 'default' => false, 'sanitize_callback' => 'milliondollartheme_sanitize_checkbox' ) );
+            $wp_customize->add_control( 'milliondollartheme_woo_show_sku', array( 'label' => __( 'Show Product SKU', 'milliondollartheme' ), 'section' => 'milliondollartheme_woo_single_product_section', 'type' => 'checkbox' ) );
+            $wp_customize->add_setting( 'milliondollartheme_woo_show_categories', array( 'default' => true, 'sanitize_callback' => 'milliondollartheme_sanitize_checkbox' ) );
+            $wp_customize->add_control( 'milliondollartheme_woo_show_categories', array( 'label' => __( 'Show Product Categories', 'milliondollartheme' ), 'section' => 'milliondollartheme_woo_single_product_section', 'type' => 'checkbox' ) );
+            $wp_customize->add_setting( 'milliondollartheme_woo_show_tags', array( 'default' => true, 'sanitize_callback' => 'milliondollartheme_sanitize_checkbox' ) );
+            $wp_customize->add_control( 'milliondollartheme_woo_show_tags', array( 'label' => __( 'Show Product Tags', 'milliondollartheme' ), 'section' => 'milliondollartheme_woo_single_product_section', 'type' => 'checkbox' ) );
+        } // End if class_exists WooCommerce
 
         // --- SEO Schema Settings Section ---
         $wp_customize->add_section( 'milliondollartheme_seo_schema_settings', array( 'title' => __( 'SEO: Schema Markup', 'milliondollartheme' ), 'priority' => 150, 'description' => __( 'Settings for Organization and WebSite schema.org markup. Ensure your site name and tagline are set correctly under Site Identity.', 'milliondollartheme' ), ) );
