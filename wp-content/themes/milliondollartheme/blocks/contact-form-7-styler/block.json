@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.wp.org/trunk/block.json",
     "apiVersion": 3,
-    "name": "milliondollartheme/contact-form-7-styler",
+    "name": "chesta/contact-form-7-styler",
     "title": "Contact Form 7 Styler",
     "category": "milliondollartheme-blocks",
     "description": "Select and apply theme styling to an existing Contact Form 7 form.",

@@ -1,7 +1,7 @@
 // Masonry Portfolio Gallery Block View Script
 // Example using vanilla JS and Masonry library (assuming it's enqueued separately by the theme or this block)
 document.addEventListener('DOMContentLoaded', function () {
-    const galleries = document.querySelectorAll('.wp-block-milliondollartheme-masonry-portfolio-gallery');
+    const galleries = document.querySelectorAll('.wp-block-chesta-masonry-portfolio-gallery');
     galleries.forEach(gallery => {
         // Check if Masonry library is available
         if (typeof Masonry !== 'undefined') {
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // window.addEventListener('load', () => msnry.layout());
             }
         } else {
-            console.warn('Masonry library not found for milliondollartheme/masonry-portfolio-gallery block.');
+            console.warn('Masonry library not found for chesta/masonry-portfolio-gallery block.');
             // Provide basic flex fallback if Masonry is not loaded
             gallery.style.display = 'flex';
             gallery.style.flexWrap = 'wrap';

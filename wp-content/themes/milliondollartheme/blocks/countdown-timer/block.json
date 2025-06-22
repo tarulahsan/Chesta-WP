@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.wp.org/trunk/block.json",
     "apiVersion": 3,
-    "name": "milliondollartheme/countdown-timer",
+    "name": "chesta/countdown-timer",
     "title": "Countdown Timer",
     "category": "milliondollartheme-blocks",
     "description": "Displays a real-time countdown to a specified date and time.",

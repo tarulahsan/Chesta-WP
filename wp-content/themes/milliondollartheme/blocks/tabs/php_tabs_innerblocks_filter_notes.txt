@@ -16,7 +16,7 @@ function milliondollartheme_filter_tabs_inner_group_block( $block_content, $bloc
         // We also need to ensure this group block is a direct child of our tabs block.
         // This is hard to determine reliably from just $block_content and $block alone without parsing block hierarchy.
         // For this iteration, we assume any core/group with 'data-tab-id' is a candidate.
-        // A more robust solution would be to use a custom 'milliondollartheme/tab-panel' inner block.
+    // A more robust solution would be to use a custom 'chesta/tab-panel' inner block.
 
         $tab_id = esc_attr( $block['attrs']['data-tab-id'] );
 

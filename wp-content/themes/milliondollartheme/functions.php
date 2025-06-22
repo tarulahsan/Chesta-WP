@@ -149,7 +149,7 @@ function milliondollartheme_render_posts_display_block( $attributes ) {
 }
 
 function milliondollartheme_register_dynamic_block_callbacks() {
-    // The 'milliondollartheme/posts-display' block is registered via block.json by the
+    // The 'chesta/posts-display' block is registered via block.json by the
     // milliondollartheme_register_blocks() function.
     // If its block.json specifies "render": "file:./render.php", WordPress handles it.
     // If it needs a PHP render callback defined directly in functions.php (like here),
@@ -159,18 +159,18 @@ function milliondollartheme_register_dynamic_block_callbacks() {
     // Let's assume block.json for posts-display does NOT have a "render" field,
     // and we want this PHP function to render it.
     // We might need to unregister it first if block.json made it a static block.
-    if ( class_exists('WP_Block_Type_Registry') && WP_Block_Type_Registry::get_instance()->is_registered('milliondollartheme/posts-display') ) {
+    if ( class_exists('WP_Block_Type_Registry') && WP_Block_Type_Registry::get_instance()->is_registered('chesta/posts-display') ) {
         // Potentially unregister if the block.json version is not what we want for dynamic rendering here.
         // This depends on how block.json for posts-display is configured.
         // For now, let's assume we might need to override.
-        // unregister_block_type('milliondollartheme/posts-display');
+        // unregister_block_type('chesta/posts-display');
     }
     // Then re-register with our PHP render callback.
     // Note: If block.json is the primary registration method, this direct re-registration
     // might only be needed if block.json doesn't specify a PHP render method and one is required.
     // The `register_block_type_from_metadata` in `milliondollartheme_register_blocks` should handle
     // blocks with `render.php` specified in their `block.json`.
-    // This specific registration here is for 'milliondollartheme/posts-display' if it needs this specific callback
+    // This specific registration here is for 'chesta/posts-display' if it needs this specific callback
     // and its block.json doesn't specify a PHP render method.
 
     // Given that `posts-display` has a `block.json`, the `milliondollartheme_register_blocks` will register it.
@@ -178,12 +178,12 @@ function milliondollartheme_register_dynamic_block_callbacks() {
     // and we want it to be a dynamic block rendered by PHP, we'd register it here.
     // The original code had an unregister and re-register. This is often to ensure the PHP callback is used.
     // For simplicity, if block.json exists, `register_block_type_from_metadata` should be the source of truth.
-    // If `milliondollartheme/posts-display`'s `block.json` is properly set up for dynamic rendering (e.g. by omitting `save` function in JS and having a render method),
+    // If `chesta/posts-display`'s `block.json` is properly set up for dynamic rendering (e.g. by omitting `save` function in JS and having a render method),
     // this explicit re-registration might not be needed or could be simplified.
     // However, to match the previous structure's intent of ensuring a PHP callback:
     if ( function_exists('milliondollartheme_render_posts_display_block') ) {
          register_block_type(
-            'milliondollartheme/posts-display', // This should match the name in blocks/posts-display/block.json
+            'chesta/posts-display', // This should match the name in blocks/posts-display/block.json
             array( 'render_callback' => 'milliondollartheme_render_posts_display_block' )
             // 'attributes' should ideally be loaded from block.json by register_block_type_from_metadata.
             // If we are overriding, we might need to redefine them here, but it's better if block.json is the source.
@@ -1233,7 +1233,7 @@ if ( ! function_exists( 'milliondollartheme_call_ai_service' ) ) {
     }
 }
 
-// --- Filter to enhance core/group blocks within milliondollartheme/tabs block (Added in Phase 7 Review) ---
+// --- Filter to enhance core/group blocks within chesta/tabs block (Added in Phase 7 Review) ---
 add_filter( 'render_block_core/group', 'milliondollartheme_filter_tabs_inner_group_block', 10, 2 );
 function milliondollartheme_filter_tabs_inner_group_block( $block_content, $block ) {
     if ( isset( $block['attrs']['data-tab-id'] ) && !empty($block['attrs']['data-tab-id']) ) {

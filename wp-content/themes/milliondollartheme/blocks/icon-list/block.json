@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.wp.org/trunk/block.json",
     "apiVersion": 3,
-    "name": "milliondollartheme/icon-list",
+    "name": "chesta/icon-list",
     "title": "Icon List",
     "category": "milliondollartheme-blocks",
     "description": "Create lists where each item is prefixed with a customizable icon.",

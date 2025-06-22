@@ -2,9 +2,9 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Check if Swiper library is available
     if (typeof Swiper === 'undefined') {
-        console.warn('Swiper library not found for milliondollartheme/image-carousel. Please ensure Swiper.js & its CSS are enqueued.');
+        console.warn('Swiper library not found for chesta/image-carousel. Please ensure Swiper.js & its CSS are enqueued.');
         // Add a class to wrappers so CSS can provide a basic fallback (e.g., scrollable flex container)
-        document.querySelectorAll('.wp-block-milliondollartheme-image-carousel .swiper-container-wrapper').forEach(el => {
+        document.querySelectorAll('.wp-block-chesta-image-carousel .swiper-container-wrapper').forEach(el => {
             el.classList.add('swiper-not-loaded');
             const swiperEl = el.querySelector('.swiper');
             if (swiperEl) { // Basic scrollable fallback
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
-    const carousels = document.querySelectorAll('.wp-block-milliondollartheme-image-carousel .swiper-container-wrapper');
+    const carousels = document.querySelectorAll('.wp-block-chesta-image-carousel .swiper-container-wrapper');
 
     carousels.forEach((carouselWrapper, index) => {
         const swiperEl = carouselWrapper.querySelector('.swiper');

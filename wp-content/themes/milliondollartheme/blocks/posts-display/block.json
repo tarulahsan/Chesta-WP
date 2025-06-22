@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.wp.org/trunk/block.json",
     "apiVersion": 3,
-    "name": "milliondollartheme/posts-display",
+    "name": "chesta/posts-display",
     "title": "Posts Display",
     "category": "milliondollartheme-blocks",
     "description": "Displays a list or grid of posts based on selected criteria.",

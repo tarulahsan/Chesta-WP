@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.wp.org/trunk/block.json",
     "apiVersion": 3,
-    "name": "milliondollartheme/single-testimonial",
+    "name": "chesta/single-testimonial",
     "title": "Single Testimonial",
     "category": "milliondollartheme-blocks",
     "description": "Displays a single customer testimonial with quote, author details, image, and rating.",

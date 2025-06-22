@@ -1,6 +1,6 @@
 // --- PHP Integration Note for functions.php ---
 // The following logic needs to be integrated into your theme's functions.php
-// to correctly register the 'milliondollartheme/posts-display' block with its PHP render callback.
+// to correctly register the 'chesta/posts-display' block with its PHP render callback.
 
 // 1. Ensure block attributes are available to PHP if not using WP 5.8+ block.json attribute sourcing:
 /*
@@ -33,7 +33,7 @@ if ( $block_folder === 'posts-display' ) {
 /*
 add_action( 'init', function() {
     if (function_exists('milliondollartheme_render_posts_display_block')) {
-        register_block_type( 'milliondollartheme/posts-display', array(
+        register_block_type( 'chesta/posts-display', array(
             'render_callback' => 'milliondollartheme_render_posts_display_block',
             // Ensure attributes from block.json are automatically picked up (WP 5.8+)
             // For older versions, you might need to list them here too.

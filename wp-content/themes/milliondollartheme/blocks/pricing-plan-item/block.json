@@ -1,12 +1,12 @@
 {
     "$schema": "https://schemas.wp.org/trunk/block.json",
     "apiVersion": 3,
-    "name": "milliondollartheme/pricing-plan-item",
+    "name": "chesta/pricing-plan-item",
     "title": "Pricing Plan Item",
     "category": "milliondollartheme-blocks",
     "description": "A single pricing plan column, intended for use within the Pricing Table block.",
     "icon": "cart",
-    "parent": ["milliondollartheme/pricing-table"],
+    "parent": ["chesta/pricing-table"],
     "attributes": {
         "planName": { "type": "string", "source": "html", "selector": ".plan-name", "default": "Basic Plan" },
         "planNameColor": { "type": "string" },

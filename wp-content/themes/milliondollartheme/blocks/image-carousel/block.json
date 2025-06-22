@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.wp.org/trunk/block.json",
     "apiVersion": 3,
-    "name": "milliondollartheme/image-carousel",
+    "name": "chesta/image-carousel",
     "title": "Image Carousel",
     "category": "milliondollartheme-blocks",
     "description": "A customizable carousel for displaying a series of images with various effects.",

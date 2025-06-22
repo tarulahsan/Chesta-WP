@@ -5,7 +5,7 @@ import { PanelBody, RangeControl, SelectControl, TextControl } from '@wordpress/
 import metadata from './block.json';
 
 const { name, attributes } = metadata; // attributes here will include the new ones
-const ALLOWED_BLOCKS = ['milliondollartheme/pricing-plan-item'];
+const ALLOWED_BLOCKS = ['chesta/pricing-plan-item'];
 const DEFAULT_PLAN_ITEM_ATTRS = { planName: 'New Plan', price: '$0', priceInterval: '/mo', features: '<li>Feature A</li><li>Feature B</li>', buttonText: 'Choose Plan' };
 
 registerBlockType(name, {
@@ -13,7 +13,7 @@ registerBlockType(name, {
     attributes: attributes, // Use the updated attributes from block.json
     edit: ({ attributes, setAttributes }) => {
         const { columns, tableStyle, gap, tableBackgroundColor, tableBorderColor } = attributes;
-        const template = Array(columns).fill(null).map(() => ['milliondollartheme/pricing-plan-item', DEFAULT_PLAN_ITEM_ATTRS]);
+        const template = Array(columns).fill(null).map(() => ['chesta/pricing-plan-item', DEFAULT_PLAN_ITEM_ATTRS]);
 
         const blockProps = useBlockProps({
             className: `is-style-${tableStyle} columns-${columns}`,

@@ -19,7 +19,7 @@ import './index.css';
 
 const { name, title, attributes } = metadata;
 
-const ALLOWED_BLOCKS = ['core/paragraph', 'core/heading', 'core/image', 'core/list', 'milliondollartheme/advanced-button'];
+const ALLOWED_BLOCKS = ['core/paragraph', 'core/heading', 'core/image', 'core/list', 'chesta/advanced-button'];
 
 registerBlockType(name, {
     title: title,
