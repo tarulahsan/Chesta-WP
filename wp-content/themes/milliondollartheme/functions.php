@@ -287,13 +287,30 @@ if ( ! function_exists( 'milliondollartheme_ai_dashboard_admin_scripts' ) ) {
             );
 
             // If you were to add a dedicated JS file for the dashboard:
-            // wp_enqueue_script(
-            //     'milliondollartheme-ai-dashboard-js',
-            //     get_template_directory_uri() . '/js/admin-ai-dashboard.js',
-            //     array('jquery'), // Or other dependencies
-            //     MILLIONDOLLARTHEME_VERSION,
-            //     true
-            // );
+            wp_enqueue_script(
+                'milliondollartheme-ai-dashboard-js',
+                get_template_directory_uri() . '/js/admin-ai-dashboard.js',
+                array('jquery', 'chart-js'), // Ensure chart-js is a dependency
+                MILLIONDOLLARTHEME_VERSION,
+                true
+            );
+
+            // Localize script for AJAX nonce and other data
+            wp_localize_script(
+                'milliondollartheme-ai-dashboard-js',
+                'mdt_ai_dashboard_vars',
+                array(
+                    'nonce' => wp_create_nonce( 'mdt_verify_key_nonce' ),
+                    'ajaxurl' => admin_url( 'admin-ajax.php' ), // Though ajaxurl is global, good to have explicitly
+                    'i18n' => array( // Internationalization strings for JS
+                        'tokensUsed' => esc_js(__( 'Tokens Used', 'milliondollartheme' )),
+                        'tokensByService' => esc_js(__( 'Tokens by Service', 'milliondollartheme' )),
+                        'tokensByTaskType' => esc_js(__( 'Tokens by Task Type', 'milliondollartheme' )),
+                    ),
+                     // Pass chart data if it's prepared here, or ensure it's available globally for JS
+                    // For now, chart data is still prepared and echoed in the PHP page function
+                )
+            );
         }
     }
 }
@@ -368,65 +385,77 @@ if ( ! function_exists( 'milliondollartheme_ai_dashboard_page' ) ) {
                     esc_html__( 'Generate a concise and SEO-friendly meta description, around 150-160 characters, for the following text. Output only the meta description itself, nothing else: \n\n%s', 'milliondollartheme' ),
                     $source_text
                 );
-                $ai_args = array(
-                    'model' => 'gpt-3.5-turbo-instruct',
-                    'max_tokens' => 70,
-                    'temperature' => 0.5,
-                    'task_type' => 'meta_description'
-                );
-                // For OpenAI, ensure the API key is available before calling
-                if (empty($current_openai_api_key)) {
-                    $meta_generator_error = esc_html__( 'OpenAI API Key is not set. Please configure it in the API Keys tab.', 'milliondollartheme' );
+
+                $selected_model_info = milliondollartheme_get_selected_ai_model_and_service('meta_description');
+
+                if ( empty( $selected_model_info ) || empty($selected_model_info['service']) || empty($selected_model_info['model']) ) {
+                    $meta_generator_error = esc_html__( 'Could not determine an AI service or model. Please check your API key and AI settings.', 'milliondollartheme' );
                 } else {
-                    $api_response = milliondollartheme_call_ai_service('openai', $prompt_text, $ai_args ); // Service is 'openai'
-                    if ( is_wp_error( $api_response ) ) {
-                        $meta_generator_error = $api_response->get_error_message();
+                    $service_to_use = $selected_model_info['service'];
+                    $model_to_use = $selected_model_info['model'];
+                    $api_key_to_check = ($service_to_use === 'openai') ? $current_openai_api_key : $current_gemini_api_key;
+
+                    if (empty($api_key_to_check)) {
+                        $meta_generator_error = sprintf(esc_html__( '%s API Key is not set. Please configure it in the API Keys tab.', 'milliondollartheme' ), ucfirst($service_to_use));
                     } else {
-                        $generated_meta_description = esc_html( $api_response );
+                        $ai_args = array(
+                            'model'       => $model_to_use,
+                            'max_tokens'  => 70,
+                            'temperature' => 0.5,
+                            'task_type'   => 'meta_description'
+                        );
+                        $api_response = milliondollartheme_call_ai_service( $service_to_use, $prompt_text, $ai_args );
+                        if ( is_wp_error( $api_response ) ) {
+                            $meta_generator_error = $api_response->get_error_message();
+                        } else {
+                            $generated_meta_description = esc_html( $api_response );
+                        }
                     }
                 }
             } elseif (empty($_POST['mdt_source_text'])) {
                 $meta_generator_error = esc_html__( 'Source text cannot be empty.', 'milliondollartheme' );
             } else {
-                 $meta_generator_error = esc_html__( 'An error occurred, or the AI service is not configured correctly for Meta Description.', 'milliondollartheme' );
+                 $meta_generator_error = esc_html__( 'An error occurred with the Meta Description tool configuration.', 'milliondollartheme' );
             }
         }
 
         // Handle Content Outline Generation
         if ( isset( $_POST['milliondollartheme_generate_outline_nonce'] ) && wp_verify_nonce( sanitize_text_field(wp_unslash(\$_POST['milliondollartheme_generate_outline_nonce'])), 'milliondollartheme_generate_outline' ) ) {
             $outline_topic = isset($_POST['mdt_outline_topic']) ? sanitize_textarea_field(wp_unslash($_POST['mdt_outline_topic'])) : '';
-            $outline_service = isset($_POST['mdt_outline_service']) ? sanitize_text_field(wp_unslash($_POST['mdt_outline_service'])) : '';
+            $form_selected_outline_service = isset($_POST['mdt_outline_service']) ? sanitize_text_field(wp_unslash($_POST['mdt_outline_service'])) : '';
 
             if (empty($outline_topic)) {
                 $outline_error_message = __( 'Outline topic cannot be empty.', 'milliondollartheme' );
-            } elseif (empty($outline_service)) {
+            } elseif (empty($form_selected_outline_service)) {
+                // This check might become redundant if get_selected_ai_model_and_service handles it gracefully,
+                // but good for explicit form validation.
                 $outline_error_message = __( 'Please select an AI service for outline generation.', 'milliondollartheme' );
             } else {
-                $api_key_to_check = '';
-                $model_to_use = '';
-                if ($outline_service === 'openai') {
-                    $api_key_to_check = $current_openai_api_key;
-                    $model_to_use = 'gpt-3.5-turbo';
-                } elseif ($outline_service === 'gemini') {
-                    $api_key_to_check = $current_gemini_api_key;
-                    $model_to_use = 'gemini-1.5-flash-latest';
-                }
+                $selected_model_info = milliondollartheme_get_selected_ai_model_and_service('content_outline', $form_selected_outline_service);
 
-                if (empty($api_key_to_check)) {
-                    $outline_error_message = sprintf(__( '%s API Key is not set. Please configure it in the API Keys tab.', 'milliondollartheme' ), ucfirst($outline_service));
+                if ( empty( $selected_model_info ) || empty($selected_model_info['service']) || empty($selected_model_info['model']) ) {
+                    $outline_error_message = esc_html__( 'Could not determine an AI service or model. Please check your API key and AI settings, or select a service.', 'milliondollartheme' );
                 } else {
-                    $prompt = sprintf( "Generate a comprehensive content outline for the topic: \"%s\". The outline should include main sections, sub-points, and key areas to cover. Format it clearly with each major point on a new line, and sub-points indented.", $outline_topic );
-                    $args = array(
-                        'model'       => $model_to_use,
-                        'max_tokens'  => 750,
-                        'temperature' => 0.6,
-                        'task_type'   => 'content_outline'
-                    );
-                    $api_response = milliondollartheme_call_ai_service( $outline_service, $prompt, $args );
-                    if ( is_wp_error( $api_response ) ) {
-                        $outline_error_message = $api_response->get_error_message();
+                    $service_to_use = $selected_model_info['service'];
+                    $model_to_use = $selected_model_info['model'];
+                    $api_key_to_check = ($service_to_use === 'openai') ? $current_openai_api_key : $current_gemini_api_key;
+
+                    if (empty($api_key_to_check)) {
+                        $outline_error_message = sprintf(__( '%s API Key is not set. Please configure it in the API Keys tab.', 'milliondollartheme' ), ucfirst($service_to_use));
                     } else {
-                        $generated_outline = $api_response;
+                        $prompt = sprintf( "Generate a comprehensive content outline for the topic: \"%s\". The outline should include main sections, sub-points, and key areas to cover. Format it clearly with each major point on a new line, and sub-points indented.", $outline_topic );
+                        $args = array(
+                            'model'       => $model_to_use,
+                            'max_tokens'  => 750,
+                            'temperature' => 0.6,
+                            'task_type'   => 'content_outline'
+                        );
+                        $api_response = milliondollartheme_call_ai_service( $service_to_use, $prompt, $args );
+                        if ( is_wp_error( $api_response ) ) {
+                            $outline_error_message = $api_response->get_error_message();
+                        } else {
+                            $generated_outline = $api_response;
+                        }
                     }
                 }
             }
@@ -435,53 +464,60 @@ if ( ! function_exists( 'milliondollartheme_ai_dashboard_page' ) ) {
         // Handle Content Expander/Rephraser
         if ( isset( $_POST['milliondollartheme_process_text_nonce'] ) && wp_verify_nonce( sanitize_text_field(wp_unslash(\$_POST['milliondollartheme_process_text_nonce'])), 'milliondollartheme_process_text' ) ) {
             $original_text = isset($_POST['mdt_original_text']) ? sanitize_textarea_field(wp_unslash($_POST['mdt_original_text'])) : '';
-            $process_action = isset($_POST['mdt_process_action']) ? sanitize_text_field(wp_unslash($_POST['mdt_process_action'])) : '';
-            $process_service = isset($_POST['mdt_process_service']) ? sanitize_text_field(wp_unslash($_POST['mdt_process_service'])) : '';
+            $process_action = isset($_POST['mdt_process_action']) ? sanitize_text_field(wp_unslash($_POST['mdt_process_action'])) : ''; // 'expand' or 'rephrase'
+            $form_selected_process_service = isset($_POST['mdt_process_service']) ? sanitize_text_field(wp_unslash($_POST['mdt_process_service'])) : '';
             $desired_tone = isset($_POST['mdt_desired_tone']) ? sanitize_text_field(wp_unslash($_POST['mdt_desired_tone'])) : '';
 
             if (empty($original_text)) {
                 $processed_text_error_message = __( 'Original text cannot be empty.', 'milliondollartheme' );
             } elseif (empty($process_action)) {
                 $processed_text_error_message = __( 'Please select an action (Expand/Rephrase).', 'milliondollartheme' );
-            } elseif (empty($process_service)) {
+            } elseif (empty($form_selected_process_service)) {
                 $processed_text_error_message = __( 'Please select an AI service.', 'milliondollartheme' );
             } else {
-                $api_key_to_check = '';
-                $model_to_use = '';
-                if ($process_service === 'openai') {
-                    $api_key_to_check = $current_openai_api_key;
-                    $model_to_use = 'gpt-3.5-turbo';
-                } elseif ($process_service === 'gemini') {
-                    $api_key_to_check = $current_gemini_api_key;
-                    $model_to_use = 'gemini-1.5-flash-latest';
-                }
+                $task_key_for_model_lookup = ($process_action === 'expand') ? 'content_expander' : 'content_rephraser';
+                // Fallback to generic if specific not set, though settings UI has expander/rephraser separately.
+                // For now, let's assume 'content_expander' and 'content_rephraser' are valid keys for get_option.
+                // These need to be added to $ai_task_types in settings tab if not already.
+                // For this implementation, let's use 'content_expander' and 'content_rephraser' as distinct task types.
+                // If you prefer a single setting, adjust $task_key_for_model_lookup.
 
-                if (empty($api_key_to_check)) {
-                    $processed_text_error_message = sprintf(__( '%s API Key is not set. Please configure it in the API Keys tab.', 'milliondollartheme' ), ucfirst($process_service));
+                $selected_model_info = milliondollartheme_get_selected_ai_model_and_service($task_key_for_model_lookup, $form_selected_process_service);
+
+                if ( empty( $selected_model_info ) || empty($selected_model_info['service']) || empty($selected_model_info['model']) ) {
+                    $processed_text_error_message = esc_html__( 'Could not determine an AI service or model for text processing. Please check your API key and AI settings, or select a service.', 'milliondollartheme' );
                 } else {
-                    $tone_instruction = !empty($desired_tone) ? sprintf("Desired tone: %s.", $desired_tone) : "";
-                    $prompt = "";
-                    if ($process_action === 'expand') {
-                        $prompt = sprintf( "Expand the following text, adding more detail, explanation, and depth. Maintain its core meaning. %s Original text:\n\"%s\"", $tone_instruction, $original_text );
-                    } elseif ($process_action === 'rephrase') {
-                        $prompt = sprintf( "Rephrase the following text to improve clarity, flow, and readability, while preserving the original meaning and intent. %s Original text:\n\"%s\"", $tone_instruction, $original_text );
-                    }
+                    $service_to_use = $selected_model_info['service'];
+                    $model_to_use = $selected_model_info['model'];
+                    $api_key_to_check = ($service_to_use === 'openai') ? $current_openai_api_key : $current_gemini_api_key;
 
-                    if (!empty($prompt)) {
-                        $args = array(
-                            'model'       => $model_to_use,
-                            'max_tokens'  => 1000,
-                            'temperature' => 0.7,
-                            'task_type'   => $process_action // 'expand' or 'rephrase'
-                        );
-                        $api_response = milliondollartheme_call_ai_service( $process_service, $prompt, $args );
-                        if ( is_wp_error( $api_response ) ) {
-                            $processed_text_error_message = $api_response->get_error_message();
-                        } else {
-                            $generated_processed_text = $api_response;
-                        }
+                    if (empty($api_key_to_check)) {
+                        $processed_text_error_message = sprintf(__( '%s API Key is not set. Please configure it in the API Keys tab.', 'milliondollartheme' ), ucfirst($service_to_use));
                     } else {
-                        $processed_text_error_message = __( 'Invalid action selected.', 'milliondollartheme' );
+                        $tone_instruction = !empty($desired_tone) ? sprintf("Desired tone: %s.", $desired_tone) : "";
+                        $prompt = "";
+                        if ($process_action === 'expand') {
+                            $prompt = sprintf( "Expand the following text, adding more detail, explanation, and depth. Maintain its core meaning. %s Original text:\n\"%s\"", $tone_instruction, $original_text );
+                        } elseif ($process_action === 'rephrase') {
+                            $prompt = sprintf( "Rephrase the following text to improve clarity, flow, and readability, while preserving the original meaning and intent. %s Original text:\n\"%s\"", $tone_instruction, $original_text );
+                        }
+
+                        if (!empty($prompt)) {
+                            $args = array(
+                                'model'       => $model_to_use,
+                                'max_tokens'  => 1000, // Consider making this dynamic or configurable
+                                'temperature' => 0.7,
+                                'task_type'   => $task_key_for_model_lookup
+                            );
+                            $api_response = milliondollartheme_call_ai_service( $service_to_use, $prompt, $args );
+                            if ( is_wp_error( $api_response ) ) {
+                                $processed_text_error_message = $api_response->get_error_message();
+                            } else {
+                                $generated_processed_text = $api_response;
+                            }
+                        } else {
+                            $processed_text_error_message = __( 'Invalid action selected for text processing.', 'milliondollartheme' );
+                        }
                     }
                 }
             }
@@ -491,42 +527,42 @@ if ( ! function_exists( 'milliondollartheme_ai_dashboard_page' ) ) {
         if ( isset( $_POST['milliondollartheme_generate_headlines_nonce'] ) && wp_verify_nonce( sanitize_text_field(wp_unslash(\$_POST['milliondollartheme_generate_headlines_nonce'])), 'milliondollartheme_generate_headlines' ) ) {
             $headline_topic = isset($_POST['mdt_headline_topic']) ? sanitize_textarea_field(wp_unslash($_POST['mdt_headline_topic'])) : '';
             $num_headlines = isset($_POST['mdt_num_headlines']) ? absint($_POST['mdt_num_headlines']) : 5;
-            $headline_service = isset($_POST['mdt_headline_service']) ? sanitize_text_field(wp_unslash($_POST['mdt_headline_service'])) : '';
+            $form_selected_headline_service = isset($_POST['mdt_headline_service']) ? sanitize_text_field(wp_unslash($_POST['mdt_headline_service'])) : '';
             $headline_style_keywords = isset($_POST['mdt_headline_style_keywords']) ? sanitize_text_field(wp_unslash($_POST['mdt_headline_style_keywords'])) : '';
 
             if (empty($headline_topic)) {
                 $headlines_error_message = __( 'Topic or content summary cannot be empty.', 'milliondollartheme' );
             } elseif ($num_headlines <= 0 || $num_headlines > 20) {
                 $headlines_error_message = __( 'Number of headlines must be between 1 and 20.', 'milliondollartheme' );
-            } elseif (empty($headline_service)) {
+            } elseif (empty($form_selected_headline_service)) {
                 $headlines_error_message = __( 'Please select an AI service for headline generation.', 'milliondollartheme' );
             } else {
-                $api_key_to_check = '';
-                $model_to_use = '';
-                if ($headline_service === 'openai') {
-                    $api_key_to_check = $current_openai_api_key;
-                    $model_to_use = 'gpt-3.5-turbo';
-                } elseif ($headline_service === 'gemini') {
-                    $api_key_to_check = $current_gemini_api_key;
-                    $model_to_use = 'gemini-1.5-flash-latest';
-                }
+                $selected_model_info = milliondollartheme_get_selected_ai_model_and_service('headline_generation', $form_selected_headline_service);
 
-                if (empty($api_key_to_check)) {
-                    $headlines_error_message = sprintf(__( '%s API Key is not set. Please configure it in the API Keys tab.', 'milliondollartheme' ), ucfirst($headline_service));
+                if ( empty( $selected_model_info ) || empty($selected_model_info['service']) || empty($selected_model_info['model']) ) {
+                    $headlines_error_message = esc_html__( 'Could not determine an AI service or model for headline generation. Please check your API key and AI settings, or select a service.', 'milliondollartheme' );
                 } else {
-                    $style_instruction = !empty($headline_style_keywords) ? sprintf("Desired style/keywords: %s.", $headline_style_keywords) : "";
-                    $prompt = sprintf( "Generate %d compelling and distinct headline options for the following topic/content summary:\n\"%s\"\n%s Each headline should be concise and engaging. Please provide each headline on a new line.", $num_headlines, $headline_topic, $style_instruction );
-                    $args = array(
-                        'model'       => $model_to_use,
-                        'max_tokens'  => $num_headlines * 60,
-                        'temperature' => 0.8,
-                        'task_type'   => 'generate_headlines'
-                    );
-                    $api_response = milliondollartheme_call_ai_service( $headline_service, $prompt, $args );
-                    if ( is_wp_error( $api_response ) ) {
-                        $headlines_error_message = $api_response->get_error_message();
+                    $service_to_use = $selected_model_info['service'];
+                    $model_to_use = $selected_model_info['model'];
+                    $api_key_to_check = ($service_to_use === 'openai') ? $current_openai_api_key : $current_gemini_api_key;
+
+                    if (empty($api_key_to_check)) {
+                        $headlines_error_message = sprintf(__( '%s API Key is not set. Please configure it in the API Keys tab.', 'milliondollartheme' ), ucfirst($service_to_use));
                     } else {
-                        $generated_headlines = $api_response;
+                        $style_instruction = !empty($headline_style_keywords) ? sprintf("Desired style/keywords: %s.", $headline_style_keywords) : "";
+                        $prompt = sprintf( "Generate %d compelling and distinct headline options for the following topic/content summary:\n\"%s\"\n%s Each headline should be concise and engaging. Please provide each headline on a new line.", $num_headlines, $headline_topic, $style_instruction );
+                        $args = array(
+                            'model'       => $model_to_use,
+                            'max_tokens'  => $num_headlines * 60, // Max 60 tokens per headline
+                            'temperature' => 0.8,
+                            'task_type'   => 'headline_generation' // Corrected task type
+                        );
+                        $api_response = milliondollartheme_call_ai_service( $service_to_use, $prompt, $args );
+                        if ( is_wp_error( $api_response ) ) {
+                            $headlines_error_message = $api_response->get_error_message();
+                        } else {
+                            $generated_headlines = $api_response;
+                        }
                     }
                 }
             }
@@ -566,7 +602,12 @@ if ( ! function_exists( 'milliondollartheme_ai_dashboard_page' ) ) {
                             <?php else : ?>
                                 <p class="api-key-status not-set"><?php esc_html_e( 'OpenAI API Key is NOT set.', 'milliondollartheme' ); ?></p>
                             <?php endif; ?>
-                            <?php submit_button( __( 'Save OpenAI Key', 'milliondollartheme' ), 'primary', 'save_openai_key' ); ?>
+                            <?php submit_button( __( 'Save OpenAI Key', 'milliondollartheme' ), 'primary', 'save_openai_key', false ); ?>
+                            <button type="button" class="button button-secondary mdt-verify-api-key" data-provider="openai" <?php disabled( empty( $current_openai_api_key ) ); ?>>
+                                <?php esc_html_e( 'Verify Key', 'milliondollartheme' ); ?>
+                            </button>
+                            <span class="spinner mdt-spinner openai-spinner"></span>
+                            <div class="mdt-key-verification-status openai-verification-status"></div>
                         </form>
                     </div>
                     <hr />
@@ -590,7 +631,12 @@ if ( ! function_exists( 'milliondollartheme_ai_dashboard_page' ) ) {
                             <?php else : ?>
                                 <p class="api-key-status not-set"><?php esc_html_e( 'Gemini API Key is NOT set.', 'milliondollartheme' ); ?></p>
                             <?php endif; ?>
-                            <?php submit_button( __( 'Save Gemini Key', 'milliondollartheme' ), 'primary', 'save_gemini_key' ); ?>
+                            <?php submit_button( __( 'Save Gemini Key', 'milliondollartheme' ), 'primary', 'save_gemini_key', false ); ?>
+                             <button type="button" class="button button-secondary mdt-verify-api-key" data-provider="gemini" <?php disabled( empty( $current_gemini_api_key ) ); ?>>
+                                <?php esc_html_e( 'Verify Key', 'milliondollartheme' ); ?>
+                            </button>
+                            <span class="spinner mdt-spinner gemini-spinner"></span>
+                            <div class="mdt-key-verification-status gemini-verification-status"></div>
                         </form>
                     </div>
                     <hr />
@@ -683,6 +729,33 @@ if ( ! function_exists( 'milliondollartheme_ai_dashboard_page' ) ) {
                                     </td>
                                 </tr>
                             </table>
+                            <?php
+                            // Determine which service/model will be used to inform the user
+                            // The $form_selected_outline_service is what's in POST if form was submitted,
+                            // otherwise we check the first available service with a key for display purposes.
+                            $display_outline_service = '';
+                            if (isset($_POST['mdt_outline_service'])) {
+                                $display_outline_service = sanitize_text_field(wp_unslash($_POST['mdt_outline_service']));
+                            } elseif (!empty($current_openai_api_key)) {
+                                $display_outline_service = 'openai';
+                            } elseif (!empty($current_gemini_api_key)) {
+                                $display_outline_service = 'gemini';
+                            } // else, it will show not configured.
+
+                            $outline_model_info = milliondollartheme_get_selected_ai_model_and_service('content_outline', $display_outline_service);
+                            if (!empty($outline_model_info['service']) && !empty($outline_model_info['model'])) {
+                                echo '<p class="description" style="margin-top: 5px; margin-bottom:15px;">';
+                                printf(
+                                    esc_html__( 'Will use: %1$s model (%2$s) if selected service is %3$s, or your default for Content Outlines. Change preference in AI Settings tab.', 'milliondollartheme' ),
+                                    '<strong>' . esc_html(ucfirst($outline_model_info['service'])) . '</strong>',
+                                    esc_html($outline_model_info['model']),
+                                    esc_html(ucfirst($display_outline_service))
+                                );
+                                echo '</p>';
+                            } else {
+                                 echo '<p class="description" style="margin-top: 5px; margin-bottom:15px; color:red;">' . esc_html__('AI service/model not fully configured. Check API keys and AI Settings or select a service.','milliondollartheme') . '</p>';
+                            }
+                            ?>
                             <?php submit_button( __( 'Generate Outline', 'milliondollartheme' ), 'primary', 'generate_outline_submit' ); ?>
                         </form>
 
@@ -746,6 +819,35 @@ if ( ! function_exists( 'milliondollartheme_ai_dashboard_page' ) ) {
                                     </td>
                                 </tr>
                             </table>
+                            <?php
+                            // Determine which service/model will be used to inform the user
+                            $display_process_action = isset($_POST['mdt_process_action']) ? sanitize_text_field(wp_unslash($_POST['mdt_process_action'])) : 'expand'; // Default to expand for display
+                            $display_process_service = '';
+                             if (isset($_POST['mdt_process_service'])) {
+                                $display_process_service = sanitize_text_field(wp_unslash($_POST['mdt_process_service']));
+                            } elseif (!empty($current_openai_api_key)) {
+                                $display_process_service = 'openai';
+                            } elseif (!empty($current_gemini_api_key)) {
+                                $display_process_service = 'gemini';
+                            }
+
+                            $process_task_key = ($display_process_action === 'expand') ? 'content_expander' : 'content_rephraser';
+                            $process_model_info = milliondollartheme_get_selected_ai_model_and_service($process_task_key, $display_process_service);
+
+                            if (!empty($process_model_info['service']) && !empty($process_model_info['model'])) {
+                                echo '<p class="description" style="margin-top: 5px; margin-bottom:15px;">';
+                                printf(
+                                    esc_html__( 'For "%1$s" action, will use: %2$s model (%3$s) if selected service is %4$s, or your default. Change preference in AI Settings.', 'milliondollartheme' ),
+                                    esc_html(ucfirst($display_process_action)),
+                                    '<strong>' . esc_html(ucfirst($process_model_info['service'])) . '</strong>',
+                                    esc_html($process_model_info['model']),
+                                    esc_html(ucfirst($display_process_service))
+                                );
+                                echo '</p>';
+                            } else {
+                                 echo '<p class="description" style="margin-top: 5px; margin-bottom:15px; color:red;">' . esc_html__('AI service/model not fully configured for text processing. Check API keys and AI Settings or select a service.','milliondollartheme') . '</p>';
+                            }
+                            ?>
                             <?php submit_button( __( 'Process Text', 'milliondollartheme' ), 'primary', 'process_text_submit' ); ?>
                         </form>
 
@@ -806,6 +908,31 @@ if ( ! function_exists( 'milliondollartheme_ai_dashboard_page' ) ) {
                                     </td>
                                 </tr>
                             </table>
+                             <?php
+                            // Determine which service/model will be used to inform the user
+                            $display_headline_service = '';
+                             if (isset($_POST['mdt_headline_service'])) {
+                                $display_headline_service = sanitize_text_field(wp_unslash($_POST['mdt_headline_service']));
+                            } elseif (!empty($current_openai_api_key)) {
+                                $display_headline_service = 'openai';
+                            } elseif (!empty($current_gemini_api_key)) {
+                                $display_headline_service = 'gemini';
+                            }
+
+                            $headline_model_info = milliondollartheme_get_selected_ai_model_and_service('headline_generation', $display_headline_service);
+                            if (!empty($headline_model_info['service']) && !empty($headline_model_info['model'])) {
+                                echo '<p class="description" style="margin-top: 5px; margin-bottom:15px;">';
+                                printf(
+                                    esc_html__( 'Will use: %1$s model (%2$s) if selected service is %3$s, or your default for Headline Generation. Change preference in AI Settings.', 'milliondollartheme' ),
+                                    '<strong>' . esc_html(ucfirst($headline_model_info['service'])) . '</strong>',
+                                    esc_html($headline_model_info['model']),
+                                    esc_html(ucfirst($display_headline_service))
+                                );
+                                echo '</p>';
+                            } else {
+                                 echo '<p class="description" style="margin-top: 5px; margin-bottom:15px; color:red;">' . esc_html__('AI service/model not fully configured. Check API keys and AI Settings or select a service.','milliondollartheme') . '</p>';
+                            }
+                            ?>
                             <?php submit_button( __( 'Generate Headlines', 'milliondollartheme' ), 'primary', 'generate_headlines_submit' ); ?>
                         </form>
 
@@ -970,106 +1097,80 @@ if ( ! function_exists( 'milliondollartheme_ai_dashboard_page' ) ) {
             </div>
 
             <div id="tab-settings" class="tab-content">
-                <h2><?php esc_html_e( 'Settings', 'milliondollartheme' ); ?></h2>
-                <p class="placeholder"><?php esc_html_e( 'General AI dashboard settings, default model preferences, etc., will be configured here.', 'milliondollartheme' ); ?></p>
+                <h2><?php esc_html_e( 'AI Model & Provider Settings', 'milliondollartheme' ); ?></h2>
+                <form method="POST" action="#settings">
+                    <?php wp_nonce_field( 'milliondollartheme_save_ai_settings_nonce', 'milliondollartheme_ai_settings_nonce' ); ?>
+                    <input type="hidden" name="mdt_ai_action" value="save_ai_settings">
+
+                    <h3><?php esc_html_e( 'Default Model Preferences', 'milliondollartheme' ); ?></h3>
+                    <p><?php esc_html_e( 'Select your preferred AI models for various tasks. These will be used by default unless overridden.', 'milliondollartheme' ); ?></p>
+
+                    <?php
+                    // Define task types and their labels
+                    $ai_task_types = array(
+                        'content_generation' => __( 'General Content Generation', 'milliondollartheme' ),
+                        'summarization'      => __( 'Text Summarization', 'milliondollartheme' ),
+                        'meta_description'   => __( 'Meta Description Generation', 'milliondollartheme' ),
+                        'content_outline'    => __( 'Content Outline Generation', 'milliondollartheme' ),
+                        'content_expander'   => __( 'Content Expander', 'milliondollartheme' ),
+                        'content_rephraser'  => __( 'Content Rephraser', 'milliondollartheme' ),
+                        'headline_generation'=> __( 'Headline Generation', 'milliondollartheme' ),
+                        'content_humanizer'  => __( 'Content Humanizer', 'milliondollartheme' ),
+                        'tags_keywords'      => __( 'Tags/Keywords Generation', 'milliondollartheme' ),
+                    );
+
+                    // Define available models (curated list for now, could be dynamic later)
+                    // Grouped by provider for clarity in UI, but saved as individual options
+                    $available_models = array(
+                        'OpenAI' => array(
+                            'gpt-4'                  => 'GPT-4',
+                            'gpt-4-turbo-preview'    => 'GPT-4 Turbo Preview',
+                            'gpt-3.5-turbo'          => 'GPT-3.5 Turbo',
+                            'gpt-3.5-turbo-instruct' => 'GPT-3.5 Turbo Instruct (Legacy Completions)',
+                        ),
+                        'Gemini' => array(
+                            'gemini-1.5-pro-latest'    => 'Gemini 1.5 Pro (Latest)',
+                            'gemini-1.5-flash-latest'  => 'Gemini 1.5 Flash (Latest)',
+                            'gemini-1.0-pro'           => 'Gemini 1.0 Pro',
+                        ),
+                        // Anthropic & OpenRouter would be added here if their APIs are integrated for model listing/selection
+                    );
+                    ?>
+
+                    <table class="form-table">
+                        <?php foreach ( $ai_task_types as $task_key => $task_label ) : ?>
+                            <?php $setting_name = "mdt_ai_default_model_{$task_key}"; ?>
+                            <?php $current_setting = get_option($setting_name, ''); // Get saved value ?>
+                            <tr valign="top">
+                                <th scope="row">
+                                    <label for="<?php echo esc_attr( $setting_name ); ?>"><?php echo esc_html( $task_label ); ?></label>
+                                </th>
+                                <td>
+                                    <select id="<?php echo esc_attr( $setting_name ); ?>" name="<?php echo esc_attr( $setting_name ); ?>">
+                                        <option value="" <?php selected($current_setting, ''); ?>><?php esc_html_e( '-- Provider Default --', 'milliondollartheme' ); ?></option>
+                                        <?php foreach ($available_models as $provider => $models) : ?>
+                                            <optgroup label="<?php echo esc_attr($provider); ?>">
+                                                <?php foreach ($models as $model_id => $model_name) : ?>
+                                                    <option value="<?php echo esc_attr( strtolower($provider) . ':' . $model_id ); ?>" <?php selected( $current_setting, strtolower($provider) . ':' . $model_id ); ?>>
+                                                        <?php echo esc_html( $model_name ); ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </optgroup>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <p class="description"><?php printf( esc_html__( 'Select the default model for %s tasks.', 'milliondollartheme' ), strtolower( $task_label ) ); ?></p>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </table>
+                    <?php submit_button( __( 'Save AI Settings', 'milliondollartheme' ) ); ?>
+                </form>
             </div>
 
         </div> <?php // .wrap ?>
-
-        <script type="text/javascript">
-            document.addEventListener('DOMContentLoaded', function() {
-                // Tab switching logic (already present)
-                const tabs = document.querySelectorAll('.mdt-ai-dashboard .nav-tab');
-                const tabContents = document.querySelectorAll('.mdt-ai-dashboard .tab-content');
-
-                tabs.forEach(tab => {
-                    tab.addEventListener('click', function(event) {
-                        event.preventDefault();
-
-                        tabs.forEach(t => t.classList.remove('nav-tab-active'));
-                        this.classList.add('nav-tab-active');
-
-                        const targetContentId = this.getAttribute('href').substring(1); // Get id from href like #api-keys
-
-                        tabContents.forEach(content => {
-                            if (content.id === 'tab-' + targetContentId) { // Match with prefix, e.g. tab-api-keys
-                                content.classList.add('active');
-                            } else {
-                                content.classList.remove('active');
-                            }
-                        });
-
-                        // Optional: Update URL hash
-                        // window.location.hash = targetContentId;
-                    });
-                });
-
-                // Optional: Activate tab based on URL hash on page load
-                // if (window.location.hash) {
-                //     const activeTab = document.querySelector('.mdt-ai-dashboard .nav-tab[href="' + window.location.hash + '"]');
-                //     if (activeTab) {
-                //         activeTab.click();
-                //     }
-                // }
-
-                // Chart.js Rendering
-                if (typeof Chart !== 'undefined' && typeof mdtAiChartData !== 'undefined') {
-                    const ctxDaily = document.getElementById('mdtDailyUsageChart');
-                    if (ctxDaily) {
-                        new Chart(ctxDaily, {
-                            type: 'line',
-                            data: {
-                                labels: mdtAiChartData.daily.labels,
-                                datasets: [{
-                                    label: '<?php esc_js_e( "Tokens Used", "milliondollartheme" ); ?>',
-                                    data: mdtAiChartData.daily.data,
-                                    tension: 0.1,
-                                    borderColor: 'rgb(75, 192, 192)',
-                                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                    fill: true,
-                                }]
-                            },
-                            options: { responsive: true, maintainAspectRatio: true }
-                        });
-                    }
-
-                    const ctxService = document.getElementById('mdtServiceUsageChart');
-                    if (ctxService) {
-                        new Chart(ctxService, {
-                            type: 'doughnut',
-                            data: {
-                                labels: mdtAiChartData.service.labels,
-                                datasets: [{
-                                    label: '<?php esc_js_e( "Tokens by Service", "milliondollartheme" ); ?>',
-                                    data: mdtAiChartData.service.data,
-                                    backgroundColor: mdtAiChartData.service.colors
-                                }]
-                            },
-                            options: { responsive: true, maintainAspectRatio: true }
-                        });
-                    }
-
-                    const ctxTaskType = document.getElementById('mdtTaskTypeUsageChart');
-                    if (ctxTaskType) {
-                        new Chart(ctxTaskType, {
-                            type: 'bar',
-                            data: {
-                                labels: mdtAiChartData.taskType.labels,
-                                datasets: [{
-                                    label: '<?php esc_js_e( "Tokens by Task Type", "milliondollartheme" ); ?>',
-                                    data: mdtAiChartData.taskType.data,
-                                    backgroundColor: mdtAiChartData.taskType.colors // Using the service colors array for now, can be customized
-                                }]
-                            },
-                            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false } // Maintain aspect ratio false for better fit in potentially varied height
-                        });
-                    }
-                } else {
-                    // console.log('Chart.js or mdtAiChartData not available.');
-                }
-            });
-        </script>
         <?php
+        // The mdtAiChartData script is still outputted here for the external JS to use.
+        // The tab handling and chart instantiation JS has been moved to admin-ai-dashboard.js
     }
 }
 
@@ -2067,6 +2168,314 @@ if ( ! function_exists( 'milliondollartheme_site_details_dashboard_page' ) ) {
 
 // --- End Site Details Dashboard Functionality ---
 
+
+// --- AJAX Handlers for AI Dashboard ---
+add_action( 'wp_ajax_mdt_verify_openai_key', 'milliondollartheme_ajax_verify_openai_key' );
+add_action( 'wp_ajax_mdt_verify_gemini_key', 'milliondollartheme_ajax_verify_gemini_key' );
+
+if ( ! function_exists( 'milliondollartheme_ajax_verify_openai_key' ) ) {
+    function milliondollartheme_ajax_verify_openai_key() {
+        check_ajax_referer( 'mdt_verify_key_nonce', 'nonce' );
+
+        $api_key = get_option( 'milliondollartheme_openai_api_key' );
+        if ( empty( $api_key ) ) {
+            wp_send_json_error( array( 'message' => __( 'OpenAI API Key is not set.', 'milliondollartheme' ) ) );
+            return;
+        }
+
+        // Example: Try to list models (a relatively lightweight request)
+        $response = wp_remote_get( 'https://api.openai.com/v1/models', array(
+            'headers' => array(
+                'Authorization' => 'Bearer ' . $api_key,
+            ),
+            'timeout' => 15,
+        ) );
+
+        if ( is_wp_error( $response ) ) {
+            wp_send_json_error( array( 'message' => __( 'Connection Error: ', 'milliondollartheme' ) . $response->get_error_message() ) );
+            return;
+        }
+
+        $response_code = wp_remote_retrieve_response_code( $response );
+        $body = wp_remote_retrieve_body( $response );
+        $data = json_decode( $body, true );
+
+        if ( $response_code === 200 && isset( $data['data'] ) ) {
+            wp_send_json_success( array( 'message' => __( 'OpenAI API Key is valid.', 'milliondollartheme' ) ) );
+        } elseif ( isset( $data['error']['message'] ) ) {
+            wp_send_json_error( array( 'message' => __( 'OpenAI API Error: ', 'milliondollartheme' ) . $data['error']['message'] ) );
+        } else {
+            wp_send_json_error( array( 'message' => __( 'Invalid response from OpenAI. Code: ', 'milliondollartheme' ) . $response_code ) );
+        }
+        wp_die();
+    }
+}
+
+// Headline Suggestions for Editor
+add_action( 'wp_ajax_mdt_generate_headline_suggestions_editor', 'milliondollartheme_ajax_generate_headline_suggestions_editor' );
+if ( ! function_exists( 'milliondollartheme_ajax_generate_headline_suggestions_editor' ) ) {
+    function milliondollartheme_ajax_generate_headline_suggestions_editor() {
+        check_ajax_referer( 'mdt_ai_editor_sidebar_nonce', '_ajax_nonce' );
+
+        $post_id = isset($_POST['post_id']) ? absint($_POST['post_id']) : 0;
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
+            wp_send_json_error( array( 'message' => __( 'Permission denied.', 'milliondollartheme' ) ), 403 );
+            return;
+        }
+
+        $source_text = isset( $_POST['source_text'] ) ? sanitize_textarea_field( wp_unslash( $_POST['source_text'] ) ) : ''; // Full content or summary
+        $num_headlines = isset( $_POST['num_headlines'] ) ? absint( $_POST['num_headlines'] ) : 5;
+
+        if ( empty( $source_text ) ) {
+            wp_send_json_error( array( 'message' => __( 'Source text for headlines is required.', 'milliondollartheme' ) ), 400 );
+            return;
+        }
+        if ($num_headlines <= 0 || $num_headlines > 10) { // Limit for editor context
+            $num_headlines = 5;
+        }
+
+        $prompt_text = sprintf(
+            esc_html__( "Generate %d compelling and distinct headline options for the following content. Each headline should be concise and engaging. Provide each headline on a new line, with no extra formatting: \n\n%s", 'milliondollartheme' ),
+            $num_headlines,
+            $source_text
+        );
+
+        $selected_model_info = milliondollartheme_get_selected_ai_model_and_service('headline_generation');
+
+        if ( empty( $selected_model_info ) || empty($selected_model_info['service']) || empty($selected_model_info['model']) ) {
+            wp_send_json_error( array( 'message' => __( 'AI service/model not configured for Headline Generation. Check AI Dashboard settings.', 'milliondollartheme' ) ), 500 );
+            return;
+        }
+
+        $service_to_use = $selected_model_info['service'];
+        $model_to_use = $selected_model_info['model'];
+
+        $api_key_available = false;
+        if ($service_to_use === 'openai' && get_option('milliondollartheme_openai_api_key')) {
+            $api_key_available = true;
+        } elseif ($service_to_use === 'gemini' && get_option('milliondollartheme_gemini_api_key')) {
+            $api_key_available = true;
+        }
+
+        if (!$api_key_available) {
+            wp_send_json_error( array( 'message' => sprintf(__( '%s API Key is not set. Please configure it in the AI Dashboard.', 'milliondollartheme' ), ucfirst($service_to_use)) ), 400 );
+            return;
+        }
+
+        $ai_args = array(
+            'model'       => $model_to_use,
+            'max_tokens'  => $num_headlines * 60, // Rough estimate
+            'temperature' => 0.8,
+            'task_type'   => 'headline_generation_editor'
+        );
+
+        $api_response = milliondollartheme_call_ai_service( $service_to_use, $prompt_text, $ai_args );
+
+        if ( is_wp_error( $api_response ) ) {
+            wp_send_json_error( array( 'message' => $api_response->get_error_message() ), 500 );
+        } else {
+            wp_send_json_success( $api_response );
+        }
+        wp_die();
+    }
+}
+
+// Content Outline for Editor
+add_action( 'wp_ajax_mdt_generate_content_outline_editor', 'milliondollartheme_ajax_generate_content_outline_editor' );
+if ( ! function_exists( 'milliondollartheme_ajax_generate_content_outline_editor' ) ) {
+    function milliondollartheme_ajax_generate_content_outline_editor() {
+        check_ajax_referer( 'mdt_ai_editor_sidebar_nonce', '_ajax_nonce' );
+
+        $post_id = isset($_POST['post_id']) ? absint($_POST['post_id']) : 0;
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
+            wp_send_json_error( array( 'message' => __( 'Permission denied.', 'milliondollartheme' ) ), 403 );
+            return;
+        }
+
+        $source_text = isset( $_POST['source_text'] ) ? sanitize_textarea_field( wp_unslash( $_POST['source_text'] ) ) : ''; // Topic for the outline
+        if ( empty( $source_text ) ) {
+            wp_send_json_error( array( 'message' => __( 'Topic for outline is required.', 'milliondollartheme' ) ), 400 );
+            return;
+        }
+
+        $prompt_text = sprintf(
+            esc_html__( "Generate a comprehensive content outline for the topic: \"%s\". The outline should include main sections (e.g., using H2 style), sub-points (e.g., H3 or H4 style), and key areas to cover. Format it clearly with each major point on a new line, and sub-points indented. Output only the outline itself.", 'milliondollartheme' ),
+            $source_text
+        );
+
+        $selected_model_info = milliondollartheme_get_selected_ai_model_and_service('content_outline');
+
+        if ( empty( $selected_model_info ) || empty($selected_model_info['service']) || empty($selected_model_info['model']) ) {
+            wp_send_json_error( array( 'message' => __( 'AI service/model not configured for Content Outline. Check AI Dashboard settings.', 'milliondollartheme' ) ), 500 );
+            return;
+        }
+
+        $service_to_use = $selected_model_info['service'];
+        $model_to_use = $selected_model_info['model'];
+
+        $api_key_available = false;
+        if ($service_to_use === 'openai' && get_option('milliondollartheme_openai_api_key')) {
+            $api_key_available = true;
+        } elseif ($service_to_use === 'gemini' && get_option('milliondollartheme_gemini_api_key')) {
+            $api_key_available = true;
+        }
+
+        if (!$api_key_available) {
+            wp_send_json_error( array( 'message' => sprintf(__( '%s API Key is not set. Please configure it in the AI Dashboard.', 'milliondollartheme' ), ucfirst($service_to_use)) ), 400 );
+            return;
+        }
+
+        $ai_args = array(
+            'model'       => $model_to_use,
+            'max_tokens'  => 750,
+            'temperature' => 0.6,
+            'task_type'   => 'content_outline_editor'
+        );
+
+        $api_response = milliondollartheme_call_ai_service( $service_to_use, $prompt_text, $ai_args );
+
+        if ( is_wp_error( $api_response ) ) {
+            wp_send_json_error( array( 'message' => $api_response->get_error_message() ), 500 );
+        } else {
+            wp_send_json_success( $api_response );
+        }
+        wp_die();
+    }
+}
+
+if ( ! function_exists( 'milliondollartheme_ajax_verify_gemini_key' ) ) {
+    function milliondollartheme_ajax_verify_gemini_key() {
+        check_ajax_referer( 'mdt_verify_key_nonce', 'nonce' );
+
+        $api_key = get_option( 'milliondollartheme_gemini_api_key' );
+        if ( empty( $api_key ) ) {
+            wp_send_json_error( array( 'message' => __( 'Gemini API Key is not set.', 'milliondollartheme' ) ) );
+            return;
+        }
+
+        // Gemini: List models or a simple generateContent call with a very small prompt
+        // Listing models is: GET https://generativelanguage.googleapis.com/v1beta/models?key=YOUR_API_KEY
+        $response = wp_remote_get( "https://generativelanguage.googleapis.com/v1beta/models?key={$api_key}", array(
+            'timeout' => 15,
+        ) );
+
+        if ( is_wp_error( $response ) ) {
+            wp_send_json_error( array( 'message' => __( 'Connection Error: ', 'milliondollartheme' ) . $response->get_error_message() ) );
+            return;
+        }
+
+        $response_code = wp_remote_retrieve_response_code( $response );
+        $body = wp_remote_retrieve_body( $response );
+        $data = json_decode( $body, true );
+
+        if ( $response_code === 200 && isset( $data['models'] ) ) {
+            wp_send_json_success( array( 'message' => __( 'Gemini API Key appears valid.', 'milliondollartheme' ) ) );
+        } elseif ( isset( $data['error']['message'] ) ) {
+            wp_send_json_error( array( 'message' => __( 'Gemini API Error: ', 'milliondollartheme' ) . $data['error']['message'] ) );
+        } else {
+            wp_send_json_error( array( 'message' => __( 'Invalid response from Gemini. Code: ', 'milliondollartheme' ) . $response_code ) );
+        }
+        wp_die();
+    }
+}
+// --- End AJAX Handlers ---
+
+if ( ! function_exists( 'milliondollartheme_get_selected_ai_model_and_service' ) ) {
+    /**
+     * Determines the AI service and model to use for a given task,
+     * considering user's default preferences, form input, and API key availability.
+     *
+     * @param string $task_key The key for the AI task (e.g., 'meta_description', 'content_outline').
+     * @param string $form_selected_service Optional. The service selected by the user in a form dropdown (e.g., 'openai', 'gemini').
+     * @return array An array with 'service' and 'model' keys, or an empty array if no valid service/model can be determined.
+     */
+    function milliondollartheme_get_selected_ai_model_and_service( $task_key, $form_selected_service = '' ) {
+        $default_setting_name = "mdt_ai_default_model_{$task_key}";
+        $preferred_model_setting = get_option( $default_setting_name, '' );
+
+        $current_openai_api_key = get_option( 'milliondollartheme_openai_api_key', '' );
+        $current_gemini_api_key = get_option( 'milliondollartheme_gemini_api_key', '' );
+        // Add other API keys here if services are expanded (e.g., Anthropic, OpenRouter)
+
+        $determined_service = '';
+        $determined_model = '';
+
+        // Fallback models if no preference is set or preferred is unavailable
+        $fallback_models = array(
+            'openai' => 'gpt-3.5-turbo', // A common, capable model
+            'gemini' => 'gemini-1.5-flash-latest', // Cost-effective and capable
+        );
+        // Specific fallback for meta description if OpenAI is chosen (as it was previously hardcoded)
+        if ($task_key === 'meta_description') {
+            $fallback_models['openai'] = 'gpt-3.5-turbo-instruct';
+        }
+
+
+        // 1. Check user's default preference for the specific task
+        if ( ! empty( $preferred_model_setting ) && strpos( $preferred_model_setting, ':' ) !== false ) {
+            list( $pref_service, $pref_model ) = explode( ':', $preferred_model_setting, 2 );
+            if ( ( $pref_service === 'openai' && ! empty( $current_openai_api_key ) ) ||
+                 ( $pref_service === 'gemini' && ! empty( $current_gemini_api_key ) ) ) {
+                // If form allows service selection AND it differs from preferred, prioritize form if valid.
+                if ( !empty($form_selected_service) && $form_selected_service !== $pref_service ) {
+                    if (($form_selected_service === 'openai' && !empty($current_openai_api_key)) ||
+                        ($form_selected_service === 'gemini' && !empty($current_gemini_api_key))) {
+                        $determined_service = $form_selected_service;
+                        $determined_model = $fallback_models[$form_selected_service]; // Use fallback for the form-selected service
+                    } else {
+                        // Form selected service's API key is missing, stick to preferred if its key is available
+                        $determined_service = $pref_service;
+                        $determined_model = $pref_model;
+                    }
+                } else {
+                     // No conflicting form selection, or form doesn't allow selection for this tool, use preferred.
+                    $determined_service = $pref_service;
+                    $determined_model = $pref_model;
+                }
+            }
+        }
+
+        // 2. If no valid preference, or preference's API key is missing, try form-selected service (if any)
+        if ( empty( $determined_service ) && ! empty( $form_selected_service ) ) {
+            if ( $form_selected_service === 'openai' && ! empty( $current_openai_api_key ) ) {
+                $determined_service = 'openai';
+                $determined_model = $fallback_models['openai'];
+            } elseif ( $form_selected_service === 'gemini' && ! empty( $current_gemini_api_key ) ) {
+                $determined_service = 'gemini';
+                $determined_model = $fallback_models['gemini'];
+            }
+        }
+
+        // 3. If still no service/model, attempt a general fallback based on available API keys
+        //    (Prioritize OpenAI then Gemini, can be made configurable later)
+        if ( empty( $determined_service ) ) {
+            if ( ! empty( $current_openai_api_key ) ) {
+                $determined_service = 'openai';
+                $determined_model = $fallback_models['openai'];
+            } elseif ( ! empty( $current_gemini_api_key ) ) {
+                $determined_service = 'gemini';
+                $determined_model = $fallback_models['gemini'];
+            }
+        }
+
+        // Special case for meta_description: if it ends up being OpenAI, ensure it's instruct model if no specific chat model was set
+        if ($task_key === 'meta_description' && $determined_service === 'openai' && strpos($determined_model, 'gpt-3.5-turbo-instruct') === false && strpos($determined_model, 'gpt-4') === false) {
+            // If the determined model for OpenAI isn't already instruct or a chat model, force instruct.
+            // This handles if the general fallback 'gpt-3.5-turbo' was selected.
+             if ($determined_model === 'gpt-3.5-turbo' && $fallback_models['openai'] === 'gpt-3.5-turbo-instruct') {
+                $determined_model = 'gpt-3.5-turbo-instruct';
+             }
+        }
+
+
+        if ( ! empty( $determined_service ) && ! empty( $determined_model ) ) {
+            return array( 'service' => $determined_service, 'model' => $determined_model );
+        }
+
+        return array(); // Return empty if no suitable service/model found
+    }
+}
+
 /**
  * Filters the excerpt length to the number of words set in the Customizer.
  *
@@ -2081,3 +2490,117 @@ function milliondollartheme_custom_excerpt_length( $length ) {
     return absint( $custom_length );
 }
 add_filter( 'excerpt_length', 'milliondollartheme_custom_excerpt_length', 999 );
+
+// --- Editor Integration: AI Tools Sidebar ---
+if ( ! function_exists( 'milliondollartheme_ai_tools_editor_sidebar_init' ) ) {
+    /**
+     * Initialize the AI Tools sidebar in the block editor.
+     */
+    function milliondollartheme_ai_tools_editor_sidebar_init() {
+        // Enqueue the script that will render the sidebar and handle its functionality.
+        // This script will be WordPress script-module compliant if using modern WP features.
+        // For simplicity, we'll use a traditional script enqueue here first.
+        wp_register_script(
+            'milliondollartheme-ai-editor-sidebar-script',
+            get_template_directory_uri() . '/js/admin-ai-editor-sidebar.js',
+            array( 'wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-core-data', 'wp-i18n' ), // Added more dependencies for React components
+            MILLIONDOLLARTHEME_VERSION,
+            true
+        );
+
+        // Pass data to the script
+        global $post;
+        $post_id = isset($post) ? $post->ID : 0;
+        $post_type = isset($post) ? get_post_type($post_id) : '';
+
+        wp_localize_script(
+            'milliondollartheme-ai-editor-sidebar-script',
+            'mdt_ai_editor_sidebar_vars',
+            array(
+                'nonce' => wp_create_nonce( 'mdt_ai_editor_sidebar_nonce' ),
+                'ajaxurl' => admin_url( 'admin-ajax.php' ),
+                'post_id' => $post_id,
+                'post_type' => $post_type,
+                'current_user_can_edit' => current_user_can('edit_post', $post_id),
+                'i18n' => array( // For JS-side translations if needed
+                    'sidebarTitle' => __( 'Chesta AI Tools', 'milliondollartheme' ),
+                    'metaDescription' => __( 'Meta Description', 'milliondollartheme' ),
+                    'contentOutline' => __( 'Content Outline', 'milliondollartheme' ),
+                    'headlineSuggestions' => __( 'Headline Suggestions', 'milliondollartheme' ),
+                    // Add more as needed
+                ),
+            )
+        );
+    }
+}
+add_action( 'enqueue_block_editor_assets', 'milliondollartheme_ai_tools_editor_sidebar_init' );
+
+// Note: The actual sidebar registration using registerPlugin will be in the JS file.
+// The PHP part mainly focuses on enqueuing the necessary assets.
+// We also need AJAX handlers for the tools.
+
+// --- AJAX Handlers for Editor AI Tools ---
+
+// Meta Description for Editor
+add_action( 'wp_ajax_mdt_generate_meta_description_editor', 'milliondollartheme_ajax_generate_meta_description_editor' );
+if ( ! function_exists( 'milliondollartheme_ajax_generate_meta_description_editor' ) ) {
+    function milliondollartheme_ajax_generate_meta_description_editor() {
+        check_ajax_referer( 'mdt_ai_editor_sidebar_nonce', '_ajax_nonce' );
+
+        $post_id = isset($_POST['post_id']) ? absint($_POST['post_id']) : 0;
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
+            wp_send_json_error( array( 'message' => __( 'Permission denied.', 'milliondollartheme' ) ), 403 );
+            return;
+        }
+
+        $source_text = isset( $_POST['source_text'] ) ? sanitize_textarea_field( wp_unslash( $_POST['source_text'] ) ) : '';
+        if ( empty( $source_text ) ) {
+            wp_send_json_error( array( 'message' => __( 'Source text is required.', 'milliondollartheme' ) ), 400 );
+            return;
+        }
+
+        $prompt_text = sprintf(
+            esc_html__( 'Generate a concise and SEO-friendly meta description, around 150-160 characters, for the following text. Output only the meta description itself, nothing else: \n\n%s', 'milliondollartheme' ),
+            $source_text
+        );
+
+        $selected_model_info = milliondollartheme_get_selected_ai_model_and_service('meta_description');
+
+        if ( empty( $selected_model_info ) || empty($selected_model_info['service']) || empty($selected_model_info['model']) ) {
+            wp_send_json_error( array( 'message' => __( 'AI service/model not configured. Check AI Dashboard settings.', 'milliondollartheme' ) ), 500 );
+            return;
+        }
+
+        $service_to_use = $selected_model_info['service'];
+        $model_to_use = $selected_model_info['model'];
+
+        $api_key_available = false;
+        if ($service_to_use === 'openai' && get_option('milliondollartheme_openai_api_key')) {
+            $api_key_available = true;
+        } elseif ($service_to_use === 'gemini' && get_option('milliondollartheme_gemini_api_key')) {
+            $api_key_available = true;
+        }
+
+        if (!$api_key_available) {
+            wp_send_json_error( array( 'message' => sprintf(__( '%s API Key is not set. Please configure it in the AI Dashboard.', 'milliondollartheme' ), ucfirst($service_to_use)) ), 400 );
+            return;
+        }
+
+        $ai_args = array(
+            'model'       => $model_to_use,
+            'max_tokens'  => 70,
+            'temperature' => 0.5,
+            'task_type'   => 'meta_description_editor' // Specific task type for logging
+        );
+
+        $api_response = milliondollartheme_call_ai_service( $service_to_use, $prompt_text, $ai_args );
+
+        if ( is_wp_error( $api_response ) ) {
+            wp_send_json_error( array( 'message' => $api_response->get_error_message() ), 500 );
+        } else {
+            wp_send_json_success( $api_response );
+        }
+        wp_die();
+    }
+}
+?>
