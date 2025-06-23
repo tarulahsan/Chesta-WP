@@ -2616,6 +2616,75 @@ if ( ! function_exists( 'milliondollartheme_ajax_generate_headline_suggestions_e
     }
 }
 
+// Headline Suggestions for Editor
+add_action( 'wp_ajax_mdt_generate_headline_suggestions_editor', 'milliondollartheme_ajax_generate_headline_suggestions_editor' );
+if ( ! function_exists( 'milliondollartheme_ajax_generate_headline_suggestions_editor' ) ) {
+    function milliondollartheme_ajax_generate_headline_suggestions_editor() {
+        check_ajax_referer( 'mdt_ai_editor_sidebar_nonce', '_ajax_nonce' );
+
+        $post_id = isset($_POST['post_id']) ? absint($_POST['post_id']) : 0;
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
+            wp_send_json_error( array( 'message' => __( 'Permission denied.', 'milliondollartheme' ) ), 403 );
+            return;
+        }
+
+        $source_text = isset( $_POST['source_text'] ) ? sanitize_textarea_field( wp_unslash( $_POST['source_text'] ) ) : ''; // Full content or summary
+        $num_headlines = isset( $_POST['num_headlines'] ) ? absint( $_POST['num_headlines'] ) : 5;
+
+        if ( empty( $source_text ) ) {
+            wp_send_json_error( array( 'message' => __( 'Source text for headlines is required.', 'milliondollartheme' ) ), 400 );
+            return;
+        }
+        if ($num_headlines <= 0 || $num_headlines > 10) { // Limit for editor context
+            $num_headlines = 5;
+        }
+
+        $prompt_text = sprintf(
+            esc_html__( "Generate %d compelling and distinct headline options for the following content. Each headline should be concise and engaging. Provide each headline on a new line, with no extra formatting: \n\n%s", 'milliondollartheme' ),
+            $num_headlines,
+            $source_text
+        );
+
+        $selected_model_info = milliondollartheme_get_selected_ai_model_and_service('headline_generation');
+
+        if ( empty( $selected_model_info ) || empty($selected_model_info['service']) || empty($selected_model_info['model']) ) {
+            wp_send_json_error( array( 'message' => __( 'AI service/model not configured for Headline Generation. Check AI Dashboard settings.', 'milliondollartheme' ) ), 500 );
+            return;
+        }
+
+        $service_to_use = $selected_model_info['service'];
+        $model_to_use = $selected_model_info['model'];
+
+        $api_key_available = false;
+        if ($service_to_use === 'openai' && get_option('milliondollartheme_openai_api_key')) {
+            $api_key_available = true;
+        } elseif ($service_to_use === 'gemini' && get_option('milliondollartheme_gemini_api_key')) {
+            $api_key_available = true;
+        }
+
+        if (!$api_key_available) {
+            wp_send_json_error( array( 'message' => sprintf(__( '%s API Key is not set. Please configure it in the AI Dashboard.', 'milliondollartheme' ), ucfirst($service_to_use)) ), 400 );
+            return;
+        }
+
+        $ai_args = array(
+            'model'       => $model_to_use,
+            'max_tokens'  => $num_headlines * 60, // Rough estimate
+            'temperature' => 0.8,
+            'task_type'   => 'headline_generation_editor'
+        );
+
+        $api_response = milliondollartheme_call_ai_service( $service_to_use, $prompt_text, $ai_args );
+
+        if ( is_wp_error( $api_response ) ) {
+            wp_send_json_error( array( 'message' => $api_response->get_error_message() ), 500 );
+        } else {
+            wp_send_json_success( $api_response );
+        }
+        wp_die();
+    }
+}
+
 // SEO Analysis for Editor Sidebar
 add_action( 'wp_ajax_mdt_analyze_post_seo_editor', 'milliondollartheme_ajax_analyze_post_seo_editor' );
 if ( ! function_exists( 'milliondollartheme_ajax_analyze_post_seo_editor' ) ) {
