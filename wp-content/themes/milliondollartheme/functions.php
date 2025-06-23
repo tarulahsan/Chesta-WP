@@ -2214,17 +2214,93 @@ if ( ! function_exists( 'milliondollartheme_handle_seo_analysis_submission' ) ) 
 // --- End SEO Dashboard Functionality ---
 
 
+// --- Register SEO Post Meta Fields ---
+if ( ! function_exists( 'milliondollartheme_register_seo_meta_fields' ) ) {
+    function milliondollartheme_register_seo_meta_fields() {
+        $post_types = array( 'post', 'page' ); // Apply to posts and pages
+
+        foreach ( $post_types as $post_type ) {
+            register_post_meta( $post_type, '_chesta_seo_override_global', array(
+                'type' => 'boolean',
+                'single' => true,
+                'show_in_rest' => true,
+                'default' => false,
+                'sanitize_callback' => 'rest_sanitize_boolean',
+                'auth_callback' => function() {
+                    return current_user_can('edit_posts');
+                }
+            ) );
+
+            register_post_meta( $post_type, '_chesta_seo_title', array(
+                'type' => 'string',
+                'single' => true,
+                'show_in_rest' => true,
+                'default' => '',
+                'sanitize_callback' => 'sanitize_text_field',
+                 'auth_callback' => function() {
+                    return current_user_can('edit_posts');
+                }
+            ) );
+
+            register_post_meta( $post_type, '_chesta_seo_description', array(
+                'type' => 'string',
+                'single' => true,
+                'show_in_rest' => true,
+                'default' => '',
+                'sanitize_callback' => 'sanitize_textarea_field', // Or wp_kses_post for more complex but potentially risky
+                 'auth_callback' => function() {
+                    return current_user_can('edit_posts');
+                }
+            ) );
+
+            register_post_meta( $post_type, '_chesta_seo_keywords', array(
+                'type' => 'string',
+                'single' => true,
+                'show_in_rest' => true,
+                'default' => '',
+                'sanitize_callback' => 'sanitize_text_field', // Keywords are typically comma-separated strings
+                 'auth_callback' => function() {
+                    return current_user_can('edit_posts');
+                }
+            ) );
+        }
+    }
+}
+add_action( 'init', 'milliondollartheme_register_seo_meta_fields' );
+
+
 // --- Theme SEO Meta Tag Output ---
 if ( ! function_exists( 'milliondollartheme_seo_meta_tags' ) ) {
     function milliondollartheme_seo_meta_tags() {
-        // Homepage Meta Description
-        if ( ( is_front_page() || is_home() ) ) { // is_home() for blog page if set as front
+        if ( is_singular() ) {
+            $post_id = get_queried_object_id();
+            $override_global = get_post_meta( $post_id, '_chesta_seo_override_global', true );
+
+            if ( $override_global ) {
+                $seo_description = get_post_meta( $post_id, '_chesta_seo_description', true );
+                if ( ! empty( $seo_description ) ) {
+                    echo '<meta name="description" content="' . esc_attr( $seo_description ) . '">' . "\n";
+                }
+
+                $seo_keywords = get_post_meta( $post_id, '_chesta_seo_keywords', true );
+                if ( ! empty( $seo_keywords ) ) {
+                    echo '<meta name="keywords" content="' . esc_attr( $seo_keywords ) . '">' . "\n";
+                }
+                return; // Individual settings applied, stop here for singular.
+            }
+            // If override is false, theme doesn't output desc/keywords for singular, letting plugins handle it or none exist.
+        }
+        // Homepage Meta Description (Global Setting)
+        // This will apply if it's the front page and not a singular page that has override enabled.
+        // If a static page is set as homepage, is_singular() would be true and handled above if overridden.
+        // If blog page is homepage, is_home() is true.
+        elseif ( ( is_front_page() || is_home() ) ) {
             $home_description = get_option( 'milliondollartheme_seo_home_description', '' );
             if ( ! empty( $home_description ) ) {
                 echo '<meta name="description" content="' . esc_attr( $home_description ) . '">' . "\n";
             }
+            // No global keywords setting for homepage in this theme's SEO panel, so not outputting.
         }
-        // Note: Per-post/page meta description would be handled here too if implemented.
     }
 }
 add_action( 'wp_head', 'milliondollartheme_seo_meta_tags', 1 ); // Priority 1 to load early
@@ -2235,49 +2311,49 @@ if ( ! function_exists( 'milliondollartheme_custom_document_title' ) ) {
         if ( ( is_front_page() || is_home() ) ) {
             $home_title = get_option( 'milliondollartheme_seo_home_title', '' );
             if ( ! empty( $home_title ) ) {
-                // For plain text titles, this is fine. If it could contain HTML entities, more care is needed.
-                // WordPress's title tag support usually handles escaping.
                 return esc_html( $home_title );
             }
         }
-
-        // Default Title Suffix for singular posts/pages
-        if ( is_singular() ) { // Checks if it's a post, page, or attachment
-            $suffix = get_option( 'milliondollartheme_seo_title_suffix', '' );
-            if ( ! empty( $suffix ) ) {
-                // $title is an array with 'title', 'site', 'tagline'
-                // We need to append to the main title part.
-                // Default title structure is often "Page Title - Site Name"
-                // We want "Page Title | Suffix - Site Name" or "Page Title | Suffix"
-                // For simplicity, let's assume $title is the fully constructed title string before this filter.
-                // A more robust way would be to use pre_get_document_title which gives parts.
-                // However, since we are using 'document_title_parts' filter later for suffix,
-                // this part for singular might be redundant or could focus only on homepage.
-                // Let's refine this to use 'document_title_parts' for suffix.
-            }
-        }
-        return $title; // Return original title if no changes for homepage
+        return $title;
     }
 }
-// add_filter( 'pre_get_document_title', 'milliondollartheme_custom_document_title', 15 ); // Runs after default title is constructed by WP
 
 if ( ! function_exists( 'milliondollartheme_custom_title_parts' ) ) {
     function milliondollartheme_custom_title_parts( $title_parts ) {
-        // Homepage title override
+        $post_id = get_queried_object_id();
+
+        // Check for singular page override first, even if it's the homepage
+        if ( is_singular( $post_id ) ) {
+            $override_global = get_post_meta( $post_id, '_chesta_seo_override_global', true );
+            $individual_seo_title = get_post_meta( $post_id, '_chesta_seo_title', true );
+
+            if ( $override_global && ! empty( $individual_seo_title ) ) {
+                $title_parts['title'] = esc_html( $individual_seo_title );
+                // When individual title is used, we might want to remove site name for a fully custom title.
+                // For now, this replaces only the 'title' part. Suffix logic below will be skipped.
+                return $title_parts; // Return early as individual title takes full precedence
+            }
+            // If no override or no individual title, fall through to homepage check or suffix logic
+        }
+
+        // Homepage title override (if not handled by singular override above)
         if ( is_front_page() || is_home() ) {
+            // This check ensures that if a singular page (set as front_page) has an override, it's already handled.
+            // This part now primarily handles the case where front_page is blog listing (is_home=true, is_singular=false)
+            // or a static page without a singular override.
             $home_title_setting = get_option( 'milliondollartheme_seo_home_title', '' );
             if ( ! empty( $home_title_setting ) ) {
                 $title_parts['title'] = esc_html( $home_title_setting );
-                // Optional: remove tagline and site name if custom home title is very specific
-                // unset($title_parts['tagline']);
-                // unset($title_parts['site']);
+                return $title_parts; // Return early if global homepage title is custom set
             }
         }
-        // Suffix for singular pages
-        elseif ( is_singular() ) {
+
+        // Apply global suffix for singular pages if no individual title override took place
+        if ( is_singular( $post_id ) ) {
+            // Re-check is_singular because the individual title override might have returned early.
+            // This block will only be reached if not overridden by individual SEO title.
             $suffix = get_option( 'milliondollartheme_seo_title_suffix', '' );
             if ( ! empty( $suffix ) && !empty($title_parts['title']) ) {
-                 // Append suffix to the page/post title part
                 $title_parts['title'] = $title_parts['title'] . ' | ' . esc_html( $suffix );
             }
         }

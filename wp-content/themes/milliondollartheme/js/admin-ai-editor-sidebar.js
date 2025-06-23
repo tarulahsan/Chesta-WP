@@ -1,6 +1,9 @@
 const { registerPlugin } = wp.plugins;
 const { PluginSidebar, PluginSidebarMoreMenuItem } = wp.editPost;
 const { PanelBody, TabPanel, TextareaControl, Button, Spinner, ExternalLink } = wp.components;
+const { registerPlugin } = wp.plugins;
+const { PluginSidebar, PluginSidebarMoreMenuItem } = wp.editPost;
+const { PanelBody, TabPanel, TextareaControl, Button, Spinner, ExternalLink, TextControl, ToggleControl } = wp.components; // Added TextControl, ToggleControl
 const { Fragment, useState, useEffect } = wp.element;
 const { __ } = wp.i18n;
 const { useSelect, useDispatch } = wp.data;
@@ -16,22 +19,39 @@ const AIToolsPluginSidebar = () => {
     const [generatedContent, setGeneratedContent] = useState(''); // For AI tools
     const [seoAnalysisResult, setSeoAnalysisResult] = useState(null); // For SEO results
     const [isLoading, setIsLoading] = useState(false);
+    const [toolBeingProcessed, setToolBeingProcessed] = useState(''); // To specify which tool is loading
     const [error, setError] = useState('');
 
-    // Get post content for some tools
-    const { editorBlocks, editedPostContent, currentPostId, currentPostType, postTitle } = useSelect((select) => {
+    // Get post content and SEO meta for some tools
+    const {
+        editorBlocks,
+        editedPostContent,
+        currentPostId,
+        currentPostType,
+        postTitle,
+        overrideGlobalSeo,
+        seoTitle,
+        seoDescription,
+        seoKeywords
+    } = useSelect((select) => {
         const { getBlocks } = select('core/block-editor');
         const { getEditedPostAttribute, getEditedPostContent, getCurrentPostId, getCurrentPostType } = select('core/editor');
+        const meta = getEditedPostAttribute('meta') || {};
         return {
             editorBlocks: getBlocks(),
             editedPostContent: getEditedPostAttribute('content'),
             currentPostId: getCurrentPostId(),
             currentPostType: getCurrentPostType(),
             postTitle: getEditedPostAttribute('title'),
+            overrideGlobalSeo: meta['_chesta_seo_override_global'] || false,
+            seoTitle: meta['_chesta_seo_title'] || '',
+            seoDescription: meta['_chesta_seo_description'] || '',
+            seoKeywords: meta['_chesta_seo_keywords'] || '',
         };
     }, []);
 
     const { createNotice } = useDispatch('core/notices');
+    const { editPost } = useDispatch('core/editor');
 
     // Function to get text from blocks, excluding certain types if needed
     const getTextFromBlocks = (blocks) => {
@@ -60,6 +80,7 @@ const AIToolsPluginSidebar = () => {
 
     const handleGenerate = (tool) => {
         setIsLoading(true);
+        setToolBeingProcessed(tool); // Set which tool is currently processing
         setError('');
 
         let ajaxAction = '';
@@ -227,8 +248,41 @@ const AIToolsPluginSidebar = () => {
                                             help={__('Enter the primary keyword or phrase for this content.', 'milliondollartheme')}
                                         />
                                         <Button isPrimary onClick={() => handleGenerate('seoAnalysis')} disabled={isLoading || !focusKeyword.trim()}>
-                                            {isLoading && activeTab === 'seoAnalysis' ? <Spinner /> : __('Analyze SEO', 'milliondollartheme')}
+                                            {isLoading && activeTab === 'seoAnalysis' && toolBeingProcessed === 'seoAnalysis' ? <Spinner /> : __('Analyze Current Content', 'milliondollartheme')}
                                         </Button>
+
+                                        <hr style={{ margin: '20px 0'}} />
+
+                                        <ToggleControl
+                                            label={__('Override Global SEO Settings', 'milliondollartheme')}
+                                            checked={overrideGlobalSeo}
+                                            onChange={(isChecked) => editPost({ meta: { ...{/* Ensure other meta fields are not lost if editPost replaces the whole meta object - though it should merge by default */} , _chesta_seo_override_global: isChecked } })}
+                                            help={overrideGlobalSeo ? __('Using custom SEO settings for this post.', 'milliondollartheme') : __('Using global/default SEO settings.', 'milliondollartheme')}
+                                        />
+
+                                        {overrideGlobalSeo && (
+                                            <Fragment>
+                                                <TextControl
+                                                    label={__('SEO Title', 'milliondollartheme')}
+                                                    value={seoTitle}
+                                                    onChange={(value) => editPost({ meta: { _chesta_seo_title: value } })}
+                                                    help={__('If empty, the post title will be used. Aim for 50-60 characters.', 'milliondollartheme')}
+                                                />
+                                                <TextareaControl
+                                                    label={__('Meta Description', 'milliondollartheme')}
+                                                    value={seoDescription}
+                                                    onChange={(value) => editPost({ meta: { _chesta_seo_description: value } })}
+                                                    help={__('Aim for 150-160 characters. Entice users to click.', 'milliondollartheme')}
+                                                    rows="4"
+                                                />
+                                                <TextControl
+                                                    label={__('Meta Keywords', 'milliondollartheme')}
+                                                    value={seoKeywords}
+                                                    onChange={(value) => editPost({ meta: { _chesta_seo_keywords: value } })}
+                                                    help={__('Comma-separated keywords. Less important for modern SEO but can be used.', 'milliondollartheme')}
+                                                />
+                                            </Fragment>
+                                        )}
                                     </PanelBody>
                                 );
                             default:
