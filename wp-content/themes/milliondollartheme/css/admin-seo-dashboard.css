@@ -222,13 +222,36 @@
     color: #006400; /* Dark green */
     font-weight: 600;
 }
+.mdt-seo-results-area td.status-good::before {
+    content: "\2714"; /* Checkmark */
+    margin-right: 8px;
+    color: #28a745;
+}
+
 .mdt-seo-results-area td.status-warning {
     color: #FF8C00; /* Dark orange */
 }
+.mdt-seo-results-area td.status-warning::before {
+    content: "\26A0"; /* Warning Sign */
+    margin-right: 8px;
+    color: #ffc107; /* Using a slightly lighter shade for the icon itself if needed */
+}
+
 .mdt-seo-results-area td.status-bad {
     color: #DC143C; /* Crimson red */
     font-weight: 600;
 }
+.mdt-seo-results-area td.status-bad::before {
+    content: "\2716"; /* Cross Mark */
+    margin-right: 8px;
+    color: #dc3545;
+}
+
 .mdt-seo-results-area td.status-neutral {
     color: #50575e; /* Default text color */
+}
+.mdt-seo-results-area td.status-neutral::before {
+    content: "\2139"; /* Information Source icon */
+    margin-right: 8px;
+    color: #6c757d;
 }

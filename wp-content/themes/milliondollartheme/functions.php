@@ -1917,31 +1917,114 @@ if ( ! function_exists( 'milliondollartheme_analyze_seo_content' ) ) {
         $description_nodes = $xpath->query( "//meta[@name='description']/@content" );
         $results['meta_description'] = $description_nodes->length > 0 ? trim( $description_nodes->item(0)->value ) : __( 'Not found', 'milliondollartheme' );
         $results['meta_description_length'] = mb_strlen( $results['meta_description'] );
+        $focus_keyword_lower = !empty($focus_keyword) ? strtolower(trim($focus_keyword)) : '';
 
-        // 3. Headings (H1-H6)
-        $results['headings'] = array( 'h1' => 0, 'h2' => 0, 'h3' => 0, 'h4' => 0, 'h5' => 0, 'h6' => 0 );
-        $results['heading_texts'] = array( 'h1' => array(), 'h2' => array() ); // Store H1 and H2 texts
-        for ( $i = 1; $i <= 6; $i++ ) {
-            $heading_nodes = $xpath->query( "//h{$i}" );
-            $results['headings']["h{$i}"] = $heading_nodes->length;
-            if ($i <=2 && $heading_nodes->length > 0) {
-                foreach($heading_nodes as $node) {
-                    $results['heading_texts']["h{$i}"][] = trim($node->textContent);
-                }
+        // Keyword in Meta Title
+        $results['keyword_in_meta_title'] = 'not_applicable';
+        if ($results['meta_title'] !== __( 'Not found', 'milliondollartheme' ) && !empty($focus_keyword_lower)) {
+            $results['keyword_in_meta_title'] = strpos(strtolower($results['meta_title']), $focus_keyword_lower) !== false;
+            if ($results['keyword_in_meta_title']) {
+                 // Check if keyword is at the beginning (within first few words)
+                $title_words = explode(' ', strtolower(trim($results['meta_title'])), 5);
+                $results['keyword_at_start_of_meta_title'] = in_array($focus_keyword_lower, $title_words) || strpos($title_words[0], $focus_keyword_lower) === 0;
             }
         }
 
-        // 4. Keyword Density (Basic)
-        $results['keyword_density'] = __( 'N/A', 'milliondollartheme' );
-        if ( ! empty( $focus_keyword ) ) {
-            $body_node = $xpath->query('//body')->item(0);
-            $text_content = $body_node ? strtolower(trim($body_node->textContent)) : '';
-            $focus_keyword_lower = strtolower(trim($focus_keyword));
+        // Keyword in Meta Description
+        $results['keyword_in_meta_description'] = 'not_applicable';
+        if ($results['meta_description'] !== __( 'Not found', 'milliondollartheme' ) && !empty($focus_keyword_lower)) {
+            $results['keyword_in_meta_description'] = strpos(strtolower($results['meta_description']), $focus_keyword_lower) !== false;
+        }
 
-            if(!empty($text_content) && !empty($focus_keyword_lower)) {
-                $word_count = str_word_count( $text_content );
-                $keyword_occurrences = substr_count( $text_content, $focus_keyword_lower );
-                $results['keyword_density'] = ($word_count > 0) ? sprintf( "%.2f%% (%d occurrences / %d words)", ( $keyword_occurrences / $word_count ) * 100, $keyword_occurrences, $word_count ) : __( 'Not enough content to calculate.', 'milliondollartheme' );
+        // 3. Headings (H1-H6)
+        $results['headings_summary'] = array( 'h1' => 0, 'h2' => 0, 'h3' => 0, 'h4' => 0, 'h5' => 0, 'h6' => 0 );
+        $results['h1_contents'] = array();
+        $results['h2_contents'] = array();
+        $results['keyword_in_h1'] = 'not_applicable';
+        $results['keyword_in_h2'] = 'not_applicable'; // True if in any H2
+        $h1_keyword_found = false;
+        $h2_keyword_found = false;
+
+        for ( $i = 1; $i <= 6; $i++ ) {
+            $heading_nodes = $xpath->query( "//h{$i}" );
+            $results['headings_summary']["h{$i}"] = $heading_nodes->length;
+            if ($heading_nodes->length > 0) {
+                foreach($heading_nodes as $node) {
+                    $textContent = trim($node->textContent);
+                    if ($i === 1) {
+                        $results['h1_contents'][] = $textContent;
+                        if (!$h1_keyword_found && !empty($focus_keyword_lower) && strpos(strtolower($textContent), $focus_keyword_lower) !== false) {
+                            $h1_keyword_found = true;
+                        }
+                    } elseif ($i === 2) {
+                        $results['h2_contents'][] = $textContent;
+                         if (!$h2_keyword_found && !empty($focus_keyword_lower) && strpos(strtolower($textContent), $focus_keyword_lower) !== false) {
+                            $h2_keyword_found = true;
+                        }
+                    }
+                }
+            }
+        }
+        if (!empty($focus_keyword_lower)) {
+            $results['keyword_in_h1'] = $h1_keyword_found;
+            $results['keyword_in_h2'] = $h2_keyword_found;
+        }
+
+        // Basic Heading Hierarchy Check (simplified: checks if Hx exists while H(x-1) does not)
+        $results['heading_hierarchy_issues'] = array();
+        if ($results['headings_summary']['h3'] > 0 && $results['headings_summary']['h2'] == 0 && $results['headings_summary']['h1'] > 0) $results['heading_hierarchy_issues'][] = "H3 tags found without preceding H2 tags (under an H1).";
+        if ($results['headings_summary']['h4'] > 0 && $results['headings_summary']['h3'] == 0 && $results['headings_summary']['h2'] > 0) $results['heading_hierarchy_issues'][] = "H4 tags found without preceding H3 tags (under an H2).";
+        // This is a very basic check and might need refinement for complex DOMs.
+
+        // 4. Content Analysis
+        $body_node = $xpath->query('//body')->item(0);
+        $text_content_full = $body_node ? $body_node->textContent : ''; // Raw text, includes scripts/styles in body
+
+        // Attempt to get cleaner text content (stripping script/style tags)
+        $clean_text_content = $text_content_full;
+        if ($body_node) {
+            $temp_dom = new DOMDocument();
+            $body_clone = $body_node->cloneNode(true);
+            // Remove script and style nodes from the clone
+            $scripts = $body_clone->getElementsByTagName('script');
+            while ($scripts->length > 0) { $scripts->item(0)->parentNode->removeChild($scripts->item(0)); }
+            $styles = $body_clone->getElementsByTagName('style');
+            while ($styles->length > 0) { $styles->item(0)->parentNode->removeChild($styles->item(0)); }
+            $clean_text_content = trim($body_clone->textContent);
+        }
+
+        $results['word_count'] = str_word_count( $clean_text_content );
+
+        // Keyword Density
+        $results['keyword_density'] = __( 'N/A', 'milliondollartheme' );
+        if ( ! empty( $focus_keyword_lower ) && !empty($clean_text_content) ) {
+            $keyword_occurrences = substr_count( strtolower($clean_text_content), $focus_keyword_lower );
+            $results['keyword_density'] = ($results['word_count'] > 0) ? sprintf( "%.2f%% (%d occurrences / %d words)", ( $keyword_occurrences / $results['word_count'] ) * 100, $keyword_occurrences, $results['word_count'] ) : __( 'Not enough content to calculate.', 'milliondollartheme' );
+            $results['keyword_occurrences'] = $keyword_occurrences;
+        }
+
+        // Readability (Flesch Reading Ease - simplified)
+        // Formula: 206.835 - 1.015 * (total words / total sentences) - 84.6 * (total syllables / total words)
+        $results['flesch_reading_ease'] = __( 'N/A', 'milliondollartheme' );
+        if ($results['word_count'] > 100) { // Only calculate for substantial text
+            $sentences = preg_split('/[.!?]+/', $clean_text_content, -1, PREG_SPLIT_NO_EMPTY);
+            $total_sentences = count($sentences);
+            $total_syllables = 0;
+            // Basic syllable counter (very approximate)
+            $words = explode(' ', $clean_text_content);
+            foreach ($words as $word) {
+                $word = strtolower(trim($word));
+                if (empty($word)) continue;
+                // Count vowels, crude but simple.
+                $syllables = preg_match_all('/[aeiouy]+/', $word);
+                $total_syllables += max(1, $syllables); // Each word has at least 1 syllable
+            }
+
+            if ($total_sentences > 0 && $results['word_count'] > 0 && $total_syllables > 0) {
+                $asl = $results['word_count'] / $total_sentences; // Average Sentence Length
+                $asw = $total_syllables / $results['word_count'];   // Average Syllables per Word
+                $flesch_score = 206.835 - (1.015 * $asl) - (84.6 * $asw);
+                $results['flesch_reading_ease'] = round($flesch_score, 2);
             }
         }
 
@@ -1949,9 +2032,42 @@ if ( ! function_exists( 'milliondollartheme_analyze_seo_content' ) ) {
         $image_nodes = $xpath->query( '//img' );
         $results['total_images'] = $image_nodes->length;
         $results['images_missing_alt'] = 0;
+        $results['images_with_keyword_in_alt'] = 0;
         foreach ( $image_nodes as $img ) {
-            if ( ! $img->hasAttribute( 'alt' ) || trim( $img->getAttribute( 'alt' ) ) === '' ) {
+            $alt_text = $img->hasAttribute('alt') ? trim($img->getAttribute('alt')) : '';
+            if ( empty($alt_text) ) {
                 $results['images_missing_alt']++;
+            } elseif (!empty($focus_keyword_lower) && strpos(strtolower($alt_text), $focus_keyword_lower) !== false) {
+                $results['images_with_keyword_in_alt']++;
+            }
+        }
+
+        // 6. Links
+        $link_nodes = $xpath->query('//a[@href]');
+        $results['total_links'] = $link_nodes->length;
+        $results['internal_links'] = 0;
+        $results['external_links'] = 0;
+        $results['nofollow_external_links'] = 0;
+
+        $site_url_host = parse_url(home_url(), PHP_URL_HOST);
+
+        foreach($link_nodes as $link) {
+            $href = $link->getAttribute('href');
+            if (empty($href) || $href === '#' || strpos($href, 'tel:') === 0 || strpos($href, 'mailto:') === 0) {
+                continue; // Skip empty, anchor, tel, or mailto links
+            }
+            $href_host = parse_url($href, PHP_URL_HOST);
+            if ($href_host && strtolower($href_host) === strtolower($site_url_host)) {
+                $results['internal_links']++;
+            } else if ($href_host) { // External link if host is different and present
+                $results['external_links']++;
+                if (strpos(strtolower($link->getAttribute('rel')), 'nofollow') !== false) {
+                    $results['nofollow_external_links']++;
+                }
+            }
+            // Links without a host (e.g. /some-page) are considered internal
+            else if (!$href_host && (strpos($href, '/') === 0 || strpos($href, './') === 0 || strpos($href, '../') === 0 || (strpos($href, ':') === false && strpos($href, '//') === false)) ) {
+                 $results['internal_links']++;
             }
         }
         return $results;
@@ -1984,40 +2100,110 @@ if ( ! function_exists( 'milliondollartheme_handle_seo_analysis_submission' ) ) 
         echo '<thead><tr><th>' . esc_html__( 'Check', 'milliondollartheme' ) . '</th><th>' . esc_html__( 'Result', 'milliondollartheme' ) . '</th><th>' . esc_html__( 'Recommendation', 'milliondollartheme' ) . '</th></tr></thead>';
         echo '<tbody>';
 
+        $target_display_url = !empty($url_to_analyze) ? $url_to_analyze : ($post_id_to_analyze ? get_permalink($post_id_to_analyze) : 'N/A');
+        echo '<tr><td colspan="3"><strong>' . esc_html__('Analyzing URL: ', 'milliondollartheme') . esc_url($target_display_url) . '</strong></td></tr>';
+        if (!empty($focus_keyword)) {
+            echo '<tr><td colspan="3"><strong>' . esc_html__('Focus Keyword: ', 'milliondollartheme') . esc_html($focus_keyword) . '</strong></td></tr>';
+        }
+
+
         // Meta Title
-        $title_status = ($analysis_results['meta_title_length'] >= 30 && $analysis_results['meta_title_length'] <= 60) ? 'good' : (($analysis_results['meta_title_length'] > 0) ? 'warning': 'bad');
-        echo '<tr><td>Meta Title</td><td>' . esc_html($analysis_results['meta_title']) . ' (Length: ' . esc_html($analysis_results['meta_title_length']) . ')</td><td class="status-' . $title_status . '">';
-        echo ($title_status === 'good') ? 'Good length (30-60 chars).' : 'Aim for 30-60 characters.';
+        $title_length_status = ($analysis_results['meta_title_length'] >= 30 && $analysis_results['meta_title_length'] <= 60) ? 'good' : (($analysis_results['meta_title_length'] > 0) ? 'warning': 'bad');
+        echo '<tr><td>Meta Title Length</td><td>' . esc_html($analysis_results['meta_title_length']) . ' characters</td><td class="status-' . $title_length_status . '">';
+        echo ($title_length_status === 'good') ? 'Good length.' : 'Aim for 30-60 characters.';
         echo '</td></tr>';
+        echo '<tr><td>Meta Title Content</td><td colspan="2">' . esc_html($analysis_results['meta_title']) . '</td></tr>';
+        if ($analysis_results['keyword_in_meta_title'] !== 'not_applicable') {
+            $kw_title_status = $analysis_results['keyword_in_meta_title'] ? 'good' : 'bad';
+            echo '<tr><td>Keyword in Title</td><td>' . ($analysis_results['keyword_in_meta_title'] ? 'Found' : 'Not found') . '</td><td class="status-' . $kw_title_status . '">';
+            echo $analysis_results['keyword_in_meta_title'] ? 'Keyword present.' : 'Consider adding the focus keyword.';
+            if ($analysis_results['keyword_in_meta_title'] && isset($analysis_results['keyword_at_start_of_meta_title'])) {
+                 echo ($analysis_results['keyword_at_start_of_meta_title'] ? ' Good: Keyword near the start.' : ' Consider moving keyword closer to the start.');
+            }
+            echo '</td></tr>';
+        }
 
         // Meta Description
-        $desc_status = ($analysis_results['meta_description_length'] >= 70 && $analysis_results['meta_description_length'] <= 160) ? 'good' : (($analysis_results['meta_description_length'] > 0) ? 'warning': 'bad');
-        echo '<tr><td>Meta Description</td><td>' . esc_html($analysis_results['meta_description']) . ' (Length: ' . esc_html($analysis_results['meta_description_length']) . ')</td><td class="status-' . $desc_status . '">';
-        echo ($desc_status === 'good') ? 'Good length (70-160 chars).' : 'Aim for 70-160 characters.';
+        $desc_length_status = ($analysis_results['meta_description_length'] >= 70 && $analysis_results['meta_description_length'] <= 160) ? 'good' : (($analysis_results['meta_description_length'] > 0) ? 'warning': 'bad');
+        echo '<tr><td>Meta Description Length</td><td>' . esc_html($analysis_results['meta_description_length']) . ' characters</td><td class="status-' . $desc_length_status . '">';
+        echo ($desc_length_status === 'good') ? 'Good length.' : 'Aim for 70-160 characters.';
         echo '</td></tr>';
+        echo '<tr><td>Meta Description Content</td><td colspan="2">' . esc_html($analysis_results['meta_description']) . '</td></tr>';
+         if ($analysis_results['keyword_in_meta_description'] !== 'not_applicable') {
+            $kw_desc_status = $analysis_results['keyword_in_meta_description'] ? 'good' : 'bad';
+            echo '<tr><td>Keyword in Meta Description</td><td>' . ($analysis_results['keyword_in_meta_description'] ? 'Found' : 'Not found') . '</td><td class="status-' . $kw_desc_status . '">';
+            echo $analysis_results['keyword_in_meta_description'] ? 'Keyword present.' : 'Consider adding the focus keyword.';
+            echo '</td></tr>';
+        }
 
         // Headings
-        echo '<tr><td>H1 Tags</td><td>' . esc_html($analysis_results['headings']['h1']) . '</td><td class="status-' . ($analysis_results['headings']['h1'] === 1 ? 'good' : 'bad') . '">';
-        echo ($analysis_results['headings']['h1'] === 1) ? 'Exactly one H1 tag found.' : 'Aim for exactly one H1 tag.';
-        if($analysis_results['headings']['h1'] > 0) echo '<br><em>Content: ' . esc_html(implode(', ', $analysis_results['heading_texts']['h1'])) . '</em>';
+        $h1_count_status = ($analysis_results['headings_summary']['h1'] === 1) ? 'good' : 'bad';
+        echo '<tr><td>H1 Tags</td><td>Found: ' . esc_html($analysis_results['headings_summary']['h1']) . '</td><td class="status-' . $h1_count_status . '">';
+        echo ($h1_count_status === 'good') ? 'Exactly one H1 tag. Excellent.' : 'Aim for exactly one H1 tag.';
+        if(!empty($analysis_results['h1_contents'])) { echo '<br><small><em>' . esc_html(implode(' / ', $analysis_results['h1_contents'])) . '</em></small>';}
         echo '</td></tr>';
 
-        echo '<tr><td>H2 Tags</td><td>' . esc_html($analysis_results['headings']['h2']) . '</td><td>';
-        echo ($analysis_results['headings']['h2'] > 0) ? 'Found H2 tags. Good for structure.' : 'Consider using H2 tags for main sections.';
-        if($analysis_results['headings']['h2'] > 0) echo '<br><em>First H2: ' . esc_html($analysis_results['heading_texts']['h2'][0] ?? '') . '</em>';
+        if ($analysis_results['keyword_in_h1'] !== 'not_applicable') {
+             $kw_h1_status = $analysis_results['keyword_in_h1'] ? 'good' : 'warning';
+             echo '<tr><td>Keyword in H1</td><td>' . ($analysis_results['keyword_in_h1'] ? 'Found' : 'Not found') . '</td><td class="status-'.$kw_h1_status.'">';
+             echo $analysis_results['keyword_in_h1'] ? 'Keyword present in H1.' : 'Consider adding focus keyword to your H1 tag.';
+             echo '</td></tr>';
+        }
+        echo '<tr><td>H2 Tags</td><td>Found: ' . esc_html($analysis_results['headings_summary']['h2']) . '</td><td class="status-' . ($analysis_results['headings_summary']['h2'] > 0 ? 'good' : 'warning') . '">';
+        echo ($analysis_results['headings_summary']['h2'] > 0) ? 'H2 tags found. Good for structure.' : 'Consider using H2 tags for main sections.';
+        if ($analysis_results['keyword_in_h2'] !== 'not_applicable') {
+             echo ($analysis_results['keyword_in_h2'] ? ' Keyword found in at least one H2.' : ' Consider adding keyword to some H2s.');
+        }
         echo '</td></tr>';
-        // Could add more for H3-H6 and hierarchy checks later
 
-        // Keyword Density
-        echo '<tr><td>Keyword Density for "'.esc_html($focus_keyword).'"</td><td>' . esc_html($analysis_results['keyword_density']) . '</td><td>';
-        echo (strpos($analysis_results['keyword_density'], 'N/A') === false) ? 'Aim for a natural distribution (e.g., 1-2%).' : 'Enter a focus keyword to check density.';
+        if (!empty($analysis_results['heading_hierarchy_issues'])) {
+            echo '<tr><td>Heading Hierarchy</td><td colspan="2" class="status-warning">' . esc_html(implode(' ', $analysis_results['heading_hierarchy_issues'])) . ' Check for proper nesting.</td></tr>';
+        }
+
+        // Content Analysis
+        echo '<tr><td>Word Count</td><td>' . esc_html($analysis_results['word_count']) . ' words</td><td>';
+        echo ($analysis_results['word_count'] >= 300) ? 'Sufficient content.' : 'Consider adding more content (aim for 300+ words for better SEO).';
+        echo '</td></tr>';
+
+        echo '<tr><td>Keyword Density</td><td>' . esc_html($analysis_results['keyword_density']) . '</td><td>';
+        echo (strpos($analysis_results['keyword_density'], 'N/A') === false) ? 'Aim for a natural distribution (e.g., 0.5-2%). Over-optimization can be penalized.' : 'Enter a focus keyword to check density.';
+        echo '</td></tr>';
+
+        $read_status = 'neutral';
+        if ($analysis_results['flesch_reading_ease'] !== __( 'N/A', 'milliondollartheme' )) {
+            if ($analysis_results['flesch_reading_ease'] >= 60) $read_status = 'good';
+            elseif ($analysis_results['flesch_reading_ease'] >= 30) $read_status = 'warning';
+            else $read_status = 'bad';
+        }
+        echo '<tr><td>Readability (Flesch Score)</td><td>' . esc_html($analysis_results['flesch_reading_ease']) . '</td><td class="status-'.$read_status.'">';
+        echo ($analysis_results['flesch_reading_ease'] === __( 'N/A', 'milliondollartheme' )) ? 'Needs more content (100+ words) for calculation.' : 'Score 60-70 is good for general audience. Higher is easier to read.';
         echo '</td></tr>';
 
         // Image Alt Texts
-        $alt_status = ($analysis_results['total_images'] > 0 && $analysis_results['images_missing_alt'] == 0) ? 'good' : (($analysis_results['total_images'] > 0) ? 'warning' : 'neutral');
+        $alt_status = ($analysis_results['total_images'] > 0 && $analysis_results['images_missing_alt'] == 0) ? 'good' : (($analysis_results['total_images'] > 0 && $analysis_results['images_missing_alt'] > 0) ? 'warning' : 'neutral');
         echo '<tr><td>Image Alt Attributes</td><td>' . esc_html($analysis_results['images_missing_alt']) . ' of ' . esc_html($analysis_results['total_images']) . ' images missing alt text.</td><td class="status-'.$alt_status.'">';
-        echo ($analysis_results['images_missing_alt'] == 0 && $analysis_results['total_images'] > 0) ? 'All images have alt text.' : 'Ensure all images have descriptive alt text.';
+        echo ($analysis_results['total_images'] == 0) ? 'No images found on page.' : (($analysis_results['images_missing_alt'] == 0) ? 'All images have alt text. Good.' : 'Ensure all images have descriptive alt text.');
+        if ($analysis_results['total_images'] > 0 && $analysis_results['keyword_occurrences'] > 0 && !empty($focus_keyword)) {
+            echo '<br>' . esc_html($analysis_results['images_with_keyword_in_alt']) . ' image(s) have alt text containing the focus keyword.';
+        }
         echo '</td></tr>';
+
+        // Links
+        echo '<tr><td>Internal Links</td><td>' . esc_html($analysis_results['internal_links']) . '</td><td>Ensure you have a good internal linking structure.</td></tr>';
+        echo '<tr><td>External Links</td><td>' . esc_html($analysis_results['external_links']) . ' ('.esc_html($analysis_results['nofollow_external_links']).' nofollowed)</td><td>Review external links. Ensure trusted sources or use "nofollow" for untrusted/paid links.</td></tr>';
+
+        // URL Analysis (basic, if URL was provided)
+        if (!empty($url_to_analyze)) {
+            $url_path = parse_url($url_to_analyze, PHP_URL_PATH);
+            $url_length = strlen($url_path);
+            $url_length_status = ($url_length <= 75) ? 'good' : 'warning';
+            echo '<tr><td>URL Length (Path)</td><td>' . esc_html($url_length) . ' characters</td><td class="status-'.$url_length_status.'">Shorter, descriptive URLs are generally better.</td></tr>';
+            if (!empty($focus_keyword)) {
+                $kw_in_url_status = (strpos(strtolower($url_path), $focus_keyword_lower) !== false) ? 'good' : 'warning';
+                 echo '<tr><td>Keyword in URL</td><td>' . ((strpos(strtolower($url_path), $focus_keyword_lower) !== false) ? 'Found' : 'Not found') . '</td><td class="status-'.$kw_in_url_status.'">Consider including your keyword in the URL if relevant and natural.</td></tr>';
+            }
+        }
+
 
         echo '</tbody></table>';
     }
@@ -2026,6 +2212,80 @@ if ( ! function_exists( 'milliondollartheme_handle_seo_analysis_submission' ) ) 
 
 
 // --- End SEO Dashboard Functionality ---
+
+
+// --- Theme SEO Meta Tag Output ---
+if ( ! function_exists( 'milliondollartheme_seo_meta_tags' ) ) {
+    function milliondollartheme_seo_meta_tags() {
+        // Homepage Meta Description
+        if ( ( is_front_page() || is_home() ) ) { // is_home() for blog page if set as front
+            $home_description = get_option( 'milliondollartheme_seo_home_description', '' );
+            if ( ! empty( $home_description ) ) {
+                echo '<meta name="description" content="' . esc_attr( $home_description ) . '">' . "\n";
+            }
+        }
+        // Note: Per-post/page meta description would be handled here too if implemented.
+    }
+}
+add_action( 'wp_head', 'milliondollartheme_seo_meta_tags', 1 ); // Priority 1 to load early
+
+if ( ! function_exists( 'milliondollartheme_custom_document_title' ) ) {
+    function milliondollartheme_custom_document_title( $title ) {
+        // Homepage Title
+        if ( ( is_front_page() || is_home() ) ) {
+            $home_title = get_option( 'milliondollartheme_seo_home_title', '' );
+            if ( ! empty( $home_title ) ) {
+                // For plain text titles, this is fine. If it could contain HTML entities, more care is needed.
+                // WordPress's title tag support usually handles escaping.
+                return esc_html( $home_title );
+            }
+        }
+
+        // Default Title Suffix for singular posts/pages
+        if ( is_singular() ) { // Checks if it's a post, page, or attachment
+            $suffix = get_option( 'milliondollartheme_seo_title_suffix', '' );
+            if ( ! empty( $suffix ) ) {
+                // $title is an array with 'title', 'site', 'tagline'
+                // We need to append to the main title part.
+                // Default title structure is often "Page Title - Site Name"
+                // We want "Page Title | Suffix - Site Name" or "Page Title | Suffix"
+                // For simplicity, let's assume $title is the fully constructed title string before this filter.
+                // A more robust way would be to use pre_get_document_title which gives parts.
+                // However, since we are using 'document_title_parts' filter later for suffix,
+                // this part for singular might be redundant or could focus only on homepage.
+                // Let's refine this to use 'document_title_parts' for suffix.
+            }
+        }
+        return $title; // Return original title if no changes for homepage
+    }
+}
+// add_filter( 'pre_get_document_title', 'milliondollartheme_custom_document_title', 15 ); // Runs after default title is constructed by WP
+
+if ( ! function_exists( 'milliondollartheme_custom_title_parts' ) ) {
+    function milliondollartheme_custom_title_parts( $title_parts ) {
+        // Homepage title override
+        if ( is_front_page() || is_home() ) {
+            $home_title_setting = get_option( 'milliondollartheme_seo_home_title', '' );
+            if ( ! empty( $home_title_setting ) ) {
+                $title_parts['title'] = esc_html( $home_title_setting );
+                // Optional: remove tagline and site name if custom home title is very specific
+                // unset($title_parts['tagline']);
+                // unset($title_parts['site']);
+            }
+        }
+        // Suffix for singular pages
+        elseif ( is_singular() ) {
+            $suffix = get_option( 'milliondollartheme_seo_title_suffix', '' );
+            if ( ! empty( $suffix ) && !empty($title_parts['title']) ) {
+                 // Append suffix to the page/post title part
+                $title_parts['title'] = $title_parts['title'] . ' | ' . esc_html( $suffix );
+            }
+        }
+        return $title_parts;
+    }
+}
+add_filter( 'document_title_parts', 'milliondollartheme_custom_title_parts', 10 );
+
 
 // --- Site Details Dashboard Functionality ---
 
@@ -2206,6 +2466,134 @@ if ( ! function_exists( 'milliondollartheme_ajax_verify_openai_key' ) ) {
             wp_send_json_error( array( 'message' => __( 'OpenAI API Error: ', 'milliondollartheme' ) . $data['error']['message'] ) );
         } else {
             wp_send_json_error( array( 'message' => __( 'Invalid response from OpenAI. Code: ', 'milliondollartheme' ) . $response_code ) );
+        }
+        wp_die();
+    }
+}
+
+// Headline Suggestions for Editor
+add_action( 'wp_ajax_mdt_generate_headline_suggestions_editor', 'milliondollartheme_ajax_generate_headline_suggestions_editor' );
+if ( ! function_exists( 'milliondollartheme_ajax_generate_headline_suggestions_editor' ) ) {
+    function milliondollartheme_ajax_generate_headline_suggestions_editor() {
+        check_ajax_referer( 'mdt_ai_editor_sidebar_nonce', '_ajax_nonce' );
+
+        $post_id = isset($_POST['post_id']) ? absint($_POST['post_id']) : 0;
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
+            wp_send_json_error( array( 'message' => __( 'Permission denied.', 'milliondollartheme' ) ), 403 );
+            return;
+        }
+
+        $source_text = isset( $_POST['source_text'] ) ? sanitize_textarea_field( wp_unslash( $_POST['source_text'] ) ) : ''; // Full content or summary
+        $num_headlines = isset( $_POST['num_headlines'] ) ? absint( $_POST['num_headlines'] ) : 5;
+
+        if ( empty( $source_text ) ) {
+            wp_send_json_error( array( 'message' => __( 'Source text for headlines is required.', 'milliondollartheme' ) ), 400 );
+            return;
+        }
+        if ($num_headlines <= 0 || $num_headlines > 10) { // Limit for editor context
+            $num_headlines = 5;
+        }
+
+        $prompt_text = sprintf(
+            esc_html__( "Generate %d compelling and distinct headline options for the following content. Each headline should be concise and engaging. Provide each headline on a new line, with no extra formatting: \n\n%s", 'milliondollartheme' ),
+            $num_headlines,
+            $source_text
+        );
+
+        $selected_model_info = milliondollartheme_get_selected_ai_model_and_service('headline_generation');
+
+        if ( empty( $selected_model_info ) || empty($selected_model_info['service']) || empty($selected_model_info['model']) ) {
+            wp_send_json_error( array( 'message' => __( 'AI service/model not configured for Headline Generation. Check AI Dashboard settings.', 'milliondollartheme' ) ), 500 );
+            return;
+        }
+
+        $service_to_use = $selected_model_info['service'];
+        $model_to_use = $selected_model_info['model'];
+
+        $api_key_available = false;
+        if ($service_to_use === 'openai' && get_option('milliondollartheme_openai_api_key')) {
+            $api_key_available = true;
+        } elseif ($service_to_use === 'gemini' && get_option('milliondollartheme_gemini_api_key')) {
+            $api_key_available = true;
+        }
+
+        if (!$api_key_available) {
+            wp_send_json_error( array( 'message' => sprintf(__( '%s API Key is not set. Please configure it in the AI Dashboard.', 'milliondollartheme' ), ucfirst($service_to_use)) ), 400 );
+            return;
+        }
+
+        $ai_args = array(
+            'model'       => $model_to_use,
+            'max_tokens'  => $num_headlines * 60, // Rough estimate
+            'temperature' => 0.8,
+            'task_type'   => 'headline_generation_editor'
+        );
+
+        $api_response = milliondollartheme_call_ai_service( $service_to_use, $prompt_text, $ai_args );
+
+        if ( is_wp_error( $api_response ) ) {
+            wp_send_json_error( array( 'message' => $api_response->get_error_message() ), 500 );
+        } else {
+            wp_send_json_success( $api_response );
+        }
+        wp_die();
+    }
+}
+
+// SEO Analysis for Editor Sidebar
+add_action( 'wp_ajax_mdt_analyze_post_seo_editor', 'milliondollartheme_ajax_analyze_post_seo_editor' );
+if ( ! function_exists( 'milliondollartheme_ajax_analyze_post_seo_editor' ) ) {
+    function milliondollartheme_ajax_analyze_post_seo_editor() {
+        check_ajax_referer( 'mdt_ai_editor_sidebar_nonce', '_ajax_nonce' );
+
+        $post_id = isset($_POST['post_id']) ? absint($_POST['post_id']) : 0;
+        if ( ! current_user_can( 'edit_post', $post_id ) ) {
+            wp_send_json_error( array( 'message' => __( 'Permission denied.', 'milliondollartheme' ) ), 403 );
+            return;
+        }
+
+        $focus_keyword = isset( $_POST['focus_keyword'] ) ? sanitize_text_field( wp_unslash( $_POST['focus_keyword'] ) ) : '';
+        $editor_content_html = isset( $_POST['editor_content'] ) ? wp_kses_post( wp_unslash( $_POST['editor_content'] ) ) : ''; // Content is HTML
+        $post_title = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '';
+
+        if ( empty( $editor_content_html ) && empty( $post_title ) ) {
+            wp_send_json_error( array( 'message' => __( 'Content or title is required for analysis.', 'milliondollartheme' ) ), 400 );
+            return;
+        }
+
+        // Construct a minimal HTML structure for analysis if only title/content is passed
+        // This helps milliondollartheme_analyze_seo_content which expects a full HTML document via DOMDocument
+        // However, milliondollartheme_analyze_seo_content primarily uses DOMDocument to extract title, meta, body.
+        // For editor content, we might need to adjust how it's analyzed or pass more structured data.
+        // For now, we'll create a mock HTML.
+        // A better approach might be to adapt milliondollartheme_analyze_seo_content to also accept raw strings for body, title, etc.
+
+        $mock_html = '<!DOCTYPE html><html><head><title>' . esc_html($post_title) . '</title></head><body>' . $editor_content_html . '</body></html>';
+
+        $analysis_results = milliondollartheme_analyze_seo_content( $mock_html, $focus_keyword );
+
+        // Add title to results if not already there from DOM parsing (e.g. if only content was passed)
+        if (empty($analysis_results['meta_title']) || $analysis_results['meta_title'] === __('Not found', 'milliondollartheme')) {
+            $analysis_results['meta_title'] = $post_title;
+            $analysis_results['meta_title_length'] = mb_strlen($post_title);
+        }
+
+        // Add URL analysis for the current post
+        $current_post_url = get_permalink($post_id);
+        if ($current_post_url && !is_wp_error($current_post_url)) {
+            $url_path = parse_url($current_post_url, PHP_URL_PATH);
+            $analysis_results['url_path'] = $url_path;
+            $analysis_results['url_length'] = mb_strlen($url_path);
+            if (!empty($focus_keyword)) {
+                 $analysis_results['keyword_in_url'] = (strpos(strtolower($url_path), strtolower($focus_keyword)) !== false);
+            }
+        }
+
+
+        if ( isset($analysis_results['error']) ) {
+            wp_send_json_error( array( 'message' => $analysis_results['error'] ), 500 );
+        } else {
+            wp_send_json_success( $analysis_results );
         }
         wp_die();
     }

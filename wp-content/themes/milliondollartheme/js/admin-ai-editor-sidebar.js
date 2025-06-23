@@ -11,20 +11,23 @@ const PLUGIN_ICON = 'dashicons-brain'; // Using a Dashicon
 
 const AIToolsPluginSidebar = () => {
     const [activeTab, setActiveTab] = useState('metaDescription');
-    const [sourceText, setSourceText] = useState(''); // For meta description, etc.
-    const [generatedContent, setGeneratedContent] = useState('');
+    const [sourceText, setSourceText] = useState(''); // Shared for AI tools, or specific parts of content
+    const [focusKeyword, setFocusKeyword] = useState('');
+    const [generatedContent, setGeneratedContent] = useState(''); // For AI tools
+    const [seoAnalysisResult, setSeoAnalysisResult] = useState(null); // For SEO results
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
 
     // Get post content for some tools
-    const { editorBlocks, editedPostContent, currentPostId, currentPostType } = useSelect((select) => {
+    const { editorBlocks, editedPostContent, currentPostId, currentPostType, postTitle } = useSelect((select) => {
         const { getBlocks } = select('core/block-editor');
-        const { getEditedPostAttribute } = select('core/editor');
+        const { getEditedPostAttribute, getEditedPostContent, getCurrentPostId, getCurrentPostType } = select('core/editor');
         return {
             editorBlocks: getBlocks(),
             editedPostContent: getEditedPostAttribute('content'),
-            currentPostId: select('core/editor').getCurrentPostId(),
-            currentPostType: select('core/editor').getCurrentPostType(),
+            currentPostId: getCurrentPostId(),
+            currentPostType: getCurrentPostType(),
+            postTitle: getEditedPostAttribute('title'),
         };
     }, []);
 
@@ -57,7 +60,6 @@ const AIToolsPluginSidebar = () => {
 
     const handleGenerate = (tool) => {
         setIsLoading(true);
-        setGeneratedContent('');
         setError('');
 
         let ajaxAction = '';
@@ -65,31 +67,42 @@ const AIToolsPluginSidebar = () => {
             _ajax_nonce: mdt_ai_editor_sidebar_vars.nonce,
             post_id: currentPostId,
             post_type: currentPostType,
-            // source_text will be added based on tool
+            // other data will be added based on tool
         };
 
-        switch (tool) {
-            case 'metaDescription':
-                ajaxAction = 'mdt_generate_meta_description_editor';
-                requestData.source_text = sourceText; // Use the potentially pre-filled sourceText
-                break;
-            case 'contentOutline':
-                ajaxAction = 'mdt_generate_content_outline_editor';
-                // For outline, source_text is usually a topic/title.
-                // Let's use the post title as a default for now, or let user input in a dedicated field.
-                // For simplicity, we'll assume a TextareaControl for topic input for outline
-                requestData.source_text = sourceText; // Assuming sourceText is used for topic
-                break;
-            case 'headlineSuggestions':
-                 ajaxAction = 'mdt_generate_headline_suggestions_editor';
-                 requestData.source_text = sourceText; // Use post content as basis
-                 requestData.num_headlines = 5; // Configurable later
-                break;
-            // Add more cases for other tools
-            default:
-                setError(__('Invalid tool selected.', 'milliondollartheme'));
-                setIsLoading(false);
-                return;
+        if (tool === 'seoAnalysis') {
+            setSeoAnalysisResult(null);
+            ajaxAction = 'mdt_analyze_post_seo_editor';
+            requestData.focus_keyword = focusKeyword;
+            // Pass current editor content for analysis
+            // Using getEditedPostContent() might be heavy if content is huge.
+            // For now, let's stick to the block serialization approach if it's more controlled.
+            // Or, pass the raw content string.
+            requestData.editor_content = editedPostContent; // Pass the full content string
+            requestData.title = postTitle; // Pass the current title
+            // The PHP handler will need to parse this content.
+        } else {
+            // AI Content Tools
+            setGeneratedContent('');
+            switch (tool) {
+                case 'metaDescription':
+                    ajaxAction = 'mdt_generate_meta_description_editor';
+                    requestData.source_text = sourceText;
+                    break;
+                case 'contentOutline':
+                    ajaxAction = 'mdt_generate_content_outline_editor';
+                    requestData.source_text = sourceText;
+                    break;
+                case 'headlineSuggestions':
+                    ajaxAction = 'mdt_generate_headline_suggestions_editor';
+                    requestData.source_text = sourceText;
+                    requestData.num_headlines = 5;
+                    break;
+                default:
+                    setError(__('Invalid AI tool selected.', 'milliondollartheme'));
+                    setIsLoading(false);
+                    return;
+            }
         }
 
         requestData.action = ajaxAction;
@@ -97,13 +110,19 @@ const AIToolsPluginSidebar = () => {
         wp.ajax.post(requestData)
             .done((response) => {
                 if (response.success && response.data) {
-                    setGeneratedContent(response.data);
+                    if (tool === 'seoAnalysis') {
+                        setSeoAnalysisResult(response.data); // Expecting an object/array of analysis points
+                    } else {
+                        setGeneratedContent(response.data); // Expecting a string for AI tools
+                    }
                 } else {
                     setError(response.data?.message || __('An error occurred.', 'milliondollartheme'));
+                     if (tool === 'seoAnalysis') setSeoAnalysisResult(null); // Clear previous results on error
                 }
             })
             .fail((jqXHR) => {
-                setError(__('AJAX request failed: ', 'milliondollartheme') + jqXHR.statusText);
+                setError(__('AJAX request failed: ', 'milliondollartheme') + jqXHR.statusText + ' (' + jqXHR.responseText + ')');
+                if (tool === 'seoAnalysis') setSeoAnalysisResult(null);
             })
             .always(() => {
                 setIsLoading(false);
@@ -148,7 +167,7 @@ const AIToolsPluginSidebar = () => {
                         { name: 'metaDescription', title: __('Meta Desc', 'milliondollartheme'), className: 'tab-meta-description' },
                         { name: 'contentOutline', title: __('Outline', 'milliondollartheme'), className: 'tab-content-outline' },
                         { name: 'headlineSuggestions', title: __('Headlines', 'milliondollartheme'), className: 'tab-headline-suggestions' },
-                        // Add more tabs as tools are developed
+                        { name: 'seoAnalysis', title: __('SEO Analysis', 'milliondollartheme'), className: 'tab-seo-analysis' },
                     ]}
                 >
                     {(tab) => {
@@ -164,7 +183,7 @@ const AIToolsPluginSidebar = () => {
                                             rows="5"
                                         />
                                         <Button isPrimary onClick={() => handleGenerate('metaDescription')} disabled={isLoading || !sourceText.trim()}>
-                                            {isLoading ? <Spinner /> : __('Generate Meta Description', 'milliondollartheme')}
+                                            {isLoading && activeTab === 'metaDescription' ? <Spinner /> : __('Generate Meta Description', 'milliondollartheme')}
                                         </Button>
                                     </PanelBody>
                                 );
@@ -172,14 +191,14 @@ const AIToolsPluginSidebar = () => {
                                 return (
                                     <PanelBody title={mdt_ai_editor_sidebar_vars.i18n.contentOutline || __('Content Outline Generator', 'milliondollartheme')}>
                                         <TextareaControl
-                                            label={__('Topic/Subject for Outline:', 'milliondollartheme')}
-                                            value={sourceText} // Re-using sourceText state for simplicity, could be a different state
+                                            label={__('Topic/Subject for Outline (defaults to post title, edit if needed):', 'milliondollartheme')}
+                                            value={sourceText}
                                             onChange={setSourceText}
                                             help={__('Enter the main topic for which you want to generate an outline.', 'milliondollartheme')}
                                             rows="3"
                                         />
                                         <Button isPrimary onClick={() => handleGenerate('contentOutline')} disabled={isLoading || !sourceText.trim()}>
-                                            {isLoading ? <Spinner /> : __('Generate Outline', 'milliondollartheme')}
+                                            {isLoading && activeTab === 'contentOutline' ? <Spinner /> : __('Generate Outline', 'milliondollartheme')}
                                         </Button>
                                     </PanelBody>
                                 );
@@ -194,7 +213,21 @@ const AIToolsPluginSidebar = () => {
                                             rows="5"
                                         />
                                         <Button isPrimary onClick={() => handleGenerate('headlineSuggestions')} disabled={isLoading || !sourceText.trim()}>
-                                            {isLoading ? <Spinner /> : __('Generate Headlines', 'milliondollartheme')}
+                                            {isLoading && activeTab === 'headlineSuggestions' ? <Spinner /> : __('Generate Headlines', 'milliondollartheme')}
+                                        </Button>
+                                    </PanelBody>
+                                );
+                            case 'seoAnalysis':
+                                return (
+                                    <PanelBody title={__('On-Page SEO Analysis', 'milliondollartheme')}>
+                                        <TextareaControl
+                                            label={__('Focus Keyword:', 'milliondollartheme')}
+                                            value={focusKeyword}
+                                            onChange={setFocusKeyword}
+                                            help={__('Enter the primary keyword or phrase for this content.', 'milliondollartheme')}
+                                        />
+                                        <Button isPrimary onClick={() => handleGenerate('seoAnalysis')} disabled={isLoading || !focusKeyword.trim()}>
+                                            {isLoading && activeTab === 'seoAnalysis' ? <Spinner /> : __('Analyze SEO', 'milliondollartheme')}
                                         </Button>
                                     </PanelBody>
                                 );
@@ -204,9 +237,10 @@ const AIToolsPluginSidebar = () => {
                     }}
                 </TabPanel>
 
-                {error && <p style={{ color: 'red' }}>{error}</p>}
+                {error && <p style={{ color: 'red', margin: '10px', padding: '10px', backgroundColor: '#ffe0e0', border: '1px solid red' }}>{error}</p>}
 
-                {generatedContent && (
+                {/* Display area for AI generated content */}
+                {generatedContent && ['metaDescription', 'contentOutline', 'headlineSuggestions'].includes(activeTab) && (
                     <PanelBody title={__('Generated Content', 'milliondollartheme')}>
                         <TextareaControl
                             value={generatedContent}
@@ -219,9 +253,36 @@ const AIToolsPluginSidebar = () => {
                         {/* Add "Insert into Editor" buttons later if applicable */}
                     </PanelBody>
                 )}
+
+                {/* Display area for SEO Analysis results */}
+                {seoAnalysisResult && activeTab === 'seoAnalysis' && (
+                    <PanelBody title={__('SEO Analysis Results', 'milliondollartheme')}>
+                        <div className="mdt-seo-analysis-results-display">
+                            {Object.entries(seoAnalysisResult).map(([key, value]) => {
+                                if (key === 'error') { // Skip top-level error if already handled
+                                    return null;
+                                }
+                                // Simple display, can be enhanced with specific formatting per check
+                                let displayValue = typeof value === 'boolean' ? (value ? 'Yes' : 'No') : value;
+                                if (typeof value === 'object' && value !== null) {
+                                    displayValue = JSON.stringify(value); // Basic object display
+                                }
+                                 // More structured display would involve mapping keys to labels and recommendations
+                                return (
+                                    <div key={key} style={{ marginBottom: '8px', paddingBottom: '8px', borderBottom: '1px solid #eee' }}>
+                                        <strong style={{ textTransform: 'capitalize' }}>{key.replace(/_/g, ' ')}:</strong>
+                                        <p style={{ margin: '0', whiteSpace: 'pre-wrap' }}>{String(displayValue)}</p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                         <p><em>{__('This is a basic analysis. For detailed recommendations, please use the main SEO Dashboard.', 'milliondollartheme')}</em></p>
+                    </PanelBody>
+                )}
+
                  <PanelBody title={__("How to Use", "milliondollartheme")}>
                     <p>
-                        {__("Select a tool from the tabs above. The content from your editor may be used as a base for some tools. Click the generate button, and the AI-generated content will appear below. You can then copy it.", "milliondollartheme")}
+                        {__("Select a tool from the tabs above. The content from your editor may be used as a base for some tools. Click the generate button, and the AI-generated content or SEO analysis will appear below. You can then copy it.", "milliondollartheme")}
                     </p>
                     <p>
                         <ExternalLink href={mdt_ai_editor_sidebar_vars.ajaxurl.replace('admin-ajax.php', 'admin.php?page=milliondollartheme-ai-dashboard#settings')}>
